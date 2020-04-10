@@ -20,8 +20,12 @@ export default class Util {
             if(oRespostaHTTP.ok) {            
                 return oRespostaHTTP.json();            
             } else {
-                Alert.alert("Erro HTTP status: " + oRespostaHTTP.status + 
-                ". URL: " + oRespostaHTTP.url);
+                if(oRespostaHTTP.status && oRespostaHTTP.url) {
+                    Alert.alert("Erro HTTP status: " + oRespostaHTTP.status + 
+                    ". URL: " + oRespostaHTTP.url);
+                } else if (oRespostaHTTP instanceof Error) {
+                    Alert.alert(oRespostaHTTP.message);
+                }
             }
         }
         return null;

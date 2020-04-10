@@ -9,6 +9,9 @@ import TelaClienteDadosPessoais from '../screens/TelaClienteDadosPessoais';
 import TelaClienteEndereco from '../screens/TelaClienteEndereco';
 import TelaClienteConfirmacao from '../screens/TelaClienteConfirmacao';
 import TelaProdutoEscolha from '../screens/TelaProdutoEscolha';
+import TelaContratoAceite from '../screens/TelaContratoAceite';
+import TelaBoletoEmissao from '../screens/TelaBoletoEmissao';
+
 
 const Stack = createStackNavigator();
 
@@ -22,6 +25,8 @@ function App() {
         <Stack.Screen name="Endereço" component={TelaClienteEndereco} />
         <Stack.Screen name="Confirmação dos dados" component={TelaClienteConfirmacao} />
         <Stack.Screen name="Produtos" component={TelaProdutoEscolha} />
+        <Stack.Screen name="Contrato" component={TelaContratoAceite} />
+        <Stack.Screen name="Boleto" component={TelaBoletoEmissao} />
       </Stack.Navigator>
     </NavigationContainer>
   );

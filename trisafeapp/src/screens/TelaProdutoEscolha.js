@@ -28,7 +28,7 @@ export default class TelaProdutoEscolha extends Component {
         this.listarProdutos = this.listarProdutos.bind(this);
         this.tratarListarProdutos = this.tratarListarProdutos.bind(this);
         this.contratar = this.contratar.bind(this);
-        this.tratarContratar = this.tratarContratar.bind(this);
+        // this.tratarContratar = this.tratarContratar.bind(this);
 
         oUtil = new Util();
         oGerenciadorDadosApp = new GerenciadorDadosApp(this);
@@ -98,11 +98,10 @@ export default class TelaProdutoEscolha extends Component {
 
     contratar() {
         try {
-            let url = oUtil.getURL('/contratos/efetivar/');
-            let oDadosAppGeral = this.state;
+            let url = oUtil.getURL('/contratos/incluir/');
             
-            oDadosAppGeral.controle_app.processando_requisicao = true;
-            this.setState(oDadosAppGeral);
+            oDadosControleApp.processando_requisicao = true;
+            oGerenciadorDadosApp.atualizarEstadoTela(this);
 
             fetch(url, {
                     method: 'POST',
@@ -110,7 +109,7 @@ export default class TelaProdutoEscolha extends Component {
                       Accept: 'application/json',
                       'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(oDadosAppGeral)
+                    body: JSON.stringify(this.state)
                   })
                   .then(oUtil.obterJsonResposta)
                   .then((oJsonDados) => {
@@ -122,12 +121,7 @@ export default class TelaProdutoEscolha extends Component {
     }
 
     tratarContratar(oDados) {
-        var oDadosAppGeral = oGerenciadorDadosApp.getDadosAppGeral();
-        
-        if(oDados) {
-            oGerenciadorDadosApp.atribuirDados('contrato', oDados);
-        }
-        oGerenciadorDadosApp.irPara('BoletoEmissao', oDadosAppGeral);
+        oGerenciadorDadosApp.atribuirDados('contrato', oDados);
     }
     
     voltar() {

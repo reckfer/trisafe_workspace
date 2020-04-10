@@ -7,134 +7,134 @@
 
 import React, { Component } from 'react';
 import {
-    ScrollView,
+    Dimensions,
     Alert,
     View
 } from 'react-native';
 import Util from './../common/Util';
 import { ThemeProvider, Button } from 'react-native-elements';
-import { WebView } from 'react-native-webview';
+import Pdf from 'react-native-pdf';
+// import { WebView } from 'react-native-webview';
 import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
 import AreaBotoes from './../common/AreaBotoes';
+import GerenciadorDadosApp from './../common/GerenciadorDadosApp';
 
 export default class TelaBoletoEmissao extends Component {
 	
-    constructor(props) {
-        super(props);
-        
-        this.limpar = this.limpar.bind(this);
-        this.voltar = this.voltar.bind(this);
-        this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
-        this.capturarDadosFiltroCallBack = this.capturarDadosFiltroCallBack.bind(this);
-        
-        oUtil = new Util();
-        oGerenciadorDadosApp = new GerenciadorDadosApp();
-        
-        this.state = oGerenciadorDadosApp.inicializarDados();
-    }
-
-    contratar() {
-        try {
-            let url = oUtil.getURL('/produtos/contratar/');
-            let oDadosAppGeral = this.state;
+        constructor(props) {
+            super(props);
             
-            oDadosAppGeral.controle_app.processando_requisicao = true;
-            this.setState(oDadosAppGeral);
-
-            fetch(url, {
-                    method: 'POST',
-                    headers: {
-                      Accept: 'application/json',
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(oDadosAppGeral)
-                  })
-                  .then(oUtil.obterJsonResposta)
-                  .then((oJsonDados) => {
-                      oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno);
-                  })
-        } catch (exc) {
-            Alert.alert(exc);
+            this.voltar = this.voltar.bind(this);
+            this.inicializarDadosTela = this.inicializarDadosTela.bind(this);
+            this.gerarBoleto = this.gerarBoleto.bind(this);
+            this.tratarRetornoBoleto = this.tratarRetornoBoleto.bind(this);
+        
+            oUtil = new Util();
+            oGerenciadorDadosApp = new GerenciadorDadosApp(this);
+            oDadosApp = oGerenciadorDadosApp.getDadosApp();
+            oDadosControleApp = oGerenciadorDadosApp.getDadosControleApp();
+    
+            this.state = oGerenciadorDadosApp.getDadosAppGeral();
+    
+            this.inicializarDadosTela();
         }
-    }
-
-    tratarDadosRetorno(oDados) {
-        let oDadosAppGeral = this.state;
-
-        if(oDados && oDados.id_cliente_iter) {
-            Alert.alert("Cod. cliente Iter: " + oDados.id_cliente_iter);
+    
+        inicializarDadosTela() {
+    
+            if(oGerenciadorDadosApp.temDados()) {
+                this.gerarBoleto();
+            }
         }
 
-        const { navigation } = this.props;
-        
-        navigation.navigate('ClienteEndereco', this.state);
-    }
-
-    limpar() {
-        let oDadosAppGeral = this.state;
-        let oDadosApp = oDadosAppGeral.dados_app;
-        let oCliente = oDadosApp.cliente;
-
-        oCliente.codigo = '';
-        oCliente.nomeCliente = '';
-        oCliente.nomeUsuario = '';
-        oCliente.cpf = '';
-        oCliente.rg = '';
-        oCliente.email = '';
-        
-        this.setState(oDadosAppGeral);
-    }
-
-    capturarDadosFiltroCallBack(oDadosFiltro) {
-        let oDadosAppGeral = this.state;
-        
-        oDadosAppGeral.codigo = oDadosFiltro.codigo;
-        this.setState(oDadosAppGeral);
+        gerarBoleto() {
+            try {
+                let url = oUtil.getURL('/boletogerencianets/gerar_boleto/');
+    
+                fetch(url, {
+                        method: 'POST',
+                        headers: {
+                          Accept: 'application/json',
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(this.state)
+                      })
+                      .then(oUtil.obterJsonResposta)
+                      .then((oJsonDados) => {
+                          oUtil.tratarRetornoServidor(oJsonDados, this.tratarRetornoBoleto);
+                      })
+            } catch (exc) {
+                Alert.alert(exc);
+            }
+        }
+    
+        tratarRetornoBoleto(oDados) {
+            oGerenciadorDadosApp.atribuirDados('boleto', oDados);
+            oGerenciadorDadosApp.atualizarEstadoTela(this);
+        }
+    
+        voltar() {
+            oGerenciadorDadosApp.voltar();
+        }
+    
+        botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;        
+        botaoConfirmar = () => <Button title="Confirmar" ></Button>;
+    
+        render() {
+    
+            let botoesTela = [ { element: this.botaoVoltar }, { element: this.botaoConfirmar } ];
+            
+            return (
+                <View style={styles.areaCliente}>
+                    <Cabecalho titulo='Contrato' nomeTela='Confirmação' />
+                    <AreaDados dadosApp={oDadosApp}/>
+                    <AreaBotoes botoes={botoesTela} />
+                </View>
+            );
+        }
     }
     
-    voltar() {
-        const { navigation } = this.props;
-        
-        navigation.navigate('ClienteConfirmacao', this.state);
+    export class AreaDados extends Component {
+    
+        constructor(props) {
+            super(props);
+        }
+    
+        render() {
+            let oDadosApp = this.props.dadosApp;
+            let oDadosBoleto = oDadosApp.boleto;
+    
+            const source = { 'uri': oDadosBoleto.url_pdf }
+    
+            return (
+                <View style={{
+                    flex: 1,
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',
+                    marginTop: 25,
+                }}>
+                    <Pdf
+                        source={source}
+                        onLoadComplete={(numberOfPages,filePath)=>{
+                            console.log('number of pages: ' + numberOfPages);
+                        }}
+                        onPageChanged={(page,numberOfPages)=>{
+                            console.log('current page: ' + page);
+                        }}
+                        onError={(error)=>{
+                            console.log(error);
+                            oUtil.obterJsonResposta(error);
+                        }}
+                        onPressLink={(uri)=>{
+                            console.log('Link presse: ' + uri);
+                        }}
+                        style={{
+                            flex:1,
+                            width:Dimensions.get('window').width,
+                            height:Dimensions.get('window').height,
+                        }}
+                    />
+                </View>
+            );
+        }
     }
-
-    botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;        
-    botaoConfirmar = () => <Button title="Confirmar" ></Button>;
-
-    render() {
-        let dadosCliente = this.state;
-        const { navigation } = this.props;
-
-        let botoesTela = [ { element: this.botaoVoltar }, { element: this.botaoConfirmar } ];
-
-        // Obtem os dados vindos da tela dados pessoais.
-        // oUtil.lerDadosNavegacao(dadosCliente, navigation);
-        oContrato = navigation.getParam('contrato');
-        oBoleto = oContrato.boleto;
-        
-        return (
-            <View style={styles.areaCliente}>
-                <Cabecalho titulo='Produto' nomeTela='Contratação' />
-                <AreaDados dadosBoleto={oBoleto}/>
-                <AreaBotoes botoes={botoesTela} />
-            </View>
-        );
-    }
-}
-
-export class AreaDados extends Component {
-
-    constructor(props) {
-        super(props);
-    }
-
-    render() {
-        
-
-        return (
-            <WebView source={{ uri: this.props.dadosBoleto.url_boleto_html }} />
-            // <WebView source={{ uri: 'https://github.com/facebook/react-native' }} />                
-        );
-    }
-}

@@ -28,10 +28,12 @@ export default class TelaTestesInicio extends Component {
         this.irParaTesteBoletoGerenciaNet = this.irParaTesteBoletoGerenciaNet.bind(this);        
         this.irParaTesteContratoPDF = this.irParaTesteContratoPDF.bind(this);
         this.gerarDadosTestes = this.gerarDadosTestes.bind(this);
-        this.obterUltimoCliente = this.obterUltimoCliente.bind(this);
+        this.obterUltimoCliente = this.obterUltimoCliente.bind(this);        
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
+        this.obterContratoPorCliente = this.obterContratoPorCliente.bind(this);
+        this.tratarDadosRetornoContrato = this.tratarDadosRetornoContrato.bind(this);
         this.inicializarDadosTela = this.inicializarDadosTela.bind(this);
-        this.tratarDadosRetornoTemp = this.tratarDadosRetornoTemp.bind(this);
+        this.voltar = this.voltar.bind(this);
 
         objUtilTests = new UtilTests();
         oUtil = new Util();
@@ -60,13 +62,12 @@ export default class TelaTestesInicio extends Component {
 
     irParaTesteBoletoGerenciaNet() {
         
-        oGerenciadorDadosApp.irPara('Produtos', this.state);
+        oGerenciadorDadosApp.irPara('Boleto', this.state);
     }
 
     irParaTesteContratoPDF() {
         
-        // oNavigation.navigate('ContratoEfetivacao');
-        this.obterContrato();
+        oGerenciadorDadosApp.irPara('Contrato', this.state);
     }
 
     obterUltimoCliente() {
@@ -79,7 +80,7 @@ export default class TelaTestesInicio extends Component {
                       Accept: 'application/json',
                       'Content-Type': 'application/json',
                     },
-                    body: {}
+                    body: JSON.stringify(this.state)
                   })
                   .then(oUtil.obterJsonResposta)
                   .then((oJsonDados) => {
@@ -93,13 +94,14 @@ export default class TelaTestesInicio extends Component {
     tratarDadosRetorno(oDados) {
 
         oGerenciadorDadosApp.atribuirDados('cliente', oDados);
+        
         oGerenciadorDadosApp.atualizarEstadoTela(this);
+        this.obterContratoPorCliente()
     }
 
-    obterContrato() {
+    obterContratoPorCliente() {
         try {
-            let url = oUtil.getURL('/contratos/obter/');
-            oDadosApp.contrato.id_contrato = '0089810000000445'
+            let url = oUtil.getURL('/contratos/obter_por_cliente/');
 
             fetch(url, {
                     method: 'POST',
@@ -111,14 +113,14 @@ export default class TelaTestesInicio extends Component {
                   })
                   .then(oUtil.obterJsonResposta)
                   .then((oJsonDados) => {
-                      oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetornoTemp);
+                      oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetornoContrato);
                   })
         } catch (exc) {
             Alert.alert(exc);
         }
     }
     
-    tratarDadosRetornoTemp(oDados) {
+    tratarDadosRetornoContrato(oDados) {
 
         oGerenciadorDadosApp.atribuirDados('contrato', oDados);
         oGerenciadorDadosApp.atualizarEstadoTela(this);
@@ -147,7 +149,11 @@ export default class TelaTestesInicio extends Component {
         return oDadosAppGeral;
     }
 
-    botaoVoltar = () => <Button title="Voltar" onPress={oGerenciadorDadosApp.voltar} ></Button>;
+    voltar() {
+        oGerenciadorDadosApp.voltar();
+    }
+
+    botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;
     
     render() {
         let botoesTela = [ 

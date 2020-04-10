@@ -44,8 +44,16 @@ const fragmentoContrato = {
         ],
         'valor_total': 0.0,
         'charge_id' : '',
+        'url_pdf': '',
         'dt_hr_inclusao' : '',
         'ult_atualizacao' : '',
+    }
+}
+
+const fragmentoBoleto = { 
+    'boleto': {
+        'url_pdf': '',
+        'url_html': ''
     }
 }
 
@@ -65,6 +73,7 @@ const composicaoDadosApp = {
     'dados_app' : [
         composicaoDadosCliente,
         fragmentoContrato,
+        fragmentoBoleto,
         fragmentoControleApp,
     ]
 }
