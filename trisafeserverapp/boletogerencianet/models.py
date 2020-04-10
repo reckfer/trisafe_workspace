@@ -6,6 +6,7 @@ from django.db import models
 from rest_framework import status
 from comum.retorno import Retorno
 from gerencianet import Gerencianet
+from contrato.models import Contrato
 
 credentials = {
     'client_id': 'Client_Id_add8181cd3a52a8343ca8912c17bebf2acc579ae',
@@ -17,18 +18,28 @@ class BoletoGerenciaNet(models.Model):
     
     def gerar(self, m_contrato):
         try:
-            # t = TransacaoGerenciaNet()
+            m_contrato_cadastro = Contrato()
+            if len(str(m_contrato.id_contrato)) > 0:
+                m_contrato_cadastro.id_contrato = m_contrato.id_contrato
             
-            # retorno = t.incluir()
-            # if not retorno.estado.ok:
-            #     return retorno
+                retorno_contrato = m_contrato_cadastro.obter()
+                if not retorno_contrato.estado.ok:
+                    if len(str(m_contrato.cliente.cpf)) > 0:
+                        m_cliente = Cliente()
+                        m_cliente.cpf = m_contrato_cadastro.cliente.cpf
+                        m_contrato.cliente = m_cliente
+                        retorno_contrato = m_contrato.obter_por_cliente() 
+                        
+                        if not retorno_contrato.estado.ok:
+                            return retorno_contrato
+
+            m_contrato_cadastro = retorno_contrato.dados
 
             today = date.today()
-
             data_vencimento = today.strftime("%Y-%m-%d")
  
             params = {
-                'id': m_contrato.charge_id
+                'id': m_contrato_cadastro.charge_id
             }
             
             body = {
@@ -36,11 +47,11 @@ class BoletoGerenciaNet(models.Model):
                     'banking_billet': {
                         'expire_at': data_vencimento,
                         'customer': {
-                            'name': m_contrato.cliente.nome,
-                            'email': m_contrato.cliente.email,
-                            'cpf': m_contrato.cliente.cpf,
-                            # 'birth': m_contrato.cliente.,
-                            'phone_number': m_contrato.cliente.telefone
+                            'name': m_contrato_cadastro.cliente.nome,
+                            'email': m_contrato_cadastro.cliente.email,
+                            'cpf': m_contrato_cadastro.cliente.cpf,
+                            # 'birth': m_contrato_cadastro.cliente.,
+                            'phone_number': m_contrato_cadastro.cliente.telefone
                         }
                     }
                 }
@@ -99,53 +110,10 @@ class BoletoGerenciaNet(models.Model):
 
     def __criar_json__(self):
         ret = {
-            "url_boleto_pdf": self.url_pdf,
-            "url_boleto_html": self.url_html,
+            "url_pdf": self.url_pdf,
+            "url_html": self.url_html,
             }
         return ret
 
     def __str__(self):
         return self.url_pdf
-
-class TransacaoGerenciaNet(models.Model):
-    
-    def incluir(self, d_dados_pedido):
-        try:
-            m_gerencia_net = Gerencianet(credentials)
-
-            d_charge = m_gerencia_net.create_charge(body=d_dados_pedido)
-            self.converter_de_gerencia_net(d_charge)
-            
-            retorno = Retorno(True)
-            retorno.dados = self
-
-            return retorno
-
-        except Exception as e:
-            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
-                    
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.')
-            return retorno
-
-    def converter_de_gerencia_net(self, d_charge):
-        if d_charge:
-            d_dados_charge = d_charge['data']
-            self.id = d_dados_charge['charge_id']
-            self.data_criacao = d_dados_charge['created_at']
-            self.estado = d_dados_charge['status']
-            self.total = d_dados_charge['total']
-
-    def json(self):
-        return self.__criar_json__()
-
-    def __criar_json__(self):
-        ret = {
-            "id": self.id,
-            "data_criacao": self.data_criacao,
-            "estado": self.estado,
-            "total": self.total
-            }
-        return ret
-
-    def __str__(self):
-        return self.id

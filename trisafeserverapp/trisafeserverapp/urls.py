@@ -20,7 +20,7 @@ from django.contrib import admin
 from django.conf.urls import url
 from cliente.views import ClienteViewSet
 from produto.views import ProdutoViewSet
-from boleto.views import BoletoViewSet
+from boletogerencianet.views import BoletoViewSet
 from contrato.views import ContratoViewSet
 from django.conf.urls import url, include
 from rest_framework import routers
@@ -48,6 +48,11 @@ router.register(r'contratos', ContratoViewSet)
 router.register(r'contratos/incluir/', ContratoViewSet)
 router.register(r'contratos/aceitar/', ContratoViewSet)
 router.register(r'contratos/obter/', ContratoViewSet)
+router.register(r'contratos/obter_arquivo_contrato/', ContratoViewSet)
+router.register(r'contratos/obter_por_cliente/', ContratoViewSet)
+router.register(r'boletogerencianets', BoletoViewSet)
+router.register(r'boletogerencianets/gerar_boleto/', BoletoViewSet)
+
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.

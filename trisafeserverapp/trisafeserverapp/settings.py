@@ -48,8 +48,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'cliente',
     'produto',
-    'boleto',
-    'contrato'
+    'contrato',
+    'transacaogerencianet',
+    'boletogerencianet',
 ]
 
 MIDDLEWARE = [
