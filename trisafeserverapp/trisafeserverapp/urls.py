@@ -51,7 +51,8 @@ router.register(r'contratos/obter/', ContratoViewSet)
 router.register(r'contratos/obter_arquivo_contrato/', ContratoViewSet)
 router.register(r'contratos/obter_por_cliente/', ContratoViewSet)
 router.register(r'boletogerencianets', BoletoViewSet)
-router.register(r'boletogerencianets/gerar_boleto/', BoletoViewSet)
+router.register(r'boletogerencianets/obter/', BoletoViewSet)
+router.register(r'boletogerencianets/gerar/', BoletoViewSet)
 
 
 # Wire up our API using automatic URL routing.

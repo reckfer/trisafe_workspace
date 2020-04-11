@@ -28,6 +28,7 @@ class ClienteViewSet(viewsets.ModelViewSet, permissions.BasePermission):
 
             retorno_cliente = m_cliente.obter()
             return Response(retorno_cliente.json())
+            
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     

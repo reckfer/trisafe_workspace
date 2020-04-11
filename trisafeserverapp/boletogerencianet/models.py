@@ -60,7 +60,45 @@ class BoletoGerenciaNet(models.Model):
             d_billet = m_gerencia_net.pay_charge(params=params, body=body)
 
             retorno = self.tratar_retorno_gerencia_net(d_billet)
+            retorno.dados = self
 
+            return retorno
+
+        except Exception as e:
+            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
+                    
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.')
+            return retorno
+    
+    def obter(self, m_contrato):
+        try:
+            m_contrato_cadastro = Contrato()
+            if len(str(m_contrato.id_contrato)) > 0:
+                m_contrato_cadastro.id_contrato = m_contrato.id_contrato
+            
+                retorno_contrato = m_contrato_cadastro.obter()
+                if not retorno_contrato.estado.ok:
+                    if len(str(m_contrato.cliente.cpf)) > 0:
+                        m_cliente = Cliente()
+                        m_cliente.cpf = m_contrato_cadastro.cliente.cpf
+                        m_contrato.cliente = m_cliente
+                        retorno_contrato = m_contrato.obter_por_cliente() 
+                        
+                        if not retorno_contrato.estado.ok:
+                            return retorno_contrato
+
+            m_contrato_cadastro = retorno_contrato.dados
+ 
+            params = {
+                'id': m_contrato_cadastro.charge_id
+            }
+
+            m_gerencia_net = Gerencianet(credentials)
+            d_billet = m_gerencia_net.detail_charge(params=params)
+
+            retorno = self.tratar_retorno_gerencia_net(d_billet)
+            retorno.dados = self
+            
             return retorno
 
         except Exception as e:
@@ -96,14 +134,23 @@ class BoletoGerenciaNet(models.Model):
 
         return retorno
 
-    def converter_de_gerencia_net(self, m_dados_boleto):
-        if m_dados_boleto:
-            if 'pdf' in m_dados_boleto:
-                m_pdf = m_dados_boleto['pdf']
+    def converter_de_gerencia_net(self, d_retorno_boleto):
+        if d_retorno_boleto:
+            d_dados_boleto = d_retorno_boleto
+
+            if 'payment' in d_dados_boleto:
+                d_payment = d_dados_boleto['payment']
+                
+                if 'banking_billet' in d_payment:
+                    d_dados_boleto = d_payment['banking_billet']
+
+            if 'pdf' in d_dados_boleto:
+                m_pdf = d_dados_boleto['pdf']
                 if m_pdf:
                     self.url_pdf = m_pdf['charge']
-            if 'link' in m_dados_boleto:
-                self.url_html = m_dados_boleto['link']
+
+            if 'link' in d_dados_boleto:
+                self.url_html = d_dados_boleto['link']
     
     def json(self):
         return self.__criar_json__()

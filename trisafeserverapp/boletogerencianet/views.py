@@ -24,13 +24,30 @@ class BoletoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
     serializer_class = BoletoSerializer
     
     @action(detail=False, methods=['post'])
-    def gerar_boleto(self, request):
+    def gerar(self, request):
         try:
             m_boleto = BoletoGerenciaNet()
             
             m_contrato = self.apropriar_dados_http(request)
             
             retorno_boleto = m_boleto.gerar(m_contrato)
+
+            return Response(retorno_boleto.json())
+            
+        except Exception as e:
+            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
+                    
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '')
+            return Response(retorno.json())
+    
+    @action(detail=False, methods=['post'])
+    def obter(self, request):
+        try:
+            m_boleto = BoletoGerenciaNet()
+            
+            m_contrato = self.apropriar_dados_http(request)
+            
+            retorno_boleto = m_boleto.obter(m_contrato)
 
             return Response(retorno_boleto.json())
             
