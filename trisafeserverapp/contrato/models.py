@@ -8,6 +8,7 @@ from rest_framework import status
 from comum.retorno import Retorno
 from cliente.models import Cliente
 from produto.models import Produto
+from emailcliente.models import EmailCliente
 from transacaogerencianet.models import TransacaoGerenciaNet
 from fpdf import FPDF
 
@@ -31,8 +32,8 @@ class Contrato(models.Model):
     ]
 
     def incluir(self, chaves_produtos):
-        try:
 
+        try:
             retorno_cliente = self.cliente.obter()
 
             if not retorno_cliente.estado.ok:
@@ -118,6 +119,7 @@ class Contrato(models.Model):
     def obter_por_cliente(self):
         try:
             retorno = Retorno(False, 'Contrato não localizado.')
+            
             m_contratos = Contrato.objects.filter(cliente__cpf=self.cliente.cpf)
             
             if m_contratos:
@@ -128,6 +130,9 @@ class Contrato(models.Model):
 
                     retorno = Retorno(True)
                     retorno.dados = m_contrato
+            
+                    email_cliente = EmailCliente()
+                    email_cliente.enviarComAnexos(m_contrato.cliente)
 
             return retorno
         except Exception as e:

@@ -568,4 +568,8 @@ env.bak/
 venv.bak/
 pip-selfcheck.json
 
+### Arquivos em geral ###
+*.pdf
+*.txt
+*.log
 # End of https://www.gitignore.io/api/node,code,python,django,reactnative,sublimetext,venv
