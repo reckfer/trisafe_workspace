@@ -27,7 +27,7 @@ export default class TelaBoletoEmissao extends Component {
             
             this.voltar = this.voltar.bind(this);
             this.inicializarDadosTela = this.inicializarDadosTela.bind(this);
-            this.gerarBoleto = this.gerarBoleto.bind(this);
+            this.obterBoleto = this.obterBoleto.bind(this);
             this.tratarRetornoBoleto = this.tratarRetornoBoleto.bind(this);
         
             oUtil = new Util();
@@ -43,13 +43,13 @@ export default class TelaBoletoEmissao extends Component {
         inicializarDadosTela() {
     
             if(oGerenciadorDadosApp.temDados()) {
-                this.gerarBoleto();
+                this.obterBoleto();
             }
         }
 
-        gerarBoleto() {
+        obterBoleto() {
             try {
-                let url = oUtil.getURL('/boletogerencianets/gerar_boleto/');
+                let url = oUtil.getURL('/boletogerencianets/obter/');
     
                 fetch(url, {
                         method: 'POST',
@@ -86,7 +86,7 @@ export default class TelaBoletoEmissao extends Component {
             
             return (
                 <View style={styles.areaCliente}>
-                    <Cabecalho titulo='Contrato' nomeTela='Confirmação' />
+                    <Cabecalho titulo='Boleto' nomeTela='Emissão' />
                     <AreaDados dadosApp={oDadosApp}/>
                     <AreaBotoes botoes={botoesTela} />
                 </View>
@@ -103,9 +103,11 @@ export default class TelaBoletoEmissao extends Component {
         render() {
             let oDadosApp = this.props.dadosApp;
             let oDadosBoleto = oDadosApp.boleto;
-    
-            const source = { 'uri': oDadosBoleto.url_pdf }
-    
+            const source = { 'uri': '' };
+
+            if(oDadosBoleto.url_pdf) {
+                source.uri = oDadosBoleto.url_pdf;
+            }
             return (
                 <View style={{
                     flex: 1,
@@ -123,7 +125,9 @@ export default class TelaBoletoEmissao extends Component {
                         }}
                         onError={(error)=>{
                             console.log(error);
-                            oUtil.obterJsonResposta(error);
+                            if(source.uri) {
+                                oUtil.obterJsonResposta(error);
+                            }
                         }}
                         onPressLink={(uri)=>{
                             console.log('Link presse: ' + uri);
