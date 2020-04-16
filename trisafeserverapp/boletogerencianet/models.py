@@ -15,6 +15,9 @@ credentials = {
 }
 
 class BoletoGerenciaNet(models.Model):
+    def __init__(self):
+        self.url_pdf = ''
+        self.url_html = ''
     
     def gerar(self, m_contrato):
         try:
@@ -141,7 +144,7 @@ class BoletoGerenciaNet(models.Model):
             if 'payment' in d_dados_boleto:
                 d_payment = d_dados_boleto['payment']
                 
-                if 'banking_billet' in d_payment:
+                if isinstance(d_payment, dict) and 'banking_billet' in d_payment:
                     d_dados_boleto = d_payment['banking_billet']
 
             if 'pdf' in d_dados_boleto:

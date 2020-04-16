@@ -282,7 +282,27 @@ export default class GerenciadorDadosApp {
         let atribuir;
         let pilhaObjetosContinuar = [];
         let oObjetoPreencher = oDados;
+        let oCampoPreencher;
+        let camposPreencher;
+        let tentarPreencher = false;
         
+        if(oDadosAtribuir) {
+            if(oDadosAtribuir instanceof Array) {
+                if(oDadosAtribuir.length > 0) {
+                    tentarPreencher = true;
+                }
+            } else if(oDadosAtribuir instanceof Object) {
+                let camposDados = Object.keys(oDadosAtribuir);
+
+                if(camposDados && camposDados.length > 0) {
+                    tentarPreencher = true;
+                }
+            }
+        }
+        
+        if(!tentarPreencher){
+            return this.oDadosReferencia;
+        }
 
         if(nomeAtributo) {
             oObjetoPreencher = oDados[nomeAtributo];
@@ -297,12 +317,15 @@ export default class GerenciadorDadosApp {
                 oDadosAtribuir = arrayEmpacotado;
             }
         }
-        let oCampoPreencher;
-        let camposPreencher = Object.keys(oObjetoPreencher);
+        camposPreencher = Object.keys(oObjetoPreencher);
 
         for (let i = 0; i < camposPreencher.length; i ++) {
-            atribuir = true;
             campo = camposPreencher[i];
+            
+            if(!(campo in oDadosAtribuir)) {
+                continue;
+            }
+            
             oCampoPreencher = oObjetoPreencher[campo];
 
             if(oCampoPreencher instanceof Array) {
@@ -314,6 +337,7 @@ export default class GerenciadorDadosApp {
                     campoItem = Object.keys(oItemArray)[0];                    
                     oDadosItemModelo = this.clonarObjeto(oItemArray);
                     oArrayDados.length = 0;
+
                     for(let i = 0; i < oArrayAtribuir.length; i++) {
                         oDadosItem = {};
                         for(campoNovo in oDadosItemModelo) {
@@ -323,7 +347,6 @@ export default class GerenciadorDadosApp {
                         this.atribuirDadosObjeto(oDadosItem, oArrayAtribuir[i]);
                         oArrayDados.push(oDadosItem);
                     }
-                    
                 }
             } else if(oCampoPreencher instanceof Object) {  
                 // Empilha os dados do objeto atual                  

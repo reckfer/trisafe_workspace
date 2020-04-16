@@ -27,6 +27,8 @@ export default class TelaContratoAceite extends Component {
         this.voltar = this.voltar.bind(this);
         this.inicializarDadosTela = this.inicializarDadosTela.bind(this);
         this.obterArquivoContrato = this.obterArquivoContrato.bind(this);
+        this.contratar = this.contratar.bind(this);
+        this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
     
         oUtil = new Util();
         oGerenciadorDadosApp = new GerenciadorDadosApp(this);
@@ -77,6 +79,7 @@ export default class TelaContratoAceite extends Component {
         oDadosControleApp.processando_requisicao = false;
 
         oGerenciadorDadosApp.atribuirDados('contrato', oDados);
+        oGerenciadorDadosApp.atribuirDados('boleto', oDados);
         oGerenciadorDadosApp.atualizarEstadoTela(this);
     }
 

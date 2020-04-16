@@ -37,9 +37,6 @@ class ContratoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
 
             if not retorno.estado.ok:
                 return retorno
-
-            # m_boleto = BoletoGerenciaNet()
-            # retorno = m_boleto.gerar(m_contrato)
             
             return Response(retorno.json())
         except Exception as e:
@@ -57,10 +54,12 @@ class ContratoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
 
             if not retorno.estado.ok:
                 return retorno
+
+            m_contrato = retorno.dados
             
             m_boleto = BoletoGerenciaNet()
-            retorno = m_boleto.gerar(retorno.dados)
-            
+            retorno = m_boleto.gerar(m_contrato)
+
             return Response(retorno.json())
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
@@ -77,9 +76,6 @@ class ContratoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
 
             if not retorno.estado.ok:
                 return retorno
-
-            # m_boleto = BoletoGerenciaNet()
-            # retorno = m_boleto.gerar(m_contrato)
             
             return Response(retorno.json())
         except Exception as e:
@@ -97,9 +93,6 @@ class ContratoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
 
             if not retorno.estado.ok:
                 return retorno
-
-            # m_boleto = BoletoGerenciaNet()
-            # retorno = m_boleto.gerar(m_contrato)
             
             return Response(retorno.json())
         except Exception as e:

@@ -21,7 +21,7 @@ class Contrato(models.Model):
     dt_hr_inclusao = models.DateTimeField(blank=False, null=False, auto_now_add=True)
     ult_atualizacao = models.DateTimeField(blank=False, null=False, auto_now=True)
     aceito = models.BooleanField(default=False)
-    url_pdf = models.CharField(max_length=200, blank=False, null=True)
+    url_pdf = models.CharField(max_length=200, blank=True, null=True)
 
     # Tipos de produtos
     FISICO = 'F'
@@ -65,8 +65,6 @@ class Contrato(models.Model):
             # Atualiza com os produtos
             self.produtos_contratados.add(*retorno_produtos.dados)
 
-            self.url_pdf = self.gerar_contrato_pdf()
-
             retorno = Retorno(True, 'Seu contrato foi gerado e será efetivado após o pagamento do boleto.')
             retorno.dados = self
 
@@ -86,7 +84,7 @@ class Contrato(models.Model):
             
             m_contrato = retorno.dados
             m_contrato.aceito = True
-            m_contrato.save()
+            m_contrato.save()            
 
             return retorno
         except Exception as e:
@@ -103,9 +101,6 @@ class Contrato(models.Model):
             if m_contratos:
                 m_contrato = m_contratos[0]
                 if m_contrato:
-                    m_contrato.aceito = True
-                    m_contrato.save()
-
                     retorno = Retorno(True)
                     retorno.dados = m_contrato
 
@@ -125,14 +120,11 @@ class Contrato(models.Model):
             if m_contratos:
                 m_contrato = m_contratos[0]
                 if m_contrato:
-                    m_contrato.aceito = True
-                    m_contrato.save()
-
                     retorno = Retorno(True)
                     retorno.dados = m_contrato
             
-                    email_cliente = EmailCliente()
-                    email_cliente.enviarComAnexos(m_contrato.cliente)
+                    # email_cliente = EmailCliente()
+                    # email_cliente.enviarComAnexos(m_contrato.cliente)
 
             return retorno
         except Exception as e:

@@ -25,6 +25,7 @@ export default class TelaTestesInicio extends Component {
         super(props);
         
         this.irParaTesteCadastroIter = this.irParaTesteCadastroIter.bind(this);
+        this.irParaTesteGeraContratoPDF = this.irParaTesteGeraContratoPDF.bind(this);
         this.irParaTesteBoletoGerenciaNet = this.irParaTesteBoletoGerenciaNet.bind(this);        
         this.irParaTesteContratoPDF = this.irParaTesteContratoPDF.bind(this);
         this.gerarDadosTestes = this.gerarDadosTestes.bind(this);
@@ -63,6 +64,11 @@ export default class TelaTestesInicio extends Component {
     irParaTesteBoletoGerenciaNet() {
         
         oGerenciadorDadosApp.irPara('Boleto', this.state);
+    }
+
+    irParaTesteGeraContratoPDF() {
+
+        oGerenciadorDadosApp.irPara('Produtos', this.state);
     }
 
     irParaTesteContratoPDF() {
@@ -137,7 +143,7 @@ export default class TelaTestesInicio extends Component {
         oDadosCliente.cpf = objUtilTests.gerarCPF();
         oDadosCliente.email = usuario + '@emailtestes.com.br';
         oDadosCliente.nome_usuario = usuario;
-        oDadosCliente.telefone = '51' + numAleatorio.toString().slice(9);
+        oDadosCliente.telefone = '519' + numAleatorio.toString().slice(10);
         oDadosCliente.rua = 'Rua do Relógio';
         oDadosCliente.numero = numAleatorio.toString().slice(15);
         oDadosCliente.cidade = 'Porto Alegre';
@@ -161,6 +167,7 @@ export default class TelaTestesInicio extends Component {
         ];
         let funcoes = {
             'irParaTesteCadastroIter': this.irParaTesteCadastroIter,
+            'irParaTesteGeraContratoPDF' : this.irParaTesteGeraContratoPDF,
             'irParaTesteBoletoGerenciaNet': this.irParaTesteBoletoGerenciaNet,
             'irParaTesteContratoPDF': this.irParaTesteContratoPDF,
             'gerarDadosTestes': this.gerarDadosTestes,
@@ -200,8 +207,8 @@ export class AreaDados extends Component {
                             <Button title="Cadastro Iter" onPress={oFuncoes.irParaTesteCadastroIter} ></Button>
                         </View>
                         <View style={{height:50}} >
-                            <Button title="Contrato PDF" onPress={oFuncoes.irParaTesteContratoPDF}></Button>
-                        </View>
+                            <Button title="Gera Contrato" onPress={oFuncoes.irParaTesteGeraContratoPDF}></Button>
+                        </View>                        
                     </View>
                     <View style={{flex: 1, flexDirection: 'row', alignItems: 'stretch', justifyContent: 'center' }}>
                         <View style={{height:50}} >
@@ -213,8 +220,8 @@ export class AreaDados extends Component {
                     </View>
                     <View style={{flex: 1, flexDirection: 'row', alignItems: 'stretch', justifyContent: 'center' }}>
                         <View style={{height:50}} >
-                            <Button title="Gerar CPF" onPress={oFuncoes.gerarDadosTestes} ></Button>
-                        </View>                        
+                            <Button title="Contrato PDF" onPress={oFuncoes.irParaTesteContratoPDF}></Button>
+                        </View>                    
                     </View>
                     <View style={{flex: 1, flexDirection: 'row', alignItems: 'stretch', justifyContent: 'center' }}>
                         <View style={{flex: 1, flexDirection: 'column', alignItems: 'stretch', justifyContent: 'center' }}>
