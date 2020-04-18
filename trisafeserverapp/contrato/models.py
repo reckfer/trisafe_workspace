@@ -124,7 +124,7 @@ class Contrato(models.Model):
                     retorno.dados = m_contrato
             
                     # email_cliente = EmailCliente()
-                    # email_cliente.enviarComAnexos(m_contrato.cliente)
+                    # email_cliente.enviar_com_anexos(m_contrato.cliente)
 
             return retorno
         except Exception as e:

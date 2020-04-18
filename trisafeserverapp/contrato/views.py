@@ -50,15 +50,25 @@ class ContratoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
         try:
             m_contrato = ContratoViewSet.apropriar_dados_http(request)
             
-            retorno = m_contrato.aceitar()
+            retorno_contrato = m_contrato.obter()
 
-            if not retorno.estado.ok:
-                return retorno
-
-            m_contrato = retorno.dados
+            if not retorno_contrato.estado.ok:
+                return retorno_contrato
             
             m_boleto = BoletoGerenciaNet()
-            retorno = m_boleto.gerar(m_contrato)
+            m_contrato = retorno_contrato.dados
+
+            if not m_contrato.aceito:
+                retorno = m_contrato.aceitar()
+
+                if not retorno.estado.ok:
+                    return retorno
+
+                m_contrato = retorno.dados
+                
+                retorno = m_boleto.gerar(m_contrato)
+            else:
+                retorno = m_boleto.obter(m_contrato)
 
             return Response(retorno.json())
         except Exception as e:

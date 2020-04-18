@@ -29,6 +29,8 @@ export default class TelaBoletoEmissao extends Component {
             this.inicializarDadosTela = this.inicializarDadosTela.bind(this);
             this.obterBoleto = this.obterBoleto.bind(this);
             this.tratarRetornoBoleto = this.tratarRetornoBoleto.bind(this);
+            this.finalizar = this.finalizar.bind(this);
+            this.tratarRetornoEmail = this.tratarRetornoEmail.bind(this);
         
             oUtil = new Util();
             oGerenciadorDadosApp = new GerenciadorDadosApp(this);
@@ -72,17 +74,43 @@ export default class TelaBoletoEmissao extends Component {
             oGerenciadorDadosApp.atribuirDados('boleto', oDados);
             oGerenciadorDadosApp.atualizarEstadoTela(this);
         }
+
+        finalizar() {
+            try {
+                let url = oUtil.getURL('/emailclientes/enviar_com_anexos/');
+    
+                fetch(url, {
+                        method: 'POST',
+                        headers: {
+                          Accept: 'application/json',
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(this.state)
+                      })
+                      .then(oUtil.obterJsonResposta)
+                      .then((oJsonDados) => {
+                          oUtil.tratarRetornoServidor(oJsonDados, this.tratarRetornoEmail);
+                      })
+            } catch (exc) {
+                Alert.alert(exc);
+            }
+        }
+
+        tratarRetornoEmail() {
+            oDadosControleApp.processando_requisicao = false;
+            oGerenciadorDadosApp.irPara('Cadastro', this.state);
+        }
     
         voltar() {
             oGerenciadorDadosApp.voltar();
         }
     
         botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;        
-        botaoConfirmar = () => <Button title="Confirmar" ></Button>;
+        botaoFinalizar = () => <Button title="Finalizar" onPress={this.finalizar}></Button>;
     
         render() {
     
-            let botoesTela = [ { element: this.botaoVoltar }, { element: this.botaoConfirmar } ];
+            let botoesTela = [ { element: this.botaoVoltar }, { element: this.botaoFinalizar } ];
             
             return (
                 <View style={styles.areaCliente}>
