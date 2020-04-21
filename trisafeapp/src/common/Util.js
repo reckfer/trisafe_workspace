@@ -6,12 +6,12 @@ export default class Util {
 
     getURL(metodo){
         protocol = 'https://';
-        domain = 'trisafeserverappheroku.herokuapp.com';
+        domain = 'trisafeserverherokua.herokuapp.com';
 
-        if (__DEV__) {
-            protocol = 'http://';
-            domain = '192.168.0.5:8000';
-        }
+        // if (__DEV__) {
+        //     protocol = 'http://';
+        //     domain = '192.168.0.5:8000';
+        // }
         return protocol + domain + metodo;
     }
 
