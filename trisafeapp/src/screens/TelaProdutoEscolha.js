@@ -19,30 +19,40 @@ import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
 import AreaBotoes from './../common/AreaBotoes';
 import GerenciadorDadosApp from './../common/GerenciadorDadosApp';
+import GerenciadorLog from './../common/GerenciadorLog';
 
 export default class TelaProdutoEscolha extends Component {
-	
+    
     constructor(props) {
         super(props);
+    
+        oLogger = new GerenciadorLog(this);
+
+        oLogger.registrar('TelaProdutoEscolha.constructor => Iniciou.');
+
         this.voltar = this.voltar.bind(this);
         this.listarProdutos = this.listarProdutos.bind(this);
         this.tratarListarProdutos = this.tratarListarProdutos.bind(this);
         this.contratar = this.contratar.bind(this);
-        // this.tratarContratar = this.tratarContratar.bind(this);
-
-        oUtil = new Util();
+        
+        oUtil = new Util(this);
         oGerenciadorDadosApp = new GerenciadorDadosApp(this);
         oDadosApp = oGerenciadorDadosApp.getDadosApp();
         oDadosControleApp = oGerenciadorDadosApp.getDadosControleApp();
 
         this.state = oGerenciadorDadosApp.getDadosAppGeral();
         
+        oLogger.registrar('TelaProdutoEscolha.constructor => Finalizou.');
+        
         this.listarProdutos();
     }
 
     listarProdutos(){
         try {
+
             let url = oUtil.getURL('/produtos/listar/');
+
+            oLogger.registrar('TelaProdutoEscolha.listarProdutos => Vai chamar a url ' + url);
 
             fetch(url, {
                 method: 'POST',
@@ -74,11 +84,12 @@ export default class TelaProdutoEscolha extends Component {
         } else if (oEstado.mensagem && oEstado.mensagem.trim()) {
             Alert.alert(oEstado.mensagem);
         }
-        console.log(oDados);
+
         if(oDados && Array.isArray(oDados)) {
             oGerenciadorDadosApp.atribuirDados('produtos_contratados', oDados);
-
+            let oProduto;
             let valorTotal = 0.00;
+
             for(let i = 0; i < oDados.length; i++)  {
             
                 oProduto = oDados[i];
@@ -86,10 +97,6 @@ export default class TelaProdutoEscolha extends Component {
             }
             let oDadosAppGeral = oGerenciadorDadosApp.getDadosAppGeral();
             
-            // let oContrato = {
-            //     'valorTotal': valorTotal,
-            //     'listaProdutos': oDados,
-            // }
             oDadosAppGeral.dados_app.contrato.valorTotal = valorTotal;
             
             this.setState(oDadosAppGeral);

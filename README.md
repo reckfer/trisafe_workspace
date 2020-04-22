@@ -32,6 +32,9 @@ Baixar as dependencias para rotina de armazenamento local:
 	
 Baixar as dependencias para notificações:
 	npm install react-native-push-notification --save
+
+Baixar as dependencias para logger:	
+	npm install react-native-logs --save
 	
 	
 Python:

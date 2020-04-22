@@ -26,7 +26,7 @@ export default class TelaClienteEndereco extends Component {
         this.avancar = this.avancar.bind(this);
         this.voltar = this.voltar.bind(this);
         
-        oUtil = new Util();
+        oUtil = new Util(this);
         oGerenciadorDadosApp = new GerenciadorDadosApp(this);
         oDadosApp = oGerenciadorDadosApp.getDadosApp();
         oDadosControleApp = oGerenciadorDadosApp.getDadosControleApp();

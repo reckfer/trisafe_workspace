@@ -32,7 +32,7 @@ export default class TelaBoletoEmissao extends Component {
             this.finalizar = this.finalizar.bind(this);
             this.tratarRetornoEmail = this.tratarRetornoEmail.bind(this);
         
-            oUtil = new Util();
+            oUtil = new Util(this);
             oGerenciadorDadosApp = new GerenciadorDadosApp(this);
             oDadosApp = oGerenciadorDadosApp.getDadosApp();
             oDadosControleApp = oGerenciadorDadosApp.getDadosControleApp();
@@ -146,19 +146,15 @@ export default class TelaBoletoEmissao extends Component {
                     <Pdf
                         source={source}
                         onLoadComplete={(numberOfPages,filePath)=>{
-                            console.log('number of pages: ' + numberOfPages);
                         }}
                         onPageChanged={(page,numberOfPages)=>{
-                            console.log('current page: ' + page);
                         }}
                         onError={(error)=>{
-                            console.log(error);
                             if(source.uri) {
                                 oUtil.obterJsonResposta(error);
                             }
                         }}
                         onPressLink={(uri)=>{
-                            console.log('Link presse: ' + uri);
                         }}
                         style={{
                             flex:1,

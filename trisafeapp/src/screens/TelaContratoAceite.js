@@ -30,7 +30,7 @@ export default class TelaContratoAceite extends Component {
         this.contratar = this.contratar.bind(this);
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
     
-        oUtil = new Util();
+        oUtil = new Util(this);
         oGerenciadorDadosApp = new GerenciadorDadosApp(this);
         oDadosApp = oGerenciadorDadosApp.getDadosApp();
         oDadosControleApp = oGerenciadorDadosApp.getDadosControleApp();
@@ -136,17 +136,13 @@ export class AreaDados extends Component {
                 <Pdf
                     source={source}
                     onLoadComplete={(numberOfPages,filePath)=>{
-                        console.log('number of pages: ' + numberOfPages);
                     }}
                     onPageChanged={(page,numberOfPages)=>{
-                        console.log('current page: ' + page);
                     }}
                     onError={(error)=>{
-                        console.log(error);
                         oUtil.obterJsonResposta(error);
                     }}
                     onPressLink={(uri)=>{
-                        console.log('Link presse: ' + uri);
                     }}
                     style={{
                         flex:1,

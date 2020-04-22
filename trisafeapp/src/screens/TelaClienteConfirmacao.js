@@ -27,7 +27,7 @@ export default class TelaClienteConfirmacao extends Component {
         this.voltar = this.voltar.bind(this);
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
         
-        oUtil = new Util();
+        oUtil = new Util(this);
         oGerenciadorDadosApp = new GerenciadorDadosApp(this);
         oDadosApp = oGerenciadorDadosApp.getDadosApp();
         oDadosControleApp = oGerenciadorDadosApp.getDadosControleApp();

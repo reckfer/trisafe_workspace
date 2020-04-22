@@ -1,9 +1,11 @@
+import { oEstruturaDadosLog, oEstruturaRegistroLog } from "./GerenciadorLog";
+
 const fragmentoClienteInicio = { 
     'cliente': {
         'cpf': '', 
         'email': '', 
     }
-}
+};
 const fragmentoClienteDadosPessoais = { 
     'cliente': {
         'nome': '', 
@@ -12,7 +14,7 @@ const fragmentoClienteDadosPessoais = {
         'nome_usuario': '',
         'telefone': '',
     }
-}
+};
 
 const fragmentoClienteEndereco = { 
     'cliente': {
@@ -24,7 +26,7 @@ const fragmentoClienteEndereco = {
         'cep': '',
         'uf': '',
     }
-}
+};
 
 const fragmentoProduto = { 
     'produto': {
@@ -33,7 +35,7 @@ const fragmentoProduto = {
         'valor': '',
         'tipo': '',
     }
-}
+};
 
 const fragmentoContrato = { 
     'contrato': {
@@ -48,26 +50,26 @@ const fragmentoContrato = {
         'dt_hr_inclusao' : '',
         'ult_atualizacao' : '',
     }
-}
+};
 
 const fragmentoBoleto = { 
     'boleto': {
         'url_pdf': '',
         'url_html': ''
     }
-}
+};
 
 const fragmentoControleApp = { 
     'controle_app': {
         'processando_requisicao': false,
     }
-}
+};
 
 const composicaoDadosCliente = [
     fragmentoClienteInicio,
     fragmentoClienteDadosPessoais,
     fragmentoClienteEndereco,
-]
+];
 
 const composicaoDadosApp = { 
     'dados_app' : [
@@ -75,6 +77,9 @@ const composicaoDadosApp = {
         fragmentoContrato,
         fragmentoBoleto,
         fragmentoControleApp,
+    ],
+    'dados_log': [
+        oEstruturaDadosLog,
     ]
 }
 
@@ -84,10 +89,15 @@ export default class GerenciadorDadosApp {
     oNavegadorReferencia;
 
     constructor(oTela) {
-        this.oTelaReferencia = oTela;
-        this.oNavegador = oTela.props.navigation;
 
-        this.inicializarDados(oTela);
+        if(oTela) {
+            this.oTelaReferencia = oTela;
+            
+            if(oTela.props) {
+                this.oNavegador = oTela.props.navigation;
+            }
+            this.inicializarDados();
+        }
     }
 
     getDadosApp() {
@@ -124,15 +134,21 @@ export default class GerenciadorDadosApp {
     inicializarDados() {
 
         if(this.oNavegador) {
-            let oDadosApp;
+            let oDadosAppGeral;
 
             if(this.oNavegador.getParam) {
-                oDadosApp = this.oNavegador.getParam('dados_app');
+                oDadosAppGeral = {
+                    'dados_app' : null,
+                    'dados_log' : null,
+                }
+                // Este trecho nao pode ser testado, pois foi alterado depois que mudou pro navegador versao 5.
+                oDadosAppGeral.dados_app = this.oNavegador.getParam('dados_app');
+                oDadosAppGeral.dados_log = this.oNavegador.getParam('dados_log');
             } else if (this.oTelaReferencia.props.route) {
-                oDadosApp = this.oTelaReferencia.props.route.params;
+                oDadosAppGeral = this.oTelaReferencia.props.route.params;
             }
-            if(oDadosApp) {
-                this.oDadosReferencia = oDadosApp;
+            if(oDadosAppGeral) {
+                this.oDadosReferencia = oDadosAppGeral;
             } else if(!this.oDadosReferencia){
                 this.oDadosReferencia = this.montarDadosApp(composicaoDadosApp);                
             }            
@@ -148,9 +164,10 @@ export default class GerenciadorDadosApp {
         let chavesDadosRaiz = Object.keys(oComposicaoDadosApp);
 
         if(chavesDadosRaiz) {
-            let oDadosFragmento = {};
+            let oDadosFragmento;
 
             for(let i = 0; i < chavesDadosRaiz.length; i++) {
+                oDadosFragmento = {};
                 oFragmentoRaiz = oComposicaoDadosApp[chavesDadosRaiz[i]];
                 
                 if(oFragmentoRaiz instanceof Array) {
@@ -173,16 +190,17 @@ export default class GerenciadorDadosApp {
         let oFragmento;
         let fragmentosProcessar;
         let listaReferenciada;
-
         for (let i = 0; i < oFragmentoLista.length; i ++) {
             oFragmento = oFragmentoLista[i];
 
             if(oFragmento instanceof Array) {
                 // Nivela lista não nomeada.
                 oFragmentoLista = this.nivelarListas(oFragmentoLista, oFragmento, i);
+                
                 // Reinicia o loop a partir da nova lista.
                 i = -1;
             } else {
+                retornarLista = false;
                 chavesCampos = Object.keys(oFragmento);
 
                 if(chavesCampos && chavesCampos.length > 0) {

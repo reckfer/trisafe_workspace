@@ -26,7 +26,7 @@ export default class TelaClienteDadosPessoais extends Component {
         this.voltar = this.voltar.bind(this);
         this.avancar = this.avancar.bind(this);
         
-        oUtil = new Util();
+        oUtil = new Util(this);
         oGerenciadorDadosApp = new GerenciadorDadosApp(this);
         oDadosApp = oGerenciadorDadosApp.getDadosApp();
         oDadosControleApp = oGerenciadorDadosApp.getDadosControleApp();

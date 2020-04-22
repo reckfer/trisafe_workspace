@@ -37,7 +37,7 @@ export default class TelaTestesInicio extends Component {
         this.voltar = this.voltar.bind(this);
 
         objUtilTests = new UtilTests();
-        oUtil = new Util();
+        oUtil = new Util(this);
         oGerenciadorDadosApp = new GerenciadorDadosApp(this);
         oDadosApp = oGerenciadorDadosApp.getDadosApp();
         oDadosControleApp = oGerenciadorDadosApp.getDadosControleApp();

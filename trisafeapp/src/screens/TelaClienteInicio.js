@@ -38,7 +38,7 @@ export default class TelaClienteInicio extends Component {
         // this.solicitarPermissoes = this.solicitarPermissoes.bind(this);
         this.tratarDadosCliente = this.tratarDadosCliente.bind(this);
 
-        oUtil = new Util();
+        oUtil = new Util(this);
         oGerenciadorDadosApp = new GerenciadorDadosApp(this);
         oDadosApp = oGerenciadorDadosApp.getDadosApp();
         oDadosControleApp = oGerenciadorDadosApp.getDadosControleApp();
@@ -175,61 +175,3 @@ export class AreaDados extends Component {
         );
     }
 }
-// gerarBoleto() {
-//     try {
-//         let oDadosAppGeral = this.state;            
-//         let url = oUtil.getURL('/boletos/gerarBoleto/');
-
-//         oDadosAppGeral.processando_requisicao = true;
-//         this.setState(oDadosAppGeral);
-
-//         fetch(url, {
-//             method: 'POST',
-//             headers: {
-//               Accept: 'application/json',
-//               'Content-Type': 'application/json',
-//             },
-//             body: JSON.stringify({
-//             }),
-//           })
-//             .then(oUtil.obterJsonResposta)
-//             .then((oJsonDados) => {
-//                 oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosBoleto, true);
-//             })
-//             .catch(function (erro) {
-//                 Alert.alert(erro.message);
-//                 throw erro;
-//             });
-//     } catch (exc) {
-//         Alert.alert(exc.message);
-//         throw exc;
-//     }
-// }
-
-// baixarPDFBoleto(){
-//     let url = 'https://download.gerencianet.com.br/229576_14_FORAA5/229576-637436-ZENEM8.pdf?sandbox=true';
-//     // Documentacao: https://github.com/joltup/rn-fetch-blob/wiki/Manually-Link-Package#index
-//     const { config, fs } = RNFetchBlob;
-//     let docDir = fs.dirs.DocumentDir; // this is the pictures directory. You can check the available directories in the wiki.
-//     let options = {
-//         // fileCache: false,
-//         // addAndroidDownloads : {
-//             useDownloadManager : true, // setting it to true will use the device's native download manager and will be shown in the notification bar.
-//             notification : false,
-//             path:  "/data/user/0/com.trisafeapp/files/boleto_gernet.pdf", // this is the path where your downloaded file will live in
-//             description : 'Baixando boleto.',
-//             mime : 'application/pdf',
-//         // }
-//     }
-//     config(options).fetch('GET', url).then((res) => {
-//         if(res) {
-//             console.log('resp of pdf', res);
-//             console.log('The file saved to ', res.path());
-//             Alert.alert(res.path());
-//         } else {
-//             Alert.alert('res vazio');
-//         }
-//     }).catch((err) => {
-//         console.log(err);
-//     });
-// }
