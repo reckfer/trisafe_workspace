@@ -18,151 +18,156 @@ import Pdf from 'react-native-pdf';
 import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
 import AreaBotoes from './../common/AreaBotoes';
-import GerenciadorDadosApp from './../common/GerenciadorDadosApp';
 
 export default class TelaBoletoEmissao extends Component {
 	
-        constructor(props) {
-            super(props);
-            
-            this.voltar = this.voltar.bind(this);
-            this.inicializarDadosTela = this.inicializarDadosTela.bind(this);
-            this.obterBoleto = this.obterBoleto.bind(this);
-            this.tratarRetornoBoleto = this.tratarRetornoBoleto.bind(this);
-            this.finalizar = this.finalizar.bind(this);
-            this.tratarRetornoEmail = this.tratarRetornoEmail.bind(this);
+    constructor(props, value) {
+        super(props);
         
-            oUtil = new Util(this);
-            oGerenciadorDadosApp = new GerenciadorDadosApp(this);
-            oDadosApp = oGerenciadorDadosApp.getDadosApp();
-            oDadosControleApp = oGerenciadorDadosApp.getDadosControleApp();
-    
-            this.state = oGerenciadorDadosApp.getDadosAppGeral();
-    
-            this.inicializarDadosTela();
+        if(props && props.navigation) {
+            this.oNavegacao = props.navigation;
         }
-    
-        inicializarDadosTela() {
-    
-            if(oGerenciadorDadosApp.temDados()) {
-                this.obterBoleto();
-            }
-        }
-
-        obterBoleto() {
-            try {
-                let url = oUtil.getURL('/boletogerencianets/obter/');
-    
-                fetch(url, {
-                        method: 'POST',
-                        headers: {
-                          Accept: 'application/json',
-                          'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(this.state)
-                      })
-                      .then(oUtil.obterJsonResposta)
-                      .then((oJsonDados) => {
-                          oUtil.tratarRetornoServidor(oJsonDados, this.tratarRetornoBoleto);
-                      })
-            } catch (exc) {
-                Alert.alert(exc);
-            }
-        }
-    
-        tratarRetornoBoleto(oDados) {
-            oGerenciadorDadosApp.atribuirDados('boleto', oDados);
-            oGerenciadorDadosApp.atualizarEstadoTela(this);
-        }
-
-        finalizar() {
-            try {
-                let url = oUtil.getURL('/emailclientes/enviar_com_anexos/');
-    
-                fetch(url, {
-                        method: 'POST',
-                        headers: {
-                          Accept: 'application/json',
-                          'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(this.state)
-                      })
-                      .then(oUtil.obterJsonResposta)
-                      .then((oJsonDados) => {
-                          oUtil.tratarRetornoServidor(oJsonDados, this.tratarRetornoEmail);
-                      })
-            } catch (exc) {
-                Alert.alert(exc);
-            }
-        }
-
-        tratarRetornoEmail() {
-            oDadosControleApp.processando_requisicao = false;
-            oGerenciadorDadosApp.irPara('Cadastro', this.state);
-        }
-    
-        voltar() {
-            oGerenciadorDadosApp.voltar();
-        }
-    
-        botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;        
-        botaoFinalizar = () => <Button title="Finalizar" onPress={this.finalizar}></Button>;
-    
-        render() {
-    
-            let botoesTela = [ { element: this.botaoVoltar }, { element: this.botaoFinalizar } ];
+        
+        if(value && value.gerenciador) {
+            this.oGerenciadorContextoApp = value.gerenciador;
+            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
+            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
+            this.oUtil = new Util(this);
             
-            return (
-                <View style={styles.areaCliente}>
-                    <Cabecalho titulo='Boleto' nomeTela='Emissão' />
-                    <AreaDados dadosApp={oDadosApp}/>
-                    <AreaBotoes botoes={botoesTela} />
-                </View>
-            );
+            this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
-    }
-    
-    export class AreaDados extends Component {
-    
-        constructor(props) {
-            super(props);
-        }
-    
-        render() {
-            let oDadosApp = this.props.dadosApp;
-            let oDadosBoleto = oDadosApp.boleto;
-            const source = { 'uri': '' };
 
-            if(oDadosBoleto.url_pdf) {
-                source.uri = oDadosBoleto.url_pdf;
-            }
-            return (
-                <View style={{
-                    flex: 1,
-                    justifyContent: 'flex-start',
-                    alignItems: 'center',
-                    marginTop: 25,
-                }}>
-                    <Pdf
-                        source={source}
-                        onLoadComplete={(numberOfPages,filePath)=>{
-                        }}
-                        onPageChanged={(page,numberOfPages)=>{
-                        }}
-                        onError={(error)=>{
-                            if(source.uri) {
-                                oUtil.obterJsonResposta(error);
-                            }
-                        }}
-                        onPressLink={(uri)=>{
-                        }}
-                        style={{
-                            flex:1,
-                            width:Dimensions.get('window').width,
-                            height:Dimensions.get('window').height,
-                        }}
-                    />
-                </View>
-            );
+        this.voltar = this.voltar.bind(this);
+        this.inicializarDadosTela = this.inicializarDadosTela.bind(this);
+        this.obterBoleto = this.obterBoleto.bind(this);
+        this.tratarRetornoBoleto = this.tratarRetornoBoleto.bind(this);
+        this.finalizar = this.finalizar.bind(this);
+        this.tratarRetornoEmail = this.tratarRetornoEmail.bind(this);
+
+        this.inicializarDadosTela();
+    }
+
+    inicializarDadosTela() {
+
+        if(this.oGerenciadorContextoApp.temDados()) {
+            this.obterBoleto();
         }
     }
+
+    obterBoleto() {
+        try {
+            let url = this.oUtil.getURL('/boletogerencianets/obter/');
+
+            fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(this.state)
+                    })
+                    .then(this.oUtil.obterJsonResposta)
+                    .then((oJsonDados) => {
+                        this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarRetornoBoleto);
+                    })
+        } catch (exc) {
+            Alert.alert(exc);
+        }
+    }
+
+    tratarRetornoBoleto(oDados) {
+        this.oGerenciadorContextoApp.atribuirDados('boleto', oDados);
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
+    }
+
+    finalizar() {
+        try {
+            let url = this.oUtil.getURL('/emailclientes/enviar_com_anexos/');
+
+            fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(this.state)
+                    })
+                    .then(this.oUtil.obterJsonResposta)
+                    .then((oJsonDados) => {
+                        this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarRetornoEmail);
+                    })
+        } catch (exc) {
+            Alert.alert(exc);
+        }
+    }
+
+    tratarRetornoEmail() {
+        this.oDadosControleApp.processando_requisicao = false;
+        this.oNavegacao.navigate('Cadastro', this.state);
+    }
+
+    voltar() {
+        this.oNavegacao.goBack();
+    }
+
+    botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;        
+    botaoFinalizar = () => <Button title="Finalizar" onPress={this.finalizar}></Button>;
+
+    render() {
+
+        let botoesTela = [ { element: this.botaoVoltar }, { element: this.botaoFinalizar } ];
+        
+        return (
+            <View style={styles.areaCliente}>
+                <Cabecalho titulo='Boleto' nomeTela='Emissão' />
+                <AreaDados dadosApp={this.oDadosApp}/>
+                <AreaBotoes botoes={botoesTela} />
+            </View>
+        );
+    }
+}
+
+export class AreaDados extends Component {
+
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        let oDadosApp = this.props.dadosApp;
+        let oDadosBoleto = oDadosApp.boleto;
+        const source = { 'uri': '' };
+
+        if(oDadosBoleto.url_pdf) {
+            source.uri = oDadosBoleto.url_pdf;
+        }
+        return (
+            <View style={{
+                flex: 1,
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                marginTop: 25,
+            }}>
+                <Pdf
+                    source={source}
+                    onLoadComplete={(numberOfPages,filePath)=>{
+                    }}
+                    onPageChanged={(page,numberOfPages)=>{
+                    }}
+                    onError={(error)=>{
+                        if(source.uri) {
+                            this.oUtil.obterJsonResposta(error);
+                        }
+                    }}
+                    onPressLink={(uri)=>{
+                    }}
+                    style={{
+                        flex:1,
+                        width:Dimensions.get('window').width,
+                        height:Dimensions.get('window').height,
+                    }}
+                />
+            </View>
+        );
+    }
+}

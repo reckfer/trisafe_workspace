@@ -1,13 +1,13 @@
 import {
     Alert,
 } from 'react-native';
-import GerenciadorLog from './../common/GerenciadorLog';
+// import GerenciadorLog from './../common/GerenciadorLog';
 
 export default class Util {
 
-    constructor(oTela){
-        oLogger = new GerenciadorLog(oTela);
-    }
+    // constructor(oTela){
+    //     this.oLogger = new GerenciadorLog(oTela);
+    // }
     getURL(metodo){
         protocol = 'https://';
         domain = 'trisafeserverherokua.herokuapp.com';
@@ -20,23 +20,23 @@ export default class Util {
     }
 
     obterJsonResposta(oRespostaHTTP) {
-        //let oLogger = logger.createLogger();
+        //let this.oLogger = logger.createLogger();
 
-        oLogger.registrar('Util.obterJsonResposta() => Iniciou.');
+        // this.oLogger.registrar('Util.obterJsonResposta() => Iniciou.');
 
         if(oRespostaHTTP) {
 
-            oLogger.registrar('Util.obterJsonResposta() => Recebeu: ' + JSON.stringify(oRespostaHTTP));
+            // this.oLogger.registrar('Util.obterJsonResposta() => Recebeu: ' + JSON.stringify(oRespostaHTTP));
 
             if(oRespostaHTTP.ok) {
                 let oJsonDados = oRespostaHTTP.json();
 
-                oLogger.registrar('Util.obterJsonResposta() => Resposta http ok. Dados: ' + JSON.stringify(oJsonDados));
+                // this.oLogger.registrar('Util.obterJsonResposta() => Resposta http ok. Dados: ' + JSON.stringify(oJsonDados));
                 
                 return oJsonDados;
             } else {
                 
-                oLogger.registrar('Util.obterJsonResposta() => Resposta http nao ok.');
+                // this.oLogger.registrar('Util.obterJsonResposta() => Resposta http nao ok.');
 
                 if(oRespostaHTTP.status && oRespostaHTTP.url) {
                     
@@ -44,22 +44,22 @@ export default class Util {
                     ". URL: " + oRespostaHTTP.url);
                 } else if (oRespostaHTTP instanceof Error) {
                     
-                    oLogger.registrar(oRespostaHTTP.message);
+                    // this.oLogger.registrar(oRespostaHTTP.message);
                     Alert.alert(oRespostaHTTP.message);
                 }
             }
         } else {
-            oLogger.registrar('Util.obterJsonResposta() => oRespostaHTTP estava vazia. Vai retornar null de obterJsonResposta().');
+            // this.oLogger.registrar('Util.obterJsonResposta() => oRespostaHTTP estava vazia. Vai retornar null de obterJsonResposta().');
         }
         return null;
     }
 
     tratarRetornoServidor(oJsonRetorno, oFuncaoTratarDados, suprimirMsgServidor) {
         
-        oLogger.registrar('Util.tratarRetornoServidor() => Iniciou.');
+        // this.oLogger.registrar('Util.tratarRetornoServidor() => Iniciou.');
 
         if(oJsonRetorno) {
-            oLogger.registrar('Util.tratarRetornoServidor() => Recebeu: ' + JSON.stringify(oJsonRetorno));
+            // this.oLogger.registrar('Util.tratarRetornoServidor() => Recebeu: ' + JSON.stringify(oJsonRetorno));
 
             let oEstado = oJsonRetorno.estado;
             let oDados = oJsonRetorno.dados;
@@ -74,7 +74,7 @@ export default class Util {
             
             oFuncaoTratarDados(oDados, oEstado);
         } else {
-            oLogger.registrar('Util.tratarRetornoServidor() => oJsonRetorno estava vazio.');
+            // this.oLogger.registrar('Util.tratarRetornoServidor() => oJsonRetorno estava vazio.');
             
             Alert.alert("O retorno do servidor foi vazio.");
         }

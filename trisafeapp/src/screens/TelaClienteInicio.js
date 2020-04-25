@@ -19,11 +19,11 @@ import Util from '../common/Util';
 import Cabecalho from '../common/CabecalhoTela';
 import AreaBotoes from '../common/AreaBotoes';
 import { styles, theme } from '../common/Estilos';
-import GerenciadorDadosApp from '../common/GerenciadorDadosApp';
+import { ContextoApp } from '../contexts/ContextoApp';
 
 export default class TelaClienteInicio extends Component {
-	
-    constructor(props) {
+    
+    constructor(props, value) {
         super(props);
         
         // var PushNotification = require("react-native-push-notification");
@@ -32,20 +32,23 @@ export default class TelaClienteInicio extends Component {
         //     message: "My Notification Message", // (required)
         //     date: new Date(Date.now() + 1000) // in 60 secs
         //   });
+
+        if(props && props.navigation) {
+            this.oNavegacao = props.navigation;
+        }
+        
+        if(value && value.gerenciador) {
+            this.oGerenciadorContextoApp = value.gerenciador;
+            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
+            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
+            this.oUtil = new Util(this);
+            
+            this.state = this.oGerenciadorContextoApp.dadosAppGeral;
+        }
         
         this.obterCliente = this.obterCliente.bind(this);
         this.irParaTestesRapidos = this.irParaTestesRapidos.bind(this);
-        // this.solicitarPermissoes = this.solicitarPermissoes.bind(this);
         this.tratarDadosCliente = this.tratarDadosCliente.bind(this);
-
-        oUtil = new Util(this);
-        oGerenciadorDadosApp = new GerenciadorDadosApp(this);
-        oDadosApp = oGerenciadorDadosApp.getDadosApp();
-        oDadosControleApp = oGerenciadorDadosApp.getDadosControleApp();
-
-        this.state = oGerenciadorDadosApp.getDadosAppGeral();
-        
-       // this.solicitarPermissoes();
     }
     
 
@@ -73,10 +76,10 @@ export default class TelaClienteInicio extends Component {
 
     obterCliente() {
         try {
-            let url = oUtil.getURL('/clientes/obter/');
+            let url = this.oUtil.getURL('/clientes/obter/');
 
-            oDadosControleApp.processando_requisicao = true;
-            oGerenciadorDadosApp.atualizarEstadoTela(this);
+            this.oDadosControleApp.processando_requisicao = true;
+            this.oGerenciadorContextoApp.atualizarEstadoTela(this);
 
             fetch(url, {
                 method: 'POST',
@@ -86,9 +89,9 @@ export default class TelaClienteInicio extends Component {
                 },
                 body: JSON.stringify(this.state),
               })
-                .then(oUtil.obterJsonResposta)
+                .then(this.oUtil.obterJsonResposta)
                 .then((oJsonDados) => {
-                    oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosCliente, true);
+                    this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosCliente, true);
                 })
                 .catch(function (erro) {
                     Alert.alert(erro.message);
@@ -111,13 +114,13 @@ export default class TelaClienteInicio extends Component {
         }
         if(oDados) {
             
-            oDadosAppGeral = oGerenciadorDadosApp.atribuirDados('cliente', oDados);
+            oDadosAppGeral = this.oGerenciadorContextoApp.atribuirDados('cliente', oDados);
         }
 
-        oDadosControleApp.processando_requisicao = false;
-        oGerenciadorDadosApp.atualizarEstadoTela(this);
+        this.oDadosControleApp.processando_requisicao = false;
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
 
-        oGerenciadorDadosApp.irPara('Dados pessoais', oDadosAppGeral);
+        this.oNavegacao.navigate('Dados pessoais', oDadosAppGeral);
     }
 
     tratarDadosBoleto(oDados, oEstado) {
@@ -134,24 +137,26 @@ export default class TelaClienteInicio extends Component {
 
     irParaTestesRapidos() {
 
-        oGerenciadorDadosApp.irPara('Testes', this.state);
+        this.oNavegacao.navigate('Testes', this.state);
     }
 
-    botaoIniciar = () => <Button title="Iniciar" onPress={this.obterCliente} loading={oDadosControleApp.processando_requisicao}></Button>;
+    botaoIniciar = () => <Button title="Iniciar" onPress={this.obterCliente} loading={this.oDadosControleApp.processando_requisicao}></Button>;
     botaoTestesRapidos = () => <Button title="Testes Rápidos" onPress={this.irParaTestesRapidos} ></Button>;
 
     render() {
         let botoesTela = [ { element: this.botaoIniciar }, { element: this.botaoTestesRapidos} ];
-
+        
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Cadastro' nomeTela='Início' />
-                <AreaDados dadosApp={oDadosApp}/>
+                <AreaDados dadosApp={this.oDadosApp}/>
                 <AreaBotoes botoes={botoesTela} />
             </View>
-        );
+        )
     }
 }
+
+TelaClienteInicio.contextType = ContextoApp;
 
 export class AreaDados extends Component {
 
@@ -162,7 +167,7 @@ export class AreaDados extends Component {
     render() {
         let oDadosApp = this.props.dadosApp;
         let oDadosCliente = oDadosApp.cliente;
-
+        
         return (
             <ScrollView>
                 <ThemeProvider theme={theme}>

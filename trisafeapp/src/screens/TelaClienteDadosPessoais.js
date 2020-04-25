@@ -16,22 +16,28 @@ import { ThemeProvider, Input, Button } from 'react-native-elements';
 import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
 import AreaBotoes from './../common/AreaBotoes';
-import GerenciadorDadosApp from './../common/GerenciadorDadosApp';
+import { ContextoApp } from '../contexts/ContextoApp';
 
 export default class TelaClienteDadosPessoais extends Component {
 	
-    constructor(props) {
+    constructor(props, value) {
         super(props);
         
+        if(props && props.navigation) {
+            this.oNavegacao = props.navigation;
+        }
+        
+        if(value && value.gerenciador) {
+            this.oGerenciadorContextoApp = value.gerenciador;
+            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
+            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
+            this.oUtil = new Util(this);
+            
+            this.state = this.oGerenciadorContextoApp.dadosAppGeral;
+        }
+
         this.voltar = this.voltar.bind(this);
         this.avancar = this.avancar.bind(this);
-        
-        oUtil = new Util(this);
-        oGerenciadorDadosApp = new GerenciadorDadosApp(this);
-        oDadosApp = oGerenciadorDadosApp.getDadosApp();
-        oDadosControleApp = oGerenciadorDadosApp.getDadosControleApp();
-
-        this.state = oGerenciadorDadosApp.getDadosAppGeral();
     }
 
     tratarRetornoJson(oJsonResposta) {
@@ -48,13 +54,13 @@ export default class TelaClienteDadosPessoais extends Component {
         
         // if(this.validarDadosPessoais()) {
             // this.state.dados_app.emCadastro = false;
-            oGerenciadorDadosApp.irPara('Endereço', this.state);
+            this.oNavegacao.navigate('Endereço', this.state);
         // }
     }
 
     voltar() {
         
-        oGerenciadorDadosApp.voltar();
+        this.oNavegacao.goBack();
     }
     
     render() { 
@@ -62,21 +68,17 @@ export default class TelaClienteDadosPessoais extends Component {
         let botaoAvancar = () => <Button title="Avançar" onPress={this.avancar} ></Button>
         
         let botoesTela = [ { element: botaoVoltar }, { element: botaoAvancar } ];
-
-        // if(!this.state.emCadastro) {
-        //     // Obtem os dados vindos da primeira tela.
-        //     oUtil.lerDadosNavegacao(dadosCliente, navigation);
-        // }
         
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Cadastro' nomeTela='Meus dados' />
-                <AreaDados dadosApp={oDadosApp}/>
+                <AreaDados dadosApp={this.oDadosApp}/>
                 <AreaBotoes botoes={botoesTela}/>
             </View>
         );
     }
 }
+TelaClienteDadosPessoais.contextType = ContextoApp;
 
 export class AreaDados extends Component {
 

@@ -13,36 +13,41 @@ import {
     Text
 } from 'react-native';
 import Util from './../common/Util';
-import { ThemeProvider, Button, ButtonGroup } from 'react-native-elements';
+import { ThemeProvider, Button } from 'react-native-elements';
 import { Card, CardTitle, CardContent, CardAction, CardButton, CardImage } from 'react-native-cards';
 import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
 import AreaBotoes from './../common/AreaBotoes';
-import GerenciadorDadosApp from './../common/GerenciadorDadosApp';
-import GerenciadorLog from './../common/GerenciadorLog';
+import { ContextoApp } from '../contexts/ContextoApp';
 
 export default class TelaProdutoEscolha extends Component {
     
-    constructor(props) {
+    constructor(props, value) {
         super(props);
     
-        oLogger = new GerenciadorLog(this);
+        // this.oLogger = new GerenciadorLog(this);
 
-        oLogger.registrar('TelaProdutoEscolha.constructor => Iniciou.');
+        // this.oLogger.registrar('TelaProdutoEscolha.constructor => Iniciou.');
+        if(props && props.navigation) {
+            this.oNavegacao = props.navigation;
+        }
+
+        if(value && value.gerenciador) {
+            this.oGerenciadorContextoApp = value.gerenciador;
+            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
+            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
+            this.oUtil = new Util(this);
+            
+            this.state = this.oGerenciadorContextoApp.dadosAppGeral;
+        }
 
         this.voltar = this.voltar.bind(this);
         this.listarProdutos = this.listarProdutos.bind(this);
         this.tratarListarProdutos = this.tratarListarProdutos.bind(this);
         this.contratar = this.contratar.bind(this);
+        this.tratarContratar = this.tratarContratar.bind(this);
         
-        oUtil = new Util(this);
-        oGerenciadorDadosApp = new GerenciadorDadosApp(this);
-        oDadosApp = oGerenciadorDadosApp.getDadosApp();
-        oDadosControleApp = oGerenciadorDadosApp.getDadosControleApp();
-
-        this.state = oGerenciadorDadosApp.getDadosAppGeral();
-        
-        oLogger.registrar('TelaProdutoEscolha.constructor => Finalizou.');
+        // this.oLogger.registrar('TelaProdutoEscolha.constructor => Finalizou.');
         
         this.listarProdutos();
     }
@@ -50,9 +55,9 @@ export default class TelaProdutoEscolha extends Component {
     listarProdutos(){
         try {
 
-            let url = oUtil.getURL('/produtos/listar/');
+            let url = this.oUtil.getURL('/produtos/listar/');
 
-            oLogger.registrar('TelaProdutoEscolha.listarProdutos => Vai chamar a url ' + url);
+            // this.oLogger.registrar('TelaProdutoEscolha.listarProdutos => Vai chamar a url ' + url);
 
             fetch(url, {
                 method: 'POST',
@@ -63,9 +68,9 @@ export default class TelaProdutoEscolha extends Component {
                 body: JSON.stringify({
                 }),
               })
-                .then(oUtil.obterJsonResposta)
+                .then(this.oUtil.obterJsonResposta)
                 .then((oJsonDados) => {
-                    oUtil.tratarRetornoServidor(oJsonDados, this.tratarListarProdutos, true);
+                    this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarListarProdutos, true);
                 })
                 .catch(function (erro) {
                     Alert.alert(erro.message);
@@ -86,7 +91,7 @@ export default class TelaProdutoEscolha extends Component {
         }
 
         if(oDados && Array.isArray(oDados)) {
-            oGerenciadorDadosApp.atribuirDados('produtos_contratados', oDados);
+            this.oGerenciadorContextoApp.atribuirDados('produtos_contratados', oDados);
             let oProduto;
             let valorTotal = 0.00;
 
@@ -95,7 +100,7 @@ export default class TelaProdutoEscolha extends Component {
                 oProduto = oDados[i];
                 valorTotal += Number.parseFloat(oProduto.valor);
             }
-            let oDadosAppGeral = oGerenciadorDadosApp.getDadosAppGeral();
+            let oDadosAppGeral = this.oGerenciadorContextoApp.dadosAppGeral;
             
             oDadosAppGeral.dados_app.contrato.valorTotal = valorTotal;
             
@@ -105,10 +110,10 @@ export default class TelaProdutoEscolha extends Component {
 
     contratar() {
         try {
-            let url = oUtil.getURL('/contratos/incluir/');
+            let url = this.oUtil.getURL('/contratos/incluir/');
             
-            oDadosControleApp.processando_requisicao = true;
-            oGerenciadorDadosApp.atualizarEstadoTela(this);
+            this.oDadosControleApp.processando_requisicao = true;
+            this.oGerenciadorContextoApp.atualizarEstadoTela(this);
 
             fetch(url, {
                     method: 'POST',
@@ -118,9 +123,9 @@ export default class TelaProdutoEscolha extends Component {
                     },
                     body: JSON.stringify(this.state)
                   })
-                  .then(oUtil.obterJsonResposta)
+                  .then(this.oUtil.obterJsonResposta)
                   .then((oJsonDados) => {
-                      oUtil.tratarRetornoServidor(oJsonDados, this.tratarContratar);
+                      this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarContratar);
                   })
         } catch (exc) {
             Alert.alert(exc);
@@ -128,11 +133,11 @@ export default class TelaProdutoEscolha extends Component {
     }
 
     tratarContratar(oDados) {
-        oGerenciadorDadosApp.atribuirDados('contrato', oDados);
+        this.oGerenciadorContextoApp.atribuirDados('contrato', oDados);
     }
     
     voltar() {
-        oGerenciadorDadosApp.voltar();
+        this.oNavegacao.goBack();
     }
 
     botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;        
@@ -143,12 +148,13 @@ export default class TelaProdutoEscolha extends Component {
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Produto' nomeTela='Contratação' />
-                <AreaDados contratar={this.contratar} dadosApp={oDadosApp}/>
+                <AreaDados contratar={this.contratar} dadosApp={this.oDadosApp}/>
                 <AreaBotoes botoes={botoesTela} />
             </View>
         );
     }
 }
+TelaProdutoEscolha.contextType = ContextoApp;
 
 export class AreaDados extends Component {
 
@@ -174,11 +180,7 @@ export class AreaDados extends Component {
             oCard = <CardContent text={produtoFormatado} key={oProduto.codigo} />;
             listaProdutosCartao.push(oCard);
         }
-        // botaoVoltar = () => <Button title="Contratar" onPress={this.contratar} ></Button>;
-        // let botoesCard = [ { element: this.botaoVoltar }];
-
-        // oCard = <CardContent text={produtoFormatado} key={oProduto.codigo} />;
-
+        
         return (
             <ScrollView>
                 <ThemeProvider theme={theme}>                    

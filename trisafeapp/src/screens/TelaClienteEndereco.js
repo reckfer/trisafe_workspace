@@ -16,35 +16,41 @@ import Util from './../common/Util';
 import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
 import AreaBotoes from './../common/AreaBotoes';
-import GerenciadorDadosApp from './../common/GerenciadorDadosApp';
+import { ContextoApp } from '../contexts/ContextoApp';
 
 export default class TelaClienteEndereco extends Component {
 	
-    constructor(props) {
+    constructor(props, value) {
         super(props);
+
+        if(props && props.navigation) {
+            this.oNavegacao = props.navigation;
+        }
+        
+        if(value && value.gerenciador) {
+            this.oGerenciadorContextoApp = value.gerenciador;
+            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
+            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
+            this.oUtil = new Util(this);
+            
+            this.state = this.oGerenciadorContextoApp.dadosAppGeral;
+        }
         
         this.avancar = this.avancar.bind(this);
         this.voltar = this.voltar.bind(this);
-        
-        oUtil = new Util(this);
-        oGerenciadorDadosApp = new GerenciadorDadosApp(this);
-        oDadosApp = oGerenciadorDadosApp.getDadosApp();
-        oDadosControleApp = oGerenciadorDadosApp.getDadosControleApp();
-
-        this.state = oGerenciadorDadosApp.getDadosAppGeral();
     }
 
     avancar() {
         // const { navigation } = this.props;
         
         // if(this.validarDadosPessoais()) {
-            oGerenciadorDadosApp.irPara('Confirmação dos dados', this.state);
+            this.oNavegacao.navigate('Confirmação dos dados', this.state);
         // }
     }
 
     voltar() {
         
-        oGerenciadorDadosApp.voltar();
+        this.oNavegacao.goBack();
     }
 
     render() {
@@ -56,12 +62,13 @@ export default class TelaClienteEndereco extends Component {
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Cadastro' nomeTela='Endereço' />
-                <AreaDados dadosApp={oDadosApp}/>
+                <AreaDados dadosApp={this.oDadosApp}/>
                 <AreaBotoes botoes={botoesTela} />
             </View>
         );
     }
 }
+TelaClienteEndereco.contextType = ContextoApp;
 
 export class AreaDados extends Component {
 

@@ -3,17 +3,17 @@ import {
     AppState
 } from 'react-native';
 
-export const oEstruturaRegistroLog = {
-    'registro_log':  {
-        'data_hora': '',
-        'mensagem_log' : '',
-    }
-}
+// export const oEstruturaRegistroLog = {
+//     'registro_log':  {
+//         'data_hora': '',
+//         'mensagem_log' : '',
+//     }
+// }
 
-export const oEstruturaDadosLog = {
-    'config_log': {},
-    'registros_log': [oEstruturaRegistroLog],
-}
+// export const oEstruturaDadosLog = {
+//     'config_log': {},
+//     'registros_log': [oEstruturaRegistroLog],
+// }
 
 export default class GerenciadorLog {
     oDadosReferencia = oEstruturaDadosLog;
@@ -90,7 +90,7 @@ export default class GerenciadorLog {
             if(!this.enviando && this.oRegistrosLogs && this.oRegistrosLogs.length > 0) {
                 this.enviando = true;
 
-                let url = oUtil.getURL('/gerenciadorlogs/registrar_do_cliente/');
+                let url = this.oUtil.getURL('/gerenciadorlogs/registrar_do_cliente/');
                 let oMensagensLog = {
                     'registros_log' : this.oRegistrosLogs,
                 }

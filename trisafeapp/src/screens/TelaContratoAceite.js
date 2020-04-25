@@ -17,46 +17,52 @@ import Pdf from 'react-native-pdf';
 import Cabecalho from '../common/CabecalhoTela';
 import { styles, theme } from '../common/Estilos';
 import AreaBotoes from '../common/AreaBotoes';
-import GerenciadorDadosApp from './../common/GerenciadorDadosApp';
+import { ContextoApp } from '../contexts/ContextoApp';
 
 export default class TelaContratoAceite extends Component {
 	
-    constructor(props) {
+    constructor(props, value) {
         super(props);
+
+        if(props && props.navigation) {
+            this.oNavegacao = props.navigation;
+        }
+        
+        if(value && value.gerenciador) {
+            this.oGerenciadorContextoApp = value.gerenciador;
+            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
+            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
+            this.oUtil = new Util(this);
+            
+            this.state = this.oGerenciadorContextoApp.dadosAppGeral;
+        }
         
         this.voltar = this.voltar.bind(this);
         this.inicializarDadosTela = this.inicializarDadosTela.bind(this);
         this.obterArquivoContrato = this.obterArquivoContrato.bind(this);
         this.contratar = this.contratar.bind(this);
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
-    
-        oUtil = new Util(this);
-        oGerenciadorDadosApp = new GerenciadorDadosApp(this);
-        oDadosApp = oGerenciadorDadosApp.getDadosApp();
-        oDadosControleApp = oGerenciadorDadosApp.getDadosControleApp();
-
-        this.state = oGerenciadorDadosApp.getDadosAppGeral();
 
         this.inicializarDadosTela();
     }
 
     inicializarDadosTela() {
 
-        if(oGerenciadorDadosApp.temDados()) {
+        if(this.oGerenciadorContextoApp.temDados()) {
             this.obterArquivoContrato();
         }
     }
 
     obterArquivoContrato() {
-        oDadosApp.contrato.url_pdf = oUtil.getURL('/contratos/obter_arquivo_contrato/');
+        this.oDadosApp.contrato.url_pdf = this.oUtil.getURL('/contratos/obter_arquivo_contrato/');
     }
 
     contratar() {
         try {
-            let url = oUtil.getURL('/contratos/aceitar/');
+            let url = this.oUtil.getURL('/contratos/aceitar/');
             
-            oDadosControleApp.processando_requisicao = true;
-            oGerenciadorDadosApp.atualizarEstadoTela(this);
+            this.oDadosControleApp.processando_requisicao = true;
+            this.oGerenciadorContextoApp.atualizarEstadoTela(this);
 
             fetch(url, {
                     method: 'POST',
@@ -66,9 +72,9 @@ export default class TelaContratoAceite extends Component {
                     },
                     body: JSON.stringify(this.state)
                     })
-                    .then(oUtil.obterJsonResposta)
+                    .then(this.oUtil.obterJsonResposta)
                     .then((oJsonDados) => {
-                        oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno);
+                        this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno);
                     })
         } catch (exc) {
             Alert.alert(exc);
@@ -77,19 +83,18 @@ export default class TelaContratoAceite extends Component {
 
     tratarDadosRetorno(oDados) {
 
-        oGerenciadorDadosApp.atribuirDados('contrato', oDados);
-        oGerenciadorDadosApp.atribuirDados('boleto', oDados);
+        this.oGerenciadorContextoApp.atribuirDados('contrato', oDados);
+        this.oGerenciadorContextoApp.atribuirDados('boleto', oDados);
 
-        oGerenciadorDadosApp.irPara('Boleto', this.state);
-        // oGerenciadorDadosApp.atualizarEstadoTela(this);
+        this.oNavegacao.navigate('Boleto', this.state);
     }
 
     voltar() {
-        oGerenciadorDadosApp.voltar();
+        this.oNavegacao.goBack();
     }
 
     botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;        
-    botaoContratar = () => <Button title="Contratar" onPress={this.contratar} loading={oDadosControleApp.processando_requisicao}></Button>;
+    botaoContratar = () => <Button title="Contratar" onPress={this.contratar} loading={this.oDadosControleApp.processando_requisicao}></Button>;
 
     render() {
 
@@ -98,12 +103,13 @@ export default class TelaContratoAceite extends Component {
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Contrato' nomeTela='Confirmação' />
-                <AreaDados dadosApp={oDadosApp}/>
+                <AreaDados dadosApp={this.oDadosApp}/>
                 <AreaBotoes botoes={botoesTela} />
             </View>
         );
     }
 }
+TelaContratoAceite.contextType = ContextoApp;
 
 export class AreaDados extends Component {
 
@@ -140,7 +146,7 @@ export class AreaDados extends Component {
                     onPageChanged={(page,numberOfPages)=>{
                     }}
                     onError={(error)=>{
-                        oUtil.obterJsonResposta(error);
+                        this.oUtil.obterJsonResposta(error);
                     }}
                     onPressLink={(uri)=>{
                     }}

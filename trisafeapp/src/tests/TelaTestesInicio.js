@@ -17,13 +17,27 @@ import Cabecalho from '../common/CabecalhoTela';
 import AreaBotoes from '../common/AreaBotoes';
 import { styles, theme } from '../common/Estilos';
 import UtilTests from './UtilTests';
-import GerenciadorDadosApp from '../common/GerenciadorDadosApp';
+import { ContextoApp } from '../contexts/ContextoApp';
 
 export default class TelaTestesInicio extends Component {
 
-    constructor(props) {
+    constructor(props, value) {
         super(props);
         
+        if(props && props.navigation) {
+            this.oNavegacao = props.navigation;
+        }
+        
+        if(value && value.gerenciador) {
+            this.oGerenciadorContextoApp = value.gerenciador;
+            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
+            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
+            this.objUtilTests = new UtilTests();
+            this.oUtil = new Util(this);
+            
+            this.state = this.oGerenciadorContextoApp.dadosAppGeral;
+        }
+
         this.irParaTesteCadastroIter = this.irParaTesteCadastroIter.bind(this);
         this.irParaTesteGeraContratoPDF = this.irParaTesteGeraContratoPDF.bind(this);
         this.irParaTesteBoletoGerenciaNet = this.irParaTesteBoletoGerenciaNet.bind(this);        
@@ -35,21 +49,13 @@ export default class TelaTestesInicio extends Component {
         this.tratarDadosRetornoContrato = this.tratarDadosRetornoContrato.bind(this);
         this.inicializarDadosTela = this.inicializarDadosTela.bind(this);
         this.voltar = this.voltar.bind(this);
-
-        objUtilTests = new UtilTests();
-        oUtil = new Util(this);
-        oGerenciadorDadosApp = new GerenciadorDadosApp(this);
-        oDadosApp = oGerenciadorDadosApp.getDadosApp();
-        oDadosControleApp = oGerenciadorDadosApp.getDadosControleApp();
-        
-        this.state = oGerenciadorDadosApp.getDadosAppGeral();
-        
+                
         this.inicializarDadosTela();
     }
 
     inicializarDadosTela() {
 
-        if(!oGerenciadorDadosApp.temDados()) {
+        if(!this.oGerenciadorContextoApp.temDados()) {
             this.obterUltimoCliente();
         }
     }
@@ -58,27 +64,27 @@ export default class TelaTestesInicio extends Component {
         
         let oDados = this.gerarDadosTestes();
 
-        oGerenciadorDadosApp.irPara('Cadastro', oDados);
+        this.oNavegacao.navigate('Cadastro', oDados);
     }
 
     irParaTesteBoletoGerenciaNet() {
         
-        oGerenciadorDadosApp.irPara('Boleto', this.state);
+        this.oNavegacao.navigate('Boleto', this.state);
     }
 
     irParaTesteGeraContratoPDF() {
 
-        oGerenciadorDadosApp.irPara('Produtos', this.state);
+        this.oNavegacao.navigate('Produtos', this.state);
     }
 
     irParaTesteContratoPDF() {
         
-        oGerenciadorDadosApp.irPara('Contrato', this.state);
+        this.oNavegacao.navigate('Contrato', this.state);
     }
 
     obterUltimoCliente() {
         try {
-            let url = oUtil.getURL('/clientes/obter_ultimo/');
+            let url = this.oUtil.getURL('/clientes/obter_ultimo/');
            
             fetch(url, {
                     method: 'POST',
@@ -88,9 +94,9 @@ export default class TelaTestesInicio extends Component {
                     },
                     body: JSON.stringify(this.state)
                   })
-                  .then(oUtil.obterJsonResposta)
+                  .then(this.oUtil.obterJsonResposta)
                   .then((oJsonDados) => {
-                      oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno);
+                      this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno);
                   })
         } catch (exc) {
             Alert.alert(exc);
@@ -99,15 +105,15 @@ export default class TelaTestesInicio extends Component {
 
     tratarDadosRetorno(oDados) {
 
-        oGerenciadorDadosApp.atribuirDados('cliente', oDados);
+        this.oGerenciadorContextoApp.atribuirDados('cliente', oDados);
         
-        oGerenciadorDadosApp.atualizarEstadoTela(this);
-        this.obterContratoPorCliente()
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
+        this.obterContratoPorCliente();
     }
 
     obterContratoPorCliente() {
         try {
-            let url = oUtil.getURL('/contratos/obter_por_cliente/');
+            let url = this.oUtil.getURL('/contratos/obter_por_cliente/');
 
             fetch(url, {
                     method: 'POST',
@@ -117,9 +123,9 @@ export default class TelaTestesInicio extends Component {
                     },
                     body: JSON.stringify(this.state)
                   })
-                  .then(oUtil.obterJsonResposta)
+                  .then(this.oUtil.obterJsonResposta)
                   .then((oJsonDados) => {
-                      oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetornoContrato);
+                      this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetornoContrato);
                   })
         } catch (exc) {
             Alert.alert(exc);
@@ -128,19 +134,19 @@ export default class TelaTestesInicio extends Component {
     
     tratarDadosRetornoContrato(oDados) {
 
-        oGerenciadorDadosApp.atribuirDados('contrato', oDados);
-        oGerenciadorDadosApp.atualizarEstadoTela(this);
+        this.oGerenciadorContextoApp.atribuirDados('contrato', oDados);
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
     }
 
     gerarDadosTestes() {
-        let oDadosAppGeral = oGerenciadorDadosApp.inicializarDados();
-        let oDadosCliente = oDadosApp.cliente;
+        let oDadosAppGeral = this.oGerenciadorContextoApp.dadosAppGeral;
+        let oDadosCliente = this.oDadosApp.cliente;
 
         let numAleatorio = Math.random();
         let usuario = numAleatorio.toString(36).slice(6);
 
         oDadosCliente.nome = 'Fernando Reck ' + usuario;
-        oDadosCliente.cpf = objUtilTests.gerarCPF();
+        oDadosCliente.cpf = this.objUtilTests.gerarCPF();
         oDadosCliente.email = usuario + '@emailtestes.com.br';
         oDadosCliente.nome_usuario = usuario;
         oDadosCliente.telefone = '519' + numAleatorio.toString().slice(10);
@@ -156,7 +162,7 @@ export default class TelaTestesInicio extends Component {
     }
 
     voltar() {
-        oGerenciadorDadosApp.voltar();
+        this.oNavegacao.goBack();
     }
 
     botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;
@@ -175,7 +181,7 @@ export default class TelaTestesInicio extends Component {
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Testes' nomeTela='Início' />
-                <AreaDados dadosApp={oDadosApp} funcoes={funcoes} />
+                <AreaDados dadosApp={this.oDadosApp} funcoes={funcoes} />
                 <AreaBotoes botoes={botoesTela} />
             </View>
         );
@@ -235,3 +241,4 @@ export class AreaDados extends Component {
         );
     }
 }
+TelaTestesInicio.contextType = ContextoApp;

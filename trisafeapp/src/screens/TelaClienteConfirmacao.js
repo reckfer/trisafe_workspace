@@ -16,31 +16,37 @@ import { ThemeProvider, Input, Button } from 'react-native-elements';
 import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
 import AreaBotoes from './../common/AreaBotoes';
-import GerenciadorDadosApp from './../common/GerenciadorDadosApp';
+import { ContextoApp } from '../contexts/ContextoApp';
 
 export default class TelaClienteConfirmacao extends Component {
 	
-    constructor(props) {
+    constructor(props, value) {
         super(props);
+
+        if(props && props.navigation) {
+            this.oNavegacao = props.navigation;
+        }
+        
+        if(value && value.gerenciador) {
+            this.oGerenciadorContextoApp = value.gerenciador;
+            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
+            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
+            this.oUtil = new Util(this);
+            
+            this.state = this.oGerenciadorContextoApp.dadosAppGeral;
+        }
         
         this.salvar = this.salvar.bind(this);
         this.voltar = this.voltar.bind(this);
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
-        
-        oUtil = new Util(this);
-        oGerenciadorDadosApp = new GerenciadorDadosApp(this);
-        oDadosApp = oGerenciadorDadosApp.getDadosApp();
-        oDadosControleApp = oGerenciadorDadosApp.getDadosControleApp();
-
-        this.state = oGerenciadorDadosApp.getDadosAppGeral();
     }
 
     salvar() {
         try {
-            let url = oUtil.getURL('/clientes/incluir/');
+            let url = this.oUtil.getURL('/clientes/incluir/');
             
-            oDadosControleApp.processando_requisicao = true;
-            oGerenciadorDadosApp.atualizarEstadoTela(this);
+            this.oDadosControleApp.processando_requisicao = true;
+            this.oGerenciadorContextoApp.atualizarEstadoTela(this);
 
             fetch(url, {
                     method: 'POST',
@@ -50,9 +56,9 @@ export default class TelaClienteConfirmacao extends Component {
                     },
                     body: JSON.stringify(this.state)
                   })
-                  .then(oUtil.obterJsonResposta)
+                  .then(this.oUtil.obterJsonResposta)
                   .then((oJsonDados) => {
-                      oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno);
+                      this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno);
                   })
         } catch (exc) {
             Alert.alert(exc);
@@ -65,16 +71,16 @@ export default class TelaClienteConfirmacao extends Component {
             Alert.alert("Cod. cliente Iter: " + oDados.id_cliente_iter);
         }
 
-        oDadosControleApp.processando_requisicao = false;
-        oGerenciadorDadosApp.atualizarEstadoTela(this);
+        this.oDadosControleApp.processando_requisicao = false;
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
     }
      
     voltar() {
-        oGerenciadorDadosApp.voltar();
+        this.oNavegacao.goBack();
     }
 
     botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;        
-    botaoConfirmar = () => <Button title="Confirmar" onPress={this.salvar} loading={oDadosControleApp.processando_requisicao} ></Button>;
+    botaoConfirmar = () => <Button title="Confirmar" onPress={this.salvar} loading={this.oDadosControleApp.processando_requisicao} ></Button>;
 
     render() {
         let botoesTela = [ { element: this.botaoVoltar }, { element: this.botaoConfirmar } ];
@@ -82,12 +88,13 @@ export default class TelaClienteConfirmacao extends Component {
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Cadastro' nomeTela='Confirmação' />
-                <AreaDados dadosApp={oDadosApp}/>
+                <AreaDados dadosApp={this.oDadosApp}/>
                 <AreaBotoes botoes={botoesTela} />
             </View>
         );
     }
 }
+TelaClienteConfirmacao.contextType = ContextoApp;
 
 export class AreaDados extends Component {
 
