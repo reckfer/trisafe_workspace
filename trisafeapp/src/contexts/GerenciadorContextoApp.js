@@ -1,33 +1,52 @@
 import { DADOS_APP_GERAL } from './DadosAppGeral';
+import RegistradorLog from './RegistradorLog';
+import { AppState } from 'react-native';
 
 export default class GerenciadorContextoApp {
     
     constructor() {
         this.oDadosReferencia = DADOS_APP_GERAL;
-    }
+
+        this.oRegistradorLog = new RegistradorLog();
+        this.oDadosReferencia.registros_log = this.oRegistradorLog.registrosLog;
+        this._transportarLogServidor = this._transportarLogServidor.bind(this);
+        AppState.addEventListener('change', this._transportarLogServidor);
+    };
 
     get dadosApp() {
         if(this.oDadosReferencia) {
             return this.oDadosReferencia.dados_app;
         }
         return null;
-    }
+    };
 
     get dadosControleApp() {
         return this.oDadosReferencia.dados_app.controle_app;
-    }
+    };
 
     get dadosAppGeral() {
         return this.oDadosReferencia;
+    };
+
+    get registradorLog() {
+        return this.oRegistradorLog;
     }
+
+    get appAtivo() {
+
+        if (AppState.currentState.match(/inactive|background/)) {
+            return false;
+        }
+
+        return true;
+    };
 
     /*** FUNCOES DE ATRIBUICOES ****/
     atualizarEstadoTela(objetoTela) {
         if(this.oDadosReferencia) {
             objetoTela.setState(this.oDadosReferencia);
         }
-    }
-
+    };
 
     atribuirDados(nomeAtributo, oDadosAtribuir) {
         let oDados = this.oDadosReferencia.dados_app;
@@ -135,13 +154,13 @@ export default class GerenciadorContextoApp {
         }
 
         return this.oDadosReferencia;
-    }
+    };
 
     _atribuirDadosObjeto(oObjetoReceber, oDadosAtribuir) {        
         for(campo in oObjetoReceber) {
             oObjetoReceber[campo] = this._atribuir(campo, oDadosAtribuir);
         }
-    }
+    };
 
     _atribuir(nomeAtributo, oDadosAtribuir) {
         for(campo in oDadosAtribuir) {
@@ -149,7 +168,7 @@ export default class GerenciadorContextoApp {
                 return oDadosAtribuir[nomeAtributo];
             }
         }
-    }
+    };
 
     /*** FUNCOES AUXILIARES ****/
     temDados() {
@@ -196,7 +215,7 @@ export default class GerenciadorContextoApp {
             }
         }
         return false;
-    }
+    };
 
     _clonarObjeto(objeto) {
         let novoObjeto = {};
@@ -206,5 +225,11 @@ export default class GerenciadorContextoApp {
             novoObjeto[campoNovo] = '';
         }
         return novoObjeto;
+    };
+
+    _transportarLogServidor() {
+        if(!this.appAtivo) {
+            this.oRegistradorLog.transportar();
+        }
     }
 }

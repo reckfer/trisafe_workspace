@@ -12,10 +12,10 @@ import {
     View
 } from 'react-native';
 import Util from '../common/Util';
-import { ThemeProvider, Button } from 'react-native-elements';
+import { Button } from 'react-native-elements';
 import Pdf from 'react-native-pdf';
 import Cabecalho from '../common/CabecalhoTela';
-import { styles, theme } from '../common/Estilos';
+import { styles } from '../common/Estilos';
 import AreaBotoes from '../common/AreaBotoes';
 import { ContextoApp } from '../contexts/ContextoApp';
 
@@ -32,7 +32,7 @@ export default class TelaContratoAceite extends Component {
             this.oGerenciadorContextoApp = value.gerenciador;
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
-            this.oUtil = new Util(this);
+            this.oUtil = new Util(this.oGerenciadorContextoApp);
             
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }

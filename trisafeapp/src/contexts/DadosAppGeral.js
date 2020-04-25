@@ -42,7 +42,7 @@ export const DADOS_BOLETO = {
 
 export const DADOS_CONTROLE_APP = {
     'processando_requisicao': false,
-}
+};
 
 export const DADOS_APP_GERAL = {
     'dados_app': {
@@ -52,14 +52,5 @@ export const DADOS_APP_GERAL = {
         'boleto': DADOS_BOLETO,
         'controle_app': DADOS_CONTROLE_APP,
     },
-    'dados_log':{
-        'config_log': {},
-        'registros_log': [{
-            'registro_log':  {
-                'data_hora': '',
-                'mensagem_log' : '',
-            }
-        }],
-    }
+    'registros_log': null,
 };
-

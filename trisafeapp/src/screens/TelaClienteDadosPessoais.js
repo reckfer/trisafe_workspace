@@ -31,7 +31,7 @@ export default class TelaClienteDadosPessoais extends Component {
             this.oGerenciadorContextoApp = value.gerenciador;
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
-            this.oUtil = new Util(this);
+            this.oUtil = new Util(this.oGerenciadorContextoApp);
             
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }

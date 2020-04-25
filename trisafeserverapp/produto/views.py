@@ -49,7 +49,6 @@ class ProdutoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
         m_produto.nome = request.data['nome']
         m_produto.tipo = request.data['tipo']
         m_produto.valor = request.data['valor']
-        # lista_produtos = request.data['produtos']
 
         m_cliente = Cliente()
         m_cliente.cpf = request.data['cpf']

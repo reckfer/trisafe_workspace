@@ -19,7 +19,7 @@ class GerenciadorLog:
             
             for d_registro_log in d_registros_log:
                 # Add the line
-                logging.debug("[%s] %s" % (d_registro_log['data_hora'], d_registro_log['registro_log']))
+                logging.debug("[%s] %s" % (d_registro_log['data_hora'], d_registro_log['mensagem_log']))
 
             return Retorno(True)
         except Exception as e:

@@ -33,7 +33,7 @@ export default class TelaTestesInicio extends Component {
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
             this.objUtilTests = new UtilTests();
-            this.oUtil = new Util(this);
+            this.oUtil = new Util(this.oGerenciadorContextoApp);
             
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }

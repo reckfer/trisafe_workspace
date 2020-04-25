@@ -1,13 +1,19 @@
 import {
     Alert,
 } from 'react-native';
-// import GerenciadorLog from './../common/GerenciadorLog';
 
 export default class Util {
 
-    // constructor(oTela){
-    //     this.oLogger = new GerenciadorLog(oTela);
-    // }
+    constructor(gerenciadorContexto) {
+        
+        if(gerenciadorContexto) {
+            this.oGerenciadorContextoApp = gerenciadorContexto;
+            this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;
+        }
+        
+        this.obterJsonResposta = this.obterJsonResposta.bind(this);
+    }
+
     getURL(metodo){
         protocol = 'https://';
         domain = 'trisafeserverherokua.herokuapp.com';
@@ -20,23 +26,22 @@ export default class Util {
     }
 
     obterJsonResposta(oRespostaHTTP) {
-        //let this.oLogger = logger.createLogger();
 
-        // this.oLogger.registrar('Util.obterJsonResposta() => Iniciou.');
+        this.oRegistradorLog.registrar('Util.obterJsonResposta() => Iniciou.');
 
         if(oRespostaHTTP) {
 
-            // this.oLogger.registrar('Util.obterJsonResposta() => Recebeu: ' + JSON.stringify(oRespostaHTTP));
+            this.oRegistradorLog.registrar('Util.obterJsonResposta() => Recebeu: ' + JSON.stringify(oRespostaHTTP));
 
             if(oRespostaHTTP.ok) {
                 let oJsonDados = oRespostaHTTP.json();
 
-                // this.oLogger.registrar('Util.obterJsonResposta() => Resposta http ok. Dados: ' + JSON.stringify(oJsonDados));
+                this.oRegistradorLog.registrar('Util.obterJsonResposta() => Resposta http ok. Dados: ' + JSON.stringify(oJsonDados));
                 
                 return oJsonDados;
             } else {
                 
-                // this.oLogger.registrar('Util.obterJsonResposta() => Resposta http nao ok.');
+                this.oRegistradorLog.registrar('Util.obterJsonResposta() => Resposta http nao ok.');
 
                 if(oRespostaHTTP.status && oRespostaHTTP.url) {
                     
@@ -44,12 +49,12 @@ export default class Util {
                     ". URL: " + oRespostaHTTP.url);
                 } else if (oRespostaHTTP instanceof Error) {
                     
-                    // this.oLogger.registrar(oRespostaHTTP.message);
+                    this.oRegistradorLog.registrar(oRespostaHTTP.message);
                     Alert.alert(oRespostaHTTP.message);
                 }
             }
         } else {
-            // this.oLogger.registrar('Util.obterJsonResposta() => oRespostaHTTP estava vazia. Vai retornar null de obterJsonResposta().');
+            this.oRegistradorLog.registrar('Util.obterJsonResposta() => oRespostaHTTP estava vazia. Vai retornar null de obterJsonResposta().');
         }
         return null;
     }

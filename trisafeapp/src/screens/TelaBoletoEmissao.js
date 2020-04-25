@@ -18,6 +18,7 @@ import Pdf from 'react-native-pdf';
 import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
 import AreaBotoes from './../common/AreaBotoes';
+import { ContextoApp } from '../contexts/ContextoApp';
 
 export default class TelaBoletoEmissao extends Component {
 	
@@ -32,7 +33,7 @@ export default class TelaBoletoEmissao extends Component {
             this.oGerenciadorContextoApp = value.gerenciador;
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
-            this.oUtil = new Util(this);
+            this.oUtil = new Util(this.oGerenciadorContextoApp);
             
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
@@ -126,6 +127,8 @@ export default class TelaBoletoEmissao extends Component {
         );
     }
 }
+
+TelaBoletoEmissao.contextType = ContextoApp;
 
 export class AreaDados extends Component {
 

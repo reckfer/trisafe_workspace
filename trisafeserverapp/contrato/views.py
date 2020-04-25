@@ -34,9 +34,6 @@ class ContratoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
             
             lista_produtos = ContratoViewSet.extrair_produtos_dados_http(request)
             retorno = m_contrato.incluir(lista_produtos)
-
-            if not retorno.estado.ok:
-                return retorno
             
             return Response(retorno.json())
         except Exception as e:
@@ -53,7 +50,7 @@ class ContratoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
             retorno_contrato = m_contrato.obter()
 
             if not retorno_contrato.estado.ok:
-                return retorno_contrato
+                return Response(retorno_contrato.json())
             
             m_boleto = BoletoGerenciaNet()
             m_contrato = retorno_contrato.dados
@@ -83,9 +80,6 @@ class ContratoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
             m_contrato = ContratoViewSet.apropriar_dados_http(request)
             
             retorno = m_contrato.obter()
-
-            if not retorno.estado.ok:
-                return retorno
             
             return Response(retorno.json())
         except Exception as e:
@@ -100,9 +94,6 @@ class ContratoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
             m_contrato = ContratoViewSet.apropriar_dados_http(request)
             
             retorno = m_contrato.obter_por_cliente()
-
-            if not retorno.estado.ok:
-                return retorno
             
             return Response(retorno.json())
         except Exception as e:
