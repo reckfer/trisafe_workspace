@@ -28,17 +28,24 @@ export default class TelaClienteConfirmacao extends Component {
         }
         
         if(value && value.gerenciador) {
+            // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
             this.oGerenciadorContextoApp = value.gerenciador;
-            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
             
+            this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
+            this.oRegistradorLog.registrar('TelaClienteConfirmacao.constructor() => Iniciou.');
+
+            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
+            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
+            this.oUtil = new Util(this.oGerenciadorContextoApp);
+
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
         
         this.salvar = this.salvar.bind(this);
-        this.voltar = this.voltar.bind(this);
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
+        this.voltar = this.voltar.bind(this);
+
+        this.oRegistradorLog.registrar('TelaClienteConfirmacao.constructor() => Finalizou.');
     }
 
     salvar() {
@@ -46,6 +53,11 @@ export default class TelaClienteConfirmacao extends Component {
             let url = this.oUtil.getURL('/clientes/incluir/');
             
             this.oDadosControleApp.processando_requisicao = true;
+
+            let dadosParametros = JSON.stringify(this.state);
+
+            this.oRegistradorLog.registrar(`TelaBoletoEmissao.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
+
             this.oGerenciadorContextoApp.atualizarEstadoTela(this);
 
             fetch(url, {
@@ -54,7 +66,7 @@ export default class TelaClienteConfirmacao extends Component {
                       Accept: 'application/json',
                       'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(this.state)
+                    body: dadosParametros,
                   })
                   .then(this.oUtil.obterJsonResposta)
                   .then((oJsonDados) => {

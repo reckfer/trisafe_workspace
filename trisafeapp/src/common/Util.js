@@ -12,6 +12,7 @@ export default class Util {
         }
         
         this.obterJsonResposta = this.obterJsonResposta.bind(this);
+        this.tratarRetornoServidor = this.tratarRetornoServidor.bind(this);
     }
 
     getURL(metodo){
@@ -20,7 +21,7 @@ export default class Util {
 
         if (__DEV__) {
             protocol = 'http://';
-            domain = '192.168.0.5:8000';
+            domain = '10.0.0.106:8000';
         }
         return protocol + domain + metodo;
     }
@@ -36,7 +37,7 @@ export default class Util {
             if(oRespostaHTTP.ok) {
                 let oJsonDados = oRespostaHTTP.json();
 
-                this.oRegistradorLog.registrar('Util.obterJsonResposta() => Resposta http ok. Dados: ' + JSON.stringify(oJsonDados));
+                this.oRegistradorLog.registrar('Util.obterJsonResposta() => Resposta http ok.');
                 
                 return oJsonDados;
             } else {
@@ -61,10 +62,10 @@ export default class Util {
 
     tratarRetornoServidor(oJsonRetorno, oFuncaoTratarDados, suprimirMsgServidor) {
         
-        // this.oLogger.registrar('Util.tratarRetornoServidor() => Iniciou.');
+        this.oRegistradorLog.registrar('Util.tratarRetornoServidor() => Iniciou.');
 
         if(oJsonRetorno) {
-            // this.oLogger.registrar('Util.tratarRetornoServidor() => Recebeu: ' + JSON.stringify(oJsonRetorno));
+            this.oRegistradorLog.registrar('Util.tratarRetornoServidor() => Recebeu: ' + JSON.stringify(oJsonRetorno));
 
             let oEstado = oJsonRetorno.estado;
             let oDados = oJsonRetorno.dados;
@@ -79,7 +80,7 @@ export default class Util {
             
             oFuncaoTratarDados(oDados, oEstado);
         } else {
-            // this.oLogger.registrar('Util.tratarRetornoServidor() => oJsonRetorno estava vazio.');
+            this.oRegistradorLog.registrar('Util.tratarRetornoServidor() => oJsonRetorno estava vazio.');
             
             Alert.alert("O retorno do servidor foi vazio.");
         }

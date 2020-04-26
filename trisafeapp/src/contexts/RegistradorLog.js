@@ -13,6 +13,7 @@ export default class RegistradorLog {
 
         this.registrar = this.registrar.bind(this);
         this.transportar = this.transportar.bind(this);
+        this.temLogs = this.temLogs.bind(this);
         this.obterJsonResposta = this.obterJsonResposta.bind(this);
         this.enviando = false;
     }
@@ -47,9 +48,12 @@ export default class RegistradorLog {
                 this.enviando = true;
 
                 let url = this.oUtil.getURL('/gerenciadorlogs/registrar_do_cliente/');
+
                 let oMensagensLog = {
                     'registros_log' : this.oRegistrosLogs,
                 }
+
+                let dadosParametros = JSON.stringify(oMensagensLog);
                 
                 fetch(url, {
                         method: 'POST',
@@ -57,9 +61,9 @@ export default class RegistradorLog {
                         Accept: 'application/json',
                         'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify(oMensagensLog)
+                        body: dadosParametros,
                     })
-                    .then(this.obterJsonResposta)
+                    .then(this.obterJsonResposta);
             }
         } catch (exc) {
             console.log(exc);

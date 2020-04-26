@@ -6,7 +6,7 @@
  */
 
 import React, { Component } from 'react';
-import { ThemeProvider, Input, Button} from 'react-native-elements';
+import { Input, Button} from 'react-native-elements';
 import {
     ScrollView,
     Alert,
@@ -15,7 +15,7 @@ import {
 import Util from '../common/Util';
 import Cabecalho from '../common/CabecalhoTela';
 import AreaBotoes from '../common/AreaBotoes';
-import { styles, theme } from '../common/Estilos';
+import { styles } from '../common/Estilos';
 import UtilTests from './UtilTests';
 import { ContextoApp } from '../contexts/ContextoApp';
 
@@ -24,32 +24,38 @@ export default class TelaTestesInicio extends Component {
     constructor(props, value) {
         super(props);
         
+        if(value && value.gerenciador) {
+            // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
+            this.oGerenciadorContextoApp = value.gerenciador;
+            
+            this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
+            this.oRegistradorLog.registrar('TelaTestesInicio.constructor() => Iniciou.');
+
+            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
+            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
+            this.oUtil = new Util(this.oGerenciadorContextoApp);
+
+            this.state = this.oGerenciadorContextoApp.dadosAppGeral;            
+        }
+        
         if(props && props.navigation) {
             this.oNavegacao = props.navigation;
         }
-        
-        if(value && value.gerenciador) {
-            this.oGerenciadorContextoApp = value.gerenciador;
-            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
-            this.objUtilTests = new UtilTests();
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
-            
-            this.state = this.oGerenciadorContextoApp.dadosAppGeral;
-        }
+        this.objUtilTests = new UtilTests();
 
+        this.inicializarDadosTela = this.inicializarDadosTela.bind(this);
         this.irParaTesteCadastroIter = this.irParaTesteCadastroIter.bind(this);
-        this.irParaTesteGeraContratoPDF = this.irParaTesteGeraContratoPDF.bind(this);
         this.irParaTesteBoletoGerenciaNet = this.irParaTesteBoletoGerenciaNet.bind(this);        
+        this.irParaTesteGeraContratoPDF = this.irParaTesteGeraContratoPDF.bind(this);
         this.irParaTesteContratoPDF = this.irParaTesteContratoPDF.bind(this);
-        this.gerarDadosTestes = this.gerarDadosTestes.bind(this);
         this.obterUltimoCliente = this.obterUltimoCliente.bind(this);        
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
         this.obterContratoPorCliente = this.obterContratoPorCliente.bind(this);
         this.tratarDadosRetornoContrato = this.tratarDadosRetornoContrato.bind(this);
-        this.inicializarDadosTela = this.inicializarDadosTela.bind(this);
+        this.gerarDadosTestes = this.gerarDadosTestes.bind(this);
         this.voltar = this.voltar.bind(this);
-                
+        
+        this.oRegistradorLog.registrar('TelaTestesInicio.constructor() => Finalizou.');
         this.inicializarDadosTela();
     }
 
@@ -85,14 +91,18 @@ export default class TelaTestesInicio extends Component {
     obterUltimoCliente() {
         try {
             let url = this.oUtil.getURL('/clientes/obter_ultimo/');
-           
+            
+            let dadosParametros = JSON.stringify(this.state);
+
+            this.oRegistradorLog.registrar(`TelaBoletoEmissao.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
+
             fetch(url, {
                     method: 'POST',
                     headers: {
                       Accept: 'application/json',
                       'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(this.state)
+                    body: dadosParametros
                   })
                   .then(this.oUtil.obterJsonResposta)
                   .then((oJsonDados) => {
@@ -114,6 +124,10 @@ export default class TelaTestesInicio extends Component {
     obterContratoPorCliente() {
         try {
             let url = this.oUtil.getURL('/contratos/obter_por_cliente/');
+            
+            let dadosParametros = JSON.stringify(this.state);
+
+            this.oRegistradorLog.registrar(`TelaBoletoEmissao.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
 
             fetch(url, {
                     method: 'POST',
@@ -121,12 +135,12 @@ export default class TelaTestesInicio extends Component {
                       Accept: 'application/json',
                       'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(this.state)
+                    body: dadosParametros,
                   })
                   .then(this.oUtil.obterJsonResposta)
                   .then((oJsonDados) => {
                       this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetornoContrato);
-                  })
+                  });
         } catch (exc) {
             Alert.alert(exc);
         }

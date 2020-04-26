@@ -28,26 +28,23 @@ export default class TelaClienteDadosPessoais extends Component {
         }
         
         if(value && value.gerenciador) {
+            // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
             this.oGerenciadorContextoApp = value.gerenciador;
-            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
             
+            this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
+            this.oRegistradorLog.registrar('TelaClienteDadosPessoais.constructor() => Iniciou.');
+
+            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
+            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
+            this.oUtil = new Util(this.oGerenciadorContextoApp);
+
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
 
         this.voltar = this.voltar.bind(this);
         this.avancar = this.avancar.bind(this);
-    }
 
-    tratarRetornoJson(oJsonResposta) {
-    
-        Alert.alert(oJsonResposta.mensagem);
-        if(oJsonResposta && !oJsonResposta.ok) {
-            
-            return null;
-        }
-        return oJsonResposta;
+        this.oRegistradorLog.registrar('TelaClienteDadosPessoais.constructor() => Finalizou.');
     }
 
     avancar() {

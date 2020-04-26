@@ -28,16 +28,23 @@ export default class TelaClienteEndereco extends Component {
         }
         
         if(value && value.gerenciador) {
+            // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
             this.oGerenciadorContextoApp = value.gerenciador;
-            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
             
+            this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
+            this.oRegistradorLog.registrar('TelaClienteEndereco.constructor() => Iniciou.');
+
+            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
+            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
+            this.oUtil = new Util(this.oGerenciadorContextoApp);
+
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
         
         this.avancar = this.avancar.bind(this);
         this.voltar = this.voltar.bind(this);
+
+        this.oRegistradorLog.registrar('TelaClienteEndereco.constructor() => Finalizou.');
     }
 
     avancar() {

@@ -30,21 +30,27 @@ export default class TelaBoletoEmissao extends Component {
         }
         
         if(value && value.gerenciador) {
+            // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
             this.oGerenciadorContextoApp = value.gerenciador;
-            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
             
+            this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
+            this.oRegistradorLog.registrar('TelaBoletoEmissao.constructor() => Iniciou.');
+
+            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
+            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
+            this.oUtil = new Util(this.oGerenciadorContextoApp);
+
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
 
-        this.voltar = this.voltar.bind(this);
         this.inicializarDadosTela = this.inicializarDadosTela.bind(this);
         this.obterBoleto = this.obterBoleto.bind(this);
         this.tratarRetornoBoleto = this.tratarRetornoBoleto.bind(this);
         this.finalizar = this.finalizar.bind(this);
         this.tratarRetornoEmail = this.tratarRetornoEmail.bind(this);
+        this.voltar = this.voltar.bind(this);
 
+        this.oRegistradorLog.registrar('TelaBoletoEmissao.constructor() => Finalizou.');
         this.inicializarDadosTela();
     }
 
@@ -59,13 +65,17 @@ export default class TelaBoletoEmissao extends Component {
         try {
             let url = this.oUtil.getURL('/boletogerencianets/obter/');
 
+            let dadosParametros = JSON.stringify(this.state);
+
+            this.oRegistradorLog.registrar(`TelaBoletoEmissao.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
+
             fetch(url, {
                     method: 'POST',
                     headers: {
                         Accept: 'application/json',
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(this.state)
+                    body: dadosParametros,
                     })
                     .then(this.oUtil.obterJsonResposta)
                     .then((oJsonDados) => {
@@ -84,6 +94,10 @@ export default class TelaBoletoEmissao extends Component {
     finalizar() {
         try {
             let url = this.oUtil.getURL('/emailclientes/enviar_com_anexos/');
+            
+            let dadosParametros = JSON.stringify(this.state);
+
+            this.oRegistradorLog.registrar(`TelaBoletoEmissao.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
 
             fetch(url, {
                     method: 'POST',
@@ -91,7 +105,7 @@ export default class TelaBoletoEmissao extends Component {
                         Accept: 'application/json',
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(this.state)
+                    body: dadosParametros,
                     })
                     .then(this.oUtil.obterJsonResposta)
                     .then((oJsonDados) => {

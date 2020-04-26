@@ -10,6 +10,15 @@ export default class GerenciadorContextoApp {
         this.oRegistradorLog = new RegistradorLog();
         this.oDadosReferencia.registros_log = this.oRegistradorLog.registrosLog;
         this._transportarLogServidor = this._transportarLogServidor.bind(this);
+        this.atualizarEstadoTela = this.atualizarEstadoTela.bind(this);
+        this.atribuirDados = this.atribuirDados.bind(this);
+        this.temDados = this.temDados.bind(this);
+        this._atribuirDadosObjeto = this._atribuirDadosObjeto.bind(this);
+        this._atribuir = this._atribuir.bind(this);
+        this._clonarObjeto = this._clonarObjeto.bind(this);
+        this._transportarLogServidor = this._transportarLogServidor.bind(this);
+        
+
         AppState.addEventListener('change', this._transportarLogServidor);
     };
 
@@ -62,6 +71,8 @@ export default class GerenciadorContextoApp {
         let oCampoPreencher;
         let camposPreencher;
         let tentarPreencher = false;
+
+        this.oRegistradorLog.registrar(`GerenciadorContextoApp.atribuirDados => Vai atribuir ${nomeAtributo}: ${JSON.stringify(oDadosAtribuir)}`);
         
         if(oDadosAtribuir) {
             if(oDadosAtribuir instanceof Array) {
@@ -156,21 +167,6 @@ export default class GerenciadorContextoApp {
         return this.oDadosReferencia;
     };
 
-    _atribuirDadosObjeto(oObjetoReceber, oDadosAtribuir) {        
-        for(campo in oObjetoReceber) {
-            oObjetoReceber[campo] = this._atribuir(campo, oDadosAtribuir);
-        }
-    };
-
-    _atribuir(nomeAtributo, oDadosAtribuir) {
-        for(campo in oDadosAtribuir) {
-            if(nomeAtributo === campo) {
-                return oDadosAtribuir[nomeAtributo];
-            }
-        }
-    };
-
-    /*** FUNCOES AUXILIARES ****/
     temDados() {
         if(this.oDadosReferencia && this.oDadosReferencia.dados_app) {
             let oDadosApp = this.oDadosReferencia.dados_app;
@@ -217,6 +213,21 @@ export default class GerenciadorContextoApp {
         return false;
     };
 
+    _atribuirDadosObjeto(oObjetoReceber, oDadosAtribuir) {        
+        for(campo in oObjetoReceber) {
+            oObjetoReceber[campo] = this._atribuir(campo, oDadosAtribuir);
+        }
+    };
+
+    _atribuir(nomeAtributo, oDadosAtribuir) {
+        for(campo in oDadosAtribuir) {
+            if(nomeAtributo === campo) {
+                return oDadosAtribuir[nomeAtributo];
+            }
+        }
+    };
+
+    /*** FUNCOES AUXILIARES ****/
     _clonarObjeto(objeto) {
         let novoObjeto = {};
 

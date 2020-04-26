@@ -25,29 +25,31 @@ export default class TelaProdutoEscolha extends Component {
     constructor(props, value) {
         super(props);
     
-        // this.oLogger = new GerenciadorLog(this);
+        if(value && value.gerenciador) {
+            // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
+            this.oGerenciadorContextoApp = value.gerenciador;
+            
+            this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
+            this.oRegistradorLog.registrar('TelaProdutoEscolha.constructor() => Iniciou.');
 
-        // this.oLogger.registrar('TelaProdutoEscolha.constructor => Iniciou.');
+            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
+            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
+            this.oUtil = new Util(this.oGerenciadorContextoApp);
+
+            this.state = this.oGerenciadorContextoApp.dadosAppGeral;
+        }
+        
         if(props && props.navigation) {
             this.oNavegacao = props.navigation;
         }
-
-        if(value && value.gerenciador) {
-            this.oGerenciadorContextoApp = value.gerenciador;
-            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
-            
-            this.state = this.oGerenciadorContextoApp.dadosAppGeral;
-        }
-
-        this.voltar = this.voltar.bind(this);
+        
         this.listarProdutos = this.listarProdutos.bind(this);
         this.tratarListarProdutos = this.tratarListarProdutos.bind(this);
         this.contratar = this.contratar.bind(this);
         this.tratarContratar = this.tratarContratar.bind(this);
+        this.voltar = this.voltar.bind(this);
         
-        // this.oLogger.registrar('TelaProdutoEscolha.constructor => Finalizou.');
+        this.oRegistradorLog.registrar('TelaProdutoEscolha.constructor() => Finalizou.');
         
         this.listarProdutos();
     }
@@ -56,8 +58,10 @@ export default class TelaProdutoEscolha extends Component {
         try {
 
             let url = this.oUtil.getURL('/produtos/listar/');
+            
+            let dadosParametros = JSON.stringify({});
 
-            // this.oLogger.registrar('TelaProdutoEscolha.listarProdutos => Vai chamar a url ' + url);
+            this.oRegistradorLog.registrar(`TelaBoletoEmissao.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
 
             fetch(url, {
                 method: 'POST',
@@ -65,8 +69,7 @@ export default class TelaProdutoEscolha extends Component {
                   Accept: 'application/json',
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                }),
+                body: dadosParametros,
               })
                 .then(this.oUtil.obterJsonResposta)
                 .then((oJsonDados) => {
@@ -111,8 +114,13 @@ export default class TelaProdutoEscolha extends Component {
     contratar() {
         try {
             let url = this.oUtil.getURL('/contratos/incluir/');
-            
+
             this.oDadosControleApp.processando_requisicao = true;
+
+            let dadosParametros = JSON.stringify(this.state);
+            
+            this.oRegistradorLog.registrar(`TelaBoletoEmissao.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
+
             this.oGerenciadorContextoApp.atualizarEstadoTela(this);
 
             fetch(url, {
@@ -121,12 +129,12 @@ export default class TelaProdutoEscolha extends Component {
                       Accept: 'application/json',
                       'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(this.state)
+                    body: dadosParametros
                   })
                   .then(this.oUtil.obterJsonResposta)
                   .then((oJsonDados) => {
                       this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarContratar);
-                  })
+                  });
         } catch (exc) {
             Alert.alert(exc);
         }

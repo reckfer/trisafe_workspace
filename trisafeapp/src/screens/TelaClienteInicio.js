@@ -38,17 +38,24 @@ export default class TelaClienteInicio extends Component {
         }
         
         if(value && value.gerenciador) {
+            // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
             this.oGerenciadorContextoApp = value.gerenciador;
-            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
             
+            this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
+            this.oRegistradorLog.registrar('TelaClienteInicio.constructor() => Iniciou.');
+
+            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
+            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
+            this.oUtil = new Util(this.oGerenciadorContextoApp);
+
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
         
         this.obterCliente = this.obterCliente.bind(this);
-        this.irParaTestesRapidos = this.irParaTestesRapidos.bind(this);
         this.tratarDadosCliente = this.tratarDadosCliente.bind(this);
+        this.irParaTestesRapidos = this.irParaTestesRapidos.bind(this);
+
+        this.oRegistradorLog.registrar('TelaClienteInicio.constructor() => Finalizou.');
     }
     
 
@@ -79,6 +86,11 @@ export default class TelaClienteInicio extends Component {
             let url = this.oUtil.getURL('/clientes/obter/');
 
             this.oDadosControleApp.processando_requisicao = true;
+
+            let dadosParametros = JSON.stringify(this.state);
+
+            this.oRegistradorLog.registrar(`TelaBoletoEmissao.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
+
             this.oGerenciadorContextoApp.atualizarEstadoTela(this);
 
             fetch(url, {
@@ -87,7 +99,7 @@ export default class TelaClienteInicio extends Component {
                   Accept: 'application/json',
                   'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(this.state),
+                body: dadosParametros,
               })
                 .then(this.oUtil.obterJsonResposta)
                 .then((oJsonDados) => {
@@ -121,18 +133,6 @@ export default class TelaClienteInicio extends Component {
         this.oGerenciadorContextoApp.atualizarEstadoTela(this);
 
         this.oNavegacao.navigate('Dados pessoais', oDadosAppGeral);
-    }
-
-    tratarDadosBoleto(oDados, oEstado) {
-        if (oEstado.mensagem && oEstado.mensagem.trim()) {
-            Alert.alert(oEstado.mensagem);
-        }
-        if(oDados && oDados.url_pdf) {
-            
-            this.baixarPDFBoleto(oDados.url_pdf);
-        } else {
-            Alert.alert('Sem dados boleto.');
-        }
     }
 
     irParaTestesRapidos() {
