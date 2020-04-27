@@ -183,42 +183,42 @@ export class AreaDados extends Component {
         for(let i = 0; i < listaProdutos.length; i++)  {
             
             oProduto = listaProdutos[i];
-            produtoFormatado = oProduto.nome + ' = R$ ' + oProduto.valor;
+            produtoFormatado = `${oProduto.nome} = R$ ${oProduto.valor}`;
             
-            oCard = <CardContent text={produtoFormatado} key={oProduto.codigo} />;
-            listaProdutosCartao.push(oCard);
+            //oCard = <CardContent text={produtoFormatado} key={oProduto.codigo} />;
+            //listaProdutosCartao.push(oCard);
         }
         
         return (
             <ScrollView>
                 <ThemeProvider theme={theme}>                    
-                    <Card>
-                        {/* <CardImage 
-                            source={{uri: 'http://bit.ly/2GfzooV'}} 
-                            title="Top 10 South African beaches"
-                        /> */}
-                        <CardTitle
-                            title="Serviço de Rastreamento"
-                            style={styles.areaCentralizadoEmLinha}
-                        />
-                        {listaProdutosCartao}
-                        <CardAction>
-                            <View style={styles.areaTitulo}>
-                                <Text style={styles.textoTitulo}>Total: R$ {valorTotal}</Text>
-                            </View>
-                        </CardAction>
-                        <CardAction 
-                            separator={true} 
-                            inColumn={false}>
-                            <View style={styles.areaCentralizadoEmLinha}>
-                                <CardButton
-                                onPress={this.props.contratar}
-                                title="Contratar"
-                                color="#FEB557"
-                                />
-                            </View>
-                        </CardAction>
-                    </Card>
+                    <View>
+                        <Card>
+                            {/* <CardImage 
+                                source={{uri: 'http://bit.ly/2GfzooV'}} 
+                                title="Top 10 South African beaches"
+                            /> */}
+                            <CardTitle
+                                title="Serviço de Rastreamento"
+                                style={styles.areaCentralizadoEmLinha}
+                            />
+                            
+                            <CardAction>
+                                <View style={styles.areaTitulo}>
+                                    <Text style={styles.textoTitulo}>Total: R$ {valorTotal}</Text>
+                                </View>
+                            </CardAction>
+                            <CardAction separator={true} inColumn={false}>
+                                <View style={styles.areaCentralizadoEmLinha}>
+                                    <CardButton
+                                    onPress={this.props.contratar}
+                                    title="Contratar"
+                                    color="#FEB557"
+                                    />
+                                </View>
+                            </CardAction>
+                        </Card>
+                    </View>
                 </ThemeProvider>
             </ScrollView>            
         );

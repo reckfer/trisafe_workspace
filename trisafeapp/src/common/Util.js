@@ -19,10 +19,10 @@ export default class Util {
         protocol = 'https://';
         domain = 'trisafeserverherokua.herokuapp.com';
 
-        if (__DEV__) {
-            protocol = 'http://';
-            domain = '10.0.0.106:8000';
-        }
+        // if (__DEV__) {
+        //     protocol = 'http://';
+        //     domain = '10.0.0.106:8000';
+        // }
         return protocol + domain + metodo;
     }
 
