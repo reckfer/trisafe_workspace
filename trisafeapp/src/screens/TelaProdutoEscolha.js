@@ -10,11 +10,10 @@ import {
     ScrollView,
     Alert,
     View,
-    Text
+    Text,
 } from 'react-native';
 import Util from './../common/Util';
-import { ThemeProvider, Button } from 'react-native-elements';
-import { Card, CardTitle, CardContent, CardAction, CardButton, CardImage } from 'react-native-cards';
+import { ThemeProvider, Button, Card, CheckBox, Divider } from 'react-native-elements';
 import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
 import AreaBotoes from './../common/AreaBotoes';
@@ -155,7 +154,7 @@ export default class TelaProdutoEscolha extends Component {
         
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho titulo='Produto' nomeTela='Contratação' />
+                <Cabecalho titulo='Produtos' nomeTela='Seleção' />
                 <AreaDados contratar={this.contratar} dadosApp={this.oDadosApp}/>
                 <AreaBotoes botoes={botoesTela} />
             </View>
@@ -173,50 +172,35 @@ export class AreaDados extends Component {
     render() {
         let oDadosApp = this.props.dadosApp;
         let oDadosContrato = oDadosApp.contrato;
-        let listaProdutosCartao = [];
         let listaProdutos = oDadosContrato.produtos_contratados;
         let valorTotal = oDadosContrato.valorTotal;        
-        let oCard;
-        let oProduto;
-        let produtoFormatado;
-        
-        for(let i = 0; i < listaProdutos.length; i++)  {
-            
-            oProduto = listaProdutos[i];
-            produtoFormatado = `${oProduto.nome} = R$ ${oProduto.valor}`;
-            
-            //oCard = <CardContent text={produtoFormatado} key={oProduto.codigo} />;
-            //listaProdutosCartao.push(oCard);
-        }
-        
+                
         return (
             <ScrollView>
                 <ThemeProvider theme={theme}>                    
                     <View>
-                        <Card>
-                            {/* <CardImage 
-                                source={{uri: 'http://bit.ly/2GfzooV'}} 
-                                title="Top 10 South African beaches"
-                            /> */}
-                            <CardTitle
-                                title="Serviço de Rastreamento"
-                                style={styles.areaCentralizadoEmLinha}
-                            />
-                            
-                            <CardAction>
-                                <View style={styles.areaTitulo}>
-                                    <Text style={styles.textoTitulo}>Total: R$ {valorTotal}</Text>
-                                </View>
-                            </CardAction>
-                            <CardAction separator={true} inColumn={false}>
-                                <View style={styles.areaCentralizadoEmLinha}>
-                                    <CardButton
-                                    onPress={this.props.contratar}
-                                    title="Contratar"
-                                    color="#FEB557"
-                                    />
-                                </View>
-                            </CardAction>
+                        <Card title={<CheckBox title="Serviço de Rastreamento" checked={true}/>} >
+                            <View>
+                            {
+                                listaProdutos.map(
+                                    (oProduto, indice) => {
+                                        return (
+                                            <View key={indice} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                                                    <CheckBox checked={true}/>
+                                                    <Text>{`${oProduto.nome}`}</Text>
+                                                </View>
+                                                <Text>{`R$ ${oProduto.valor}`}</Text>
+                                            </View>
+                                        )
+                                    }
+                                )
+                            }
+                            </View>
+                            <Divider />
+                            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 10, marginRight: 10 }}>
+                                <Text>{`Total = R$ ${valorTotal}`}</Text>
+                            </View>
                         </Card>
                     </View>
                 </ThemeProvider>
