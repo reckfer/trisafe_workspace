@@ -14,10 +14,12 @@ import {
 } from 'react-native';
 import Util from './../common/Util';
 import { ThemeProvider, Button, Card, CheckBox, Divider } from 'react-native-elements';
+// import { Card, CardTitle, CardContent, CardAction, CardButton, CardImage } from 'react-native-cards';
 import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
 import AreaBotoes from './../common/AreaBotoes';
 import { ContextoApp } from '../contexts/ContextoApp';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default class TelaProdutoEscolha extends Component {
     
@@ -173,24 +175,28 @@ export class AreaDados extends Component {
         let oDadosApp = this.props.dadosApp;
         let oDadosContrato = oDadosApp.contrato;
         let listaProdutos = oDadosContrato.produtos_contratados;
-        let valorTotal = oDadosContrato.valorTotal;        
+        let valorTotal = 0.00;
+        if(!isNaN(oDadosContrato.valor_total)) {
+            valorTotal = oDadosContrato.valor_total.toFixed(2).replace('.', ',');
+        }
                 
         return (
             <ScrollView>
                 <ThemeProvider theme={theme}>                    
                     <View>
-                        <Card title={<CheckBox title="Serviço de Rastreamento" checked={true}/>} >
+                        <Card title={<CheckBox title="Serviço de Rastreamento Veicular" checked={true}/>} >
                             <View>
                             {
                                 listaProdutos.map(
                                     (oProduto, indice) => {
+                                        let valor = oProduto.valor.toFixed(2).replace('.', ',');
                                         return (
-                                            <View key={indice} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                                            <View key={indice} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginRight: 10 }}>
                                                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
-                                                    <CheckBox checked={true}/>
+                                                    <CheckBox checked={true} checkedIcon={<Icon name="check" color="#022C18"/>}/>
                                                     <Text>{`${oProduto.nome}`}</Text>
                                                 </View>
-                                                <Text>{`R$ ${oProduto.valor}`}</Text>
+                                                <Text style={{fontWeight:'bold'}}>{`R$ ${valor}`}</Text>
                                             </View>
                                         )
                                     }
@@ -199,7 +205,7 @@ export class AreaDados extends Component {
                             </View>
                             <Divider />
                             <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 10, marginRight: 10 }}>
-                                <Text>{`Total = R$ ${valorTotal}`}</Text>
+                                <Text style={{fontWeight:'bold'}}>{`Total = R$ ${valorTotal}`}</Text>
                             </View>
                         </Card>
                     </View>
