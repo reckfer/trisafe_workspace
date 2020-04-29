@@ -7,6 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import mixins
 from emailcliente.models import EmailCliente
+from gerenciadorlog.views import GerenciadorLogViewSet
 from contrato.models import Contrato
 from rest_framework.renderers import JSONRenderer
 from comum.retorno import Retorno
@@ -28,6 +29,9 @@ class EmailClienteViewSet(viewsets.ModelViewSet, permissions.BasePermission):
     @action(detail=False, methods=['post'])
     def enviar_com_anexos(self, request):
         try:
+            v_gerenciador_log = GerenciadorLogViewSet()
+            v_gerenciador_log.registrar_do_cliente(request)
+            
             m_email_cliente = EmailCliente()
             
             m_contrato = EmailClienteViewSet.apropriar_dados_http(request)

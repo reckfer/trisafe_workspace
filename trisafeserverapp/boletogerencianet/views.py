@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import mixins
 from boletogerencianet.models import BoletoGerenciaNet
+from gerenciadorlog.views import GerenciadorLogViewSet
 from rest_framework.renderers import JSONRenderer
 from comum.retorno import Retorno
 from contrato.models import Contrato
@@ -26,6 +27,9 @@ class BoletoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
     @action(detail=False, methods=['post'])
     def gerar(self, request):
         try:
+            v_gerenciador_log = GerenciadorLogViewSet()
+            v_gerenciador_log.registrar_do_cliente(request)
+
             m_boleto = BoletoGerenciaNet()
             
             m_contrato = self.apropriar_dados_http(request)
@@ -43,6 +47,9 @@ class BoletoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
     @action(detail=False, methods=['post'])
     def obter(self, request):
         try:
+            v_gerenciador_log = GerenciadorLogViewSet()
+            v_gerenciador_log.registrar_do_cliente(request)
+            
             m_boleto = BoletoGerenciaNet()
             
             m_contrato = self.apropriar_dados_http(request)

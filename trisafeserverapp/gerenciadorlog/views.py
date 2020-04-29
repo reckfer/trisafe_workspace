@@ -1,4 +1,5 @@
 import mimetypes
+from datetime import datetime
 from django.shortcuts import render
 from django.forms.models import model_to_dict
 from django.http.response import HttpResponse
@@ -28,13 +29,40 @@ class GerenciadorLogViewSet(viewsets.ModelViewSet, permissions.BasePermission):
     @action(detail=False, methods=['post'])
     def registrar_do_cliente(self, request):
         try:
-            m_gerenciador_log = GerenciadorLog('aaa')
+            retorno = Retorno(True)
+            if 'registros_log' in request.data:
+                m_gerenciador_log = GerenciadorLog('')
+                
+                d_registros_log = request.data['registros_log']
             
-            d_registros_log = request.data['registros_log']
+                if(len(d_registros_log) > 0):
+                    data_hora = datetime.now()
 
-            retorno = m_gerenciador_log.registrar(d_registros_log)
+                    d_registro_inicial = [{
+                        'data_hora' : '',
+                        'mensagem_log' : ''
+                    }, 
+                    {
+                        'data_hora' : '',
+                        'mensagem_log' : '++++++++  REGISTROS DO CLIENTE +++++++'
+                    }]
+                    retorno = m_gerenciador_log.registrar(d_registro_inicial)
+                    
+                    retorno = m_gerenciador_log.registrar(d_registros_log)
 
+                    d_registro_final = [
+                    {
+                        'data_hora' : '',
+                        'mensagem_log' : '++++++++  FIM DOS REGISTROS DO CLIENTE +++++++'
+                    },
+                    {
+                        'data_hora' : '',
+                        'mensagem_log' : ''
+                    }]
+                    retorno = m_gerenciador_log.registrar(d_registro_final)
+            
             return Response(retorno.json())
+            
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     

@@ -92,7 +92,7 @@ export default class TelaTestesInicio extends Component {
         try {
             let url = this.oUtil.getURL('/clientes/obter_ultimo/');
             
-            let dadosParametros = JSON.stringify(this.state);
+            let dadosParametros = JSON.stringify(this.oDadosApp);
 
             this.oRegistradorLog.registrar(`TelaBoletoEmissao.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
 
@@ -102,7 +102,7 @@ export default class TelaTestesInicio extends Component {
                       Accept: 'application/json',
                       'Content-Type': 'application/json',
                     },
-                    body: dadosParametros
+                    body: JSON.stringify(this.state)
                   })
                   .then(this.oUtil.obterJsonResposta)
                   .then((oJsonDados) => {
@@ -125,7 +125,7 @@ export default class TelaTestesInicio extends Component {
         try {
             let url = this.oUtil.getURL('/contratos/obter_por_cliente/');
             
-            let dadosParametros = JSON.stringify(this.state);
+            let dadosParametros = JSON.stringify(this.oDadosApp);
 
             this.oRegistradorLog.registrar(`TelaBoletoEmissao.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
 
@@ -135,7 +135,7 @@ export default class TelaTestesInicio extends Component {
                       Accept: 'application/json',
                       'Content-Type': 'application/json',
                     },
-                    body: dadosParametros,
+                    body: JSON.stringify(this.state),
                   })
                   .then(this.oUtil.obterJsonResposta)
                   .then((oJsonDados) => {

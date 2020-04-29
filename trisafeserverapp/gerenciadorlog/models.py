@@ -8,8 +8,8 @@ from comum.retorno import Retorno
 
 class GerenciadorLog:
     def __init__(self, id_cliente):
-        nome_arquivo = 'Atividades_%s.log' % (id_cliente)
-        caminho_arquivo = os.path.join(BASE_DIR, nome_arquivo)
+        # nome_arquivo = 'Atividades_%s.log' % (id_cliente)
+        # caminho_arquivo = os.path.join(BASE_DIR, nome_arquivo)
         logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
     def registrar(self, d_registros_log):

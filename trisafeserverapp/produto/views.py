@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import mixins
 from produto.models import Produto
 from cliente.models import Cliente
+from gerenciadorlog.views import GerenciadorLogViewSet
 from rest_framework.renderers import JSONRenderer
 from comum.retorno import Retorno
 import json
@@ -25,6 +26,9 @@ class ProdutoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
     @action(detail=False, methods=['post'])
     def listar(self, request):
         try:
+            v_gerenciador_log = GerenciadorLogViewSet()
+            v_gerenciador_log.registrar_do_cliente(request)
+            
             m_produto = Produto()
             
             retorno_produtos = m_produto.listar()

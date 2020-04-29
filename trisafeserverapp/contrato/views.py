@@ -13,6 +13,7 @@ from rest_framework.renderers import JSONRenderer
 from comum.retorno import Retorno
 # from boleto.models import TransacaoGerenciaNet
 from boletogerencianet.models import BoletoGerenciaNet
+from boletogerencianet.views import GerenciadorLogViewSet
 import json
 import traceback
 import sys
@@ -30,6 +31,9 @@ class ContratoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
     @action(detail=False, methods=['post'])
     def incluir(self, request):
         try:
+            v_gerenciador_log = GerenciadorLogViewSet()
+            v_gerenciador_log.registrar_do_cliente(request)
+
             m_contrato = ContratoViewSet.apropriar_dados_http(request)
             
             lista_produtos = ContratoViewSet.extrair_produtos_dados_http(request)
@@ -45,6 +49,9 @@ class ContratoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
     @action(detail=False, methods=['post'])
     def aceitar(self, request):
         try:
+            v_gerenciador_log = GerenciadorLogViewSet()
+            v_gerenciador_log.registrar_do_cliente(request)
+
             m_contrato = ContratoViewSet.apropriar_dados_http(request)
             
             retorno_contrato = m_contrato.obter()
@@ -77,6 +84,9 @@ class ContratoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
     @action(detail=False, methods=['post'])
     def obter(self, request):
         try:
+            v_gerenciador_log = GerenciadorLogViewSet()
+            v_gerenciador_log.registrar_do_cliente(request)
+
             m_contrato = ContratoViewSet.apropriar_dados_http(request)
             
             retorno = m_contrato.obter()
@@ -91,6 +101,9 @@ class ContratoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
     @action(detail=False, methods=['post'])
     def obter_por_cliente(self, request):
         try:
+            v_gerenciador_log = GerenciadorLogViewSet()
+            v_gerenciador_log.registrar_do_cliente(request)
+            
             m_contrato = ContratoViewSet.apropriar_dados_http(request)
             
             retorno = m_contrato.obter_por_cliente()
@@ -104,22 +117,30 @@ class ContratoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
     
     @action(detail=False, methods=['post'])
     def obter_arquivo_contrato(self, request):
+        try:
+            v_gerenciador_log = GerenciadorLogViewSet()
+            v_gerenciador_log.registrar_do_cliente(request)
 
-        m_contrato = ContratoViewSet.apropriar_dados_http(request)
+            m_contrato = ContratoViewSet.apropriar_dados_http(request)
+            
+            retorno_contrato = m_contrato.gerar_contrato_pdf()
+            
+            if not retorno_contrato.estado.ok:
+                return Response(retorno_contrato.json())
         
-        retorno_contrato = m_contrato.gerar_contrato_pdf()
-        
-        if not retorno_contrato.estado.ok:
-            return Response(retorno_contrato.json())
-    
-        dados_arquivo = retorno_contrato.dados
+            dados_arquivo = retorno_contrato.dados
 
-        arquivo = open(dados_arquivo['caminho_arquivo'], 'rb')
-        mime_type, _ = mimetypes.guess_type(dados_arquivo['caminho_arquivo'])
-        http_response = HttpResponse(arquivo, content_type=mime_type)
-        http_response['Content-Disposition'] = "attachment; filename=%s" % dados_arquivo['nome_arquivo']
+            arquivo = open(dados_arquivo['caminho_arquivo'], 'rb')
+            mime_type, _ = mimetypes.guess_type(dados_arquivo['caminho_arquivo'])
+            http_response = HttpResponse(arquivo, content_type=mime_type)
+            http_response['Content-Disposition'] = "attachment; filename=%s" % dados_arquivo['nome_arquivo']
 
-        return http_response
+            return http_response
+        except Exception as e:
+            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
+                    
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '')
+            return Response(retorno.json())
 
     @classmethod
     def apropriar_dados_http(cls, request):

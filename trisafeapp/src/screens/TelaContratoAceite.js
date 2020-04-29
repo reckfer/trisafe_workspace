@@ -36,9 +36,10 @@ export default class TelaContratoAceite extends Component {
             this.oRegistradorLog.registrar('TelaContratoAceite.constructor() => Iniciou.');
 
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
+            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
             this.oUtil = new Util(this.oGerenciadorContextoApp);
 
+            this.oDadosControleApp.processando_requisicao = false;
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
         
@@ -69,7 +70,7 @@ export default class TelaContratoAceite extends Component {
             
             this.oDadosControleApp.processando_requisicao = true;
 
-            let dadosParametros = JSON.stringify(this.state);
+            let dadosParametros = JSON.stringify(this.oDadosApp);
 
             this.oRegistradorLog.registrar(`TelaBoletoEmissao.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
 
@@ -81,7 +82,7 @@ export default class TelaContratoAceite extends Component {
                         Accept: 'application/json',
                         'Content-Type': 'application/json',
                     },
-                    body: dadosParametros,
+                    body: JSON.stringify(this.state),
                     })
                     .then(this.oUtil.obterJsonResposta)
                     .then((oJsonDados) => {

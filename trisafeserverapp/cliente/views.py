@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import mixins
 from cliente.models import Cliente
+from gerenciadorlog.views import GerenciadorLogViewSet
 from rest_framework.renderers import JSONRenderer
 from comum.retorno import Retorno
 import json
@@ -24,6 +25,9 @@ class ClienteViewSet(viewsets.ModelViewSet, permissions.BasePermission):
     @action(detail=False, methods=['post'])
     def obter(self, request):
         try:
+            v_gerenciador_log = GerenciadorLogViewSet()
+            v_gerenciador_log.registrar_do_cliente(request)
+
             m_cliente = ClienteViewSet.apropriar_dados_http_chave(request)
 
             retorno_cliente = m_cliente.obter()
@@ -38,6 +42,9 @@ class ClienteViewSet(viewsets.ModelViewSet, permissions.BasePermission):
     @action(detail=False, methods=['post'])
     def obter_ultimo(self, request):
         try:
+            v_gerenciador_log = GerenciadorLogViewSet()
+            v_gerenciador_log.registrar_do_cliente(request)
+
             m_cliente = Cliente()
             retorno_cliente = m_cliente.obter_ultimo()
             
@@ -51,6 +58,9 @@ class ClienteViewSet(viewsets.ModelViewSet, permissions.BasePermission):
     @action(detail=False, methods=['post'])
     def incluir(self, request):
         try:
+            v_gerenciador_log = GerenciadorLogViewSet()
+            v_gerenciador_log.registrar_do_cliente(request)
+            
             m_cliente = ClienteViewSet.apropriar_dados_http(request)
             
             retorno = m_cliente.incluir()

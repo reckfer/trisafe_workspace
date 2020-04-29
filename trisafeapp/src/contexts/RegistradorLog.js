@@ -13,8 +13,8 @@ export default class RegistradorLog {
 
         this.registrar = this.registrar.bind(this);
         this.transportar = this.transportar.bind(this);
-        this.temLogs = this.temLogs.bind(this);
-        this.obterJsonResposta = this.obterJsonResposta.bind(this);
+        this.limpar = this.limpar.bind(this);
+        this._obterJsonResposta = this._obterJsonResposta.bind(this);
         this.enviando = false;
     }
 
@@ -31,20 +31,9 @@ export default class RegistradorLog {
         this.oRegistrosLogs.push(oMensagemLog);
     }
 
-    temLogs() {
-
-        if(this.oRegistrosLogs.length > 1) {
-            let oRegistroLog = this.oRegistrosLogs[1];
-            if(oRegistroLog && oRegistroLog.data_hora) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     transportar() {
         try {
-            if(!this.enviando && this.oRegistrosLogs.length > 1) {
+            if(!this.enviando && this.oRegistrosLogs.length > 0) {
                 this.enviando = true;
 
                 let url = this.oUtil.getURL('/gerenciadorlogs/registrar_do_cliente/');
@@ -63,7 +52,7 @@ export default class RegistradorLog {
                         },
                         body: dadosParametros,
                     })
-                    .then(this.obterJsonResposta);
+                    .then(this._obterJsonResposta);
             }
         } catch (exc) {
             console.log(exc);
@@ -71,9 +60,13 @@ export default class RegistradorLog {
         }
     };
 
-    obterJsonResposta(oRespostaHTTP) {
+    limpar() {
+        this.oRegistrosLogs.length = 0;
+    }
+
+    _obterJsonResposta(oRespostaHTTP) {
         this.enviando = false;
-        this.oRegistrosLogs.length = 1;
+        this.limpar();
 
         if(oRespostaHTTP) {
 

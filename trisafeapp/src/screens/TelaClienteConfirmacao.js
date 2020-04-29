@@ -54,9 +54,9 @@ export default class TelaClienteConfirmacao extends Component {
             
             this.oDadosControleApp.processando_requisicao = true;
 
-            let dadosParametros = JSON.stringify(this.state);
+            let dadosParametros = JSON.stringify(this.oDadosApp);
 
-            this.oRegistradorLog.registrar(`TelaBoletoEmissao.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
+            this.oRegistradorLog.registrar(`TelaClienteConfirmacao.salvar() => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
 
             this.oGerenciadorContextoApp.atualizarEstadoTela(this);
 
@@ -66,7 +66,7 @@ export default class TelaClienteConfirmacao extends Component {
                       Accept: 'application/json',
                       'Content-Type': 'application/json',
                     },
-                    body: dadosParametros,
+                    body: JSON.stringify(this.state),
                   })
                   .then(this.oUtil.obterJsonResposta)
                   .then((oJsonDados) => {

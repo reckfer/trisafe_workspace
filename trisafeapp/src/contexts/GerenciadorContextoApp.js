@@ -71,7 +71,8 @@ export default class GerenciadorContextoApp {
         let oCampoPreencher;
         let camposPreencher;
         let tentarPreencher = false;
-
+        
+        this.oRegistradorLog.limpar();
         this.oRegistradorLog.registrar(`GerenciadorContextoApp.atribuirDados => Vai atribuir ${nomeAtributo}: ${JSON.stringify(oDadosAtribuir)}`);
         
         if(oDadosAtribuir) {

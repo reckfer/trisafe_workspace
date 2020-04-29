@@ -27,21 +27,11 @@ from gerenciadorlog.views import GerenciadorLogViewSet
 from django.conf.urls import url, include
 from rest_framework import routers
 
-# # Serializers define the API representation.
-# class ClienteSerializer(serializers.HyperlinkedModelSerializer):
-#     class Meta:
-#         model = Cliente
-#         fields = ('nome', 'endereco')
-
-# # ViewSets define the view behavior.
-# class ClienteViewSet(viewsets.ModelViewSet):
-#     queryset = Cliente.objects.all()
-#     serializer_class = ClienteSerializer
-
 # Routers provide an easy way of automatically determining the URL conf.
 router = routers.DefaultRouter()
 router.register(r'clientes', ClienteViewSet)
 router.register(r'clientes/incluir/', ClienteViewSet)
+router.register(r'clientes/obter/', ClienteViewSet)
 router.register(r'clientes/obter_ultimo/', ClienteViewSet)
 router.register(r'produtos', ProdutoViewSet)
 router.register(r'produtos/listar', ProdutoViewSet)

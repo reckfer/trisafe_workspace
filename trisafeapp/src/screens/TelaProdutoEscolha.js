@@ -46,8 +46,8 @@ export default class TelaProdutoEscolha extends Component {
         
         this.listarProdutos = this.listarProdutos.bind(this);
         this.tratarListarProdutos = this.tratarListarProdutos.bind(this);
-        this.contratar = this.contratar.bind(this);
-        this.tratarContratar = this.tratarContratar.bind(this);
+        this.incluirContrato = this.incluirContrato.bind(this);
+        this.tratarIncluirContrato = this.tratarIncluirContrato.bind(this);
         this.voltar = this.voltar.bind(this);
         
         this.oRegistradorLog.registrar('TelaProdutoEscolha.constructor() => Finalizou.');
@@ -62,7 +62,7 @@ export default class TelaProdutoEscolha extends Component {
             
             let dadosParametros = JSON.stringify({});
 
-            this.oRegistradorLog.registrar(`TelaBoletoEmissao.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
+            this.oRegistradorLog.registrar(`TelaProdutoEscolha.listarProdutos => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
 
             fetch(url, {
                 method: 'POST',
@@ -70,7 +70,7 @@ export default class TelaProdutoEscolha extends Component {
                   Accept: 'application/json',
                   'Content-Type': 'application/json',
                 },
-                body: dadosParametros,
+                body: JSON.stringify(this.state),
               })
                 .then(this.oUtil.obterJsonResposta)
                 .then((oJsonDados) => {
@@ -106,21 +106,20 @@ export default class TelaProdutoEscolha extends Component {
             }
             let oDadosAppGeral = this.oGerenciadorContextoApp.dadosAppGeral;
             
-            oDadosAppGeral.dados_app.contrato.valorTotal = valorTotal;
+            oDadosAppGeral.dados_app.contrato.valor_total = valorTotal;
             
             this.setState(oDadosAppGeral);
         }
     }
 
-    contratar() {
+    incluirContrato() {
         try {
             let url = this.oUtil.getURL('/contratos/incluir/');
 
             this.oDadosControleApp.processando_requisicao = true;
 
-            let dadosParametros = JSON.stringify(this.state);
-            
-            this.oRegistradorLog.registrar(`TelaBoletoEmissao.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
+            let dadosParametros = JSON.stringify(this.oDadosApp);            
+            this.oRegistradorLog.registrar(`TelaProdutoEscolha.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
 
             this.oGerenciadorContextoApp.atualizarEstadoTela(this);
 
@@ -130,18 +129,18 @@ export default class TelaProdutoEscolha extends Component {
                       Accept: 'application/json',
                       'Content-Type': 'application/json',
                     },
-                    body: dadosParametros
+                    body: JSON.stringify(this.state)
                   })
                   .then(this.oUtil.obterJsonResposta)
                   .then((oJsonDados) => {
-                      this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarContratar);
+                      this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarIncluirContrato);
                   });
         } catch (exc) {
             Alert.alert(exc);
         }
     }
 
-    tratarContratar(oDados) {
+    tratarIncluirContrato(oDados) {
         this.oGerenciadorContextoApp.atribuirDados('contrato', oDados);
     }
     
@@ -149,15 +148,16 @@ export default class TelaProdutoEscolha extends Component {
         this.oNavegacao.goBack();
     }
 
-    botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;        
+    botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;
+    botaoIncluirContrato = () => <Button title="Avançar" onPress={this.incluirContrato} ></Button>;
     
     render() {
-        let botoesTela = [ { element: this.botaoVoltar }];
+        let botoesTela = [ { element: this.botaoVoltar }, { element: this.botaoIncluirContrato }];
         
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Produtos' nomeTela='Seleção' />
-                <AreaDados contratar={this.contratar} dadosApp={this.oDadosApp}/>
+                <AreaDados dadosApp={this.oDadosApp}/>
                 <AreaBotoes botoes={botoesTela} />
             </View>
         );
@@ -176,7 +176,8 @@ export class AreaDados extends Component {
         let oDadosContrato = oDadosApp.contrato;
         let listaProdutos = oDadosContrato.produtos_contratados;
         let valorTotal = 0.00;
-        if(!isNaN(oDadosContrato.valor_total)) {
+
+        if((typeof oDadosContrato.valor_total === 'number') && !isNaN(oDadosContrato.valor_total)) {
             valorTotal = oDadosContrato.valor_total.toFixed(2).replace('.', ',');
         }
                 
@@ -189,12 +190,21 @@ export class AreaDados extends Component {
                             {
                                 listaProdutos.map(
                                     (oProduto, indice) => {
-                                        let valor = oProduto.valor.toFixed(2).replace('.', ',');
+                                        let nomeProduto = '';
+                                        let valor = 0.00;
+
+                                        if(oProduto.nome) {
+                                            nomeProduto = oProduto.nome;
+                                        }
+
+                                        if((typeof oProduto.valor === 'number') && !isNaN(oProduto.valor)) {
+                                            valor = oProduto.valor.toFixed(2).replace('.', ',');
+                                        }
                                         return (
                                             <View key={indice} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginRight: 10 }}>
                                                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
                                                     <CheckBox checked={true} checkedIcon={<Icon name="check" color="#022C18"/>}/>
-                                                    <Text>{`${oProduto.nome}`}</Text>
+                                                    <Text>{`${nomeProduto}`}</Text>
                                                 </View>
                                                 <Text style={{fontWeight:'bold'}}>{`R$ ${valor}`}</Text>
                                             </View>
