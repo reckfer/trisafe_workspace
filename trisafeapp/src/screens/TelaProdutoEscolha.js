@@ -76,11 +76,11 @@ export default class TelaProdutoEscolha extends Component {
                     this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarListarProdutos, true);
                 })
                 .catch(function (erro) {
-                    Alert.alert(erro.message);
+                    Alert.alert('Trisafe', erro.message);
                     throw erro;
                 });
         } catch (exc) {
-            Alert.alert(exc.message);
+            Alert.alert('Trisafe', exc.message);
             throw exc;
         }
     }
@@ -88,9 +88,9 @@ export default class TelaProdutoEscolha extends Component {
     tratarListarProdutos(oDados, oEstado) {
         
         if(oEstado.cod_mensagem === 'NaoCadastrado') {
-            Alert.alert('Nenhum produto TriSafe cadastrado.');
+            Alert.alert('Trisafe', 'Nenhum produto TriSafe cadastrado.');
         } else if (oEstado.mensagem && oEstado.mensagem.trim()) {
-            Alert.alert(oEstado.mensagem);
+            Alert.alert('Trisafe', oEstado.mensagem);
         }
 
         if(oDados && Array.isArray(oDados)) {
@@ -135,7 +135,7 @@ export default class TelaProdutoEscolha extends Component {
                       this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarIncluirContrato);
                   });
         } catch (exc) {
-            Alert.alert(exc);
+            Alert.alert('Trisafe', exc);
         }
     }
 

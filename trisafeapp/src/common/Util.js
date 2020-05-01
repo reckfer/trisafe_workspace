@@ -46,12 +46,12 @@ export default class Util {
 
                 if(oRespostaHTTP.status && oRespostaHTTP.url) {
                     
-                    Alert.alert("Erro HTTP status: " + oRespostaHTTP.status + 
+                    Alert.alert('Trisafe', "Erro HTTP status: " + oRespostaHTTP.status + 
                     ". URL: " + oRespostaHTTP.url);
                 } else if (oRespostaHTTP instanceof Error) {
                     
                     this.oRegistradorLog.registrar(oRespostaHTTP.message);
-                    Alert.alert(oRespostaHTTP.message);
+                    Alert.alert('Trisafe', oRespostaHTTP.message);
                 }
             }
         } else {
@@ -71,7 +71,7 @@ export default class Util {
             let oDados = oJsonRetorno.dados;
 
             if (!suprimirMsgServidor && oEstado.mensagem && oEstado.mensagem.trim()){
-                Alert.alert(oEstado.mensagem);
+                Alert.alert('Trisafe', oEstado.mensagem);
             }
             
             if(oDados && typeof(oDados) === 'string' && oDados.trim()) {
@@ -82,7 +82,7 @@ export default class Util {
         } else {
             this.oRegistradorLog.registrar('Util.tratarRetornoServidor() => oJsonRetorno estava vazio.');
             
-            Alert.alert("O retorno do servidor foi vazio.");
+            Alert.alert('Trisafe', "O retorno do servidor foi vazio.");
         }
     }
 }

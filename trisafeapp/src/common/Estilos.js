@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
         
     },
     textoNomeTela: {
-        fontSize: 28,
+        fontSize: 16,
         fontWeight: '300',
         color: '#000000',
         textAlign: 'center',
@@ -69,8 +69,6 @@ const theme = {
             borderRadius: 7,
             alignSelf: 'stretch',
             shadowColor: "#000",
-
-            shadowColor: "#000",
             shadowOffset: {
                 width: 0,
                 height: 1,
@@ -84,6 +82,17 @@ const theme = {
             borderColor: 'white',
           },
       },
+    Card: {
+        borderRadius: 7,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.22,
+        shadowRadius: 2.22,
+        elevation: 3,
+    },
     Button: {
         buttonStyle: {
             width: 10,

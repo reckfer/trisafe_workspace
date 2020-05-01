@@ -89,7 +89,7 @@ export default class TelaContratoAceite extends Component {
                         this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno);
                     })
         } catch (exc) {
-            Alert.alert(exc);
+            Alert.alert('Trisafe', exc);
         }
     }
 

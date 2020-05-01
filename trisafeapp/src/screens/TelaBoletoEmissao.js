@@ -82,7 +82,7 @@ export default class TelaBoletoEmissao extends Component {
                         this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarRetornoBoleto, true);
                     })
         } catch (exc) {
-            Alert.alert(exc);
+            Alert.alert('Trisafe', exc);
         }
     }
 
@@ -113,7 +113,7 @@ export default class TelaBoletoEmissao extends Component {
                         this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarRetornoEmail);
                     })
         } catch (exc) {
-            Alert.alert(exc);
+            Alert.alert('Trisafe', exc);
         }
     }
 
@@ -135,7 +135,7 @@ export default class TelaBoletoEmissao extends Component {
         
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho titulo='Boleto' nomeTela='Emissão' />
+                <Cabecalho titulo='Boleto' nomeTela='Visualização' />
                 <AreaDados dadosApp={this.oDadosApp}/>
                 <AreaBotoes botoes={botoesTela} />
             </View>

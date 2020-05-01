@@ -55,8 +55,7 @@ export default class RegistradorLog {
                     .then(this._obterJsonResposta);
             }
         } catch (exc) {
-            console.log(exc);
-            Alert.alert(exc);
+            Alert.alert('Trisafe', exc);
         }
     };
 
@@ -74,11 +73,11 @@ export default class RegistradorLog {
 
                 if(oRespostaHTTP.status && oRespostaHTTP.url) {
                     
-                    Alert.alert("Erro HTTP status: " + oRespostaHTTP.status + 
+                    Alert.alert('Trisafe', "Erro HTTP status: " + oRespostaHTTP.status + 
                     ". URL: " + oRespostaHTTP.url);
                 } else if (oRespostaHTTP instanceof Error) {
                     
-                    Alert.alert(oRespostaHTTP.message);
+                    Alert.alert('Trisafe', oRespostaHTTP.message);
                 }
             }
         }

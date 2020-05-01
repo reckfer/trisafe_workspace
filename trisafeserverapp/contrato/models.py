@@ -65,7 +65,7 @@ class Contrato(models.Model):
             # Atualiza com os produtos
             self.produtos_contratados.add(*retorno_produtos.dados)
 
-            retorno = Retorno(True, 'Confira os dados do seu\ncontrato e clique em\nContratar para aceitá-lo.')
+            retorno = Retorno(True, 'Contrato gerado com sucesso. Selecione "Contratar" para aceitá-lo.')
             retorno.dados = self
 
             return retorno

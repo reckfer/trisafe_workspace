@@ -9,6 +9,8 @@ import TelaClienteConfirmacao from '../screens/TelaClienteConfirmacao';
 import TelaProdutoEscolha from '../screens/TelaProdutoEscolha';
 import TelaContratoAceite from '../screens/TelaContratoAceite';
 import TelaBoletoEmissao from '../screens/TelaBoletoEmissao';
+import TelaMenuInicio from '../screens/TelaMenuInicio';
+import TelaVeiculoInicio from '../screens/TelaVeiculoInicio';
 import { ContextoAppProvider } from '../contexts/ContextoApp';
 
 const Stack = createStackNavigator();
@@ -19,7 +21,8 @@ export default function App () {
     <ContextoAppProvider>
         <NavigationContainer>
           <Stack.Navigator headerMode='none'>
-              <Stack.Screen name="Cadastro" component={TelaClienteInicio} />            
+              <Stack.Screen name="Menu" component={TelaMenuInicio} />
+              <Stack.Screen name="Cadastro" component={TelaClienteInicio} />
               <Stack.Screen name="Testes" component={TelaTestesInicio} />
               <Stack.Screen name="Dados pessoais" component={TelaClienteDadosPessoais} />
               <Stack.Screen name="Endereço" component={TelaClienteEndereco} />
@@ -27,6 +30,7 @@ export default function App () {
               <Stack.Screen name="Produtos" component={TelaProdutoEscolha} />
               <Stack.Screen name="Contrato" component={TelaContratoAceite} />
               <Stack.Screen name="Boleto" component={TelaBoletoEmissao} />
+              <Stack.Screen name="Veiculo Inicio" component={TelaVeiculoInicio} />
           </Stack.Navigator>
         </NavigationContainer>
     </ContextoAppProvider>

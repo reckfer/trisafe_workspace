@@ -25,13 +25,6 @@ export default class TelaClienteInicio extends Component {
     
     constructor(props, value) {
         super(props);
-        
-        // var PushNotification = require("react-native-push-notification");
-        // PushNotification.localNotificationSchedule({
-        //     //... You can use all the options from localNotifications
-        //     message: "My Notification Message", // (required)
-        //     date: new Date(Date.now() + 1000) // in 60 secs
-        //   });
 
         if(props && props.navigation) {
             this.oNavegacao = props.navigation;
@@ -57,36 +50,12 @@ export default class TelaClienteInicio extends Component {
 
         this.oRegistradorLog.registrar('TelaClienteInicio.constructor() => Finalizou.');
     }
-    
-
-    // async solicitarPermissoes(){
-    //     try {
-    //         const granted = await PermissionsAndroid.request(
-    //           PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-    //           {
-    //             title: "Storage Permission",
-    //             message: "App needs access to memory to download the file "
-    //           }
-    //         );
-    //         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-    //           Alert.alert("Permission granted","Now you can download anything!");
-    //         } else {
-    //           Alert.alert(
-    //             "Permission Denied!",
-    //             "You need to give storage permission to download the file"
-    //           );
-    //         }
-    //       } catch (err) {
-    //         console.warn(err);
-    //       }
-    // }
 
     obterCliente() {
         try {
             let url = this.oUtil.getURL('/clientes/obter/');
 
             this.oDadosControleApp.processando_requisicao = true;
-
             let dadosParametros = JSON.stringify(this.oDadosApp);
 
             this.oRegistradorLog.registrar(`TelaBoletoEmissao.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
@@ -106,11 +75,11 @@ export default class TelaClienteInicio extends Component {
                     this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosCliente, true);
                 })
                 .catch(function (erro) {
-                    Alert.alert(erro.message);
+                    Alert.alert('Trisafe', erro.message);
                     throw erro;
                 });
         } catch (exc) {
-            Alert.alert(exc.message);
+            Alert.alert('Trisafe', exc.message);
             throw exc;
         }
     }
@@ -156,7 +125,7 @@ export default class TelaClienteInicio extends Component {
         
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho titulo='Cadastro' nomeTela='Início' />
+                <Cabecalho titulo='Meus dados' nomeTela='Início' />
                 <AreaDados dadosApp={this.oDadosApp}/>
                 <AreaBotoes botoes={botoesTela} />
             </View>

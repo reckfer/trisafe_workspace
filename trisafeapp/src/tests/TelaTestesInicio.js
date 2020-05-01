@@ -107,7 +107,7 @@ export default class TelaTestesInicio extends Component {
                       this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno);
                   })
         } catch (exc) {
-            Alert.alert(exc);
+            Alert.alert('Trisafe', exc);
         }
     }
 
@@ -140,7 +140,7 @@ export default class TelaTestesInicio extends Component {
                       this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetornoContrato);
                   });
         } catch (exc) {
-            Alert.alert(exc);
+            Alert.alert('Trisafe', exc);
         }
     }
     

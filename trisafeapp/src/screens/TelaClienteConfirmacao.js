@@ -77,14 +77,14 @@ export default class TelaClienteConfirmacao extends Component {
                       this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno, true);
                   })
         } catch (exc) {
-            Alert.alert(exc);
+            Alert.alert('Trisafe', exc);
         }
     }
 
     tratarDadosRetorno(oDados, oEstado) {
 
         if (oEstado.mensagem && oEstado.mensagem.trim()){
-            Alert.alert(oEstado.mensagem);
+            Alert.alert('Trisafe', oEstado.mensagem);
         }
         if(oEstado.ok) {
             this.oNavegacao.navigate('Produtos', this.state);
@@ -106,7 +106,7 @@ export default class TelaClienteConfirmacao extends Component {
 
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho titulo='Cadastro' nomeTela='Confirmação' />
+                <Cabecalho titulo='Meus dados' nomeTela='Confirmação' />
                 <AreaDados dadosApp={this.oDadosApp}/>
                 <AreaBotoes botoes={botoesTela} />
             </View>

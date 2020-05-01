@@ -12,6 +12,7 @@ import {
     Image
 } from 'react-native';
 import { styles } from './Estilos';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default class Cabecalho extends Component {
     constructor(props) {
@@ -22,7 +23,8 @@ export default class Cabecalho extends Component {
         let caminhoImagem = '../images/tri-logo-01.png';
         return (
             <View style={styles.areaCabecalho}>
-                <Image source={require(caminhoImagem)} />
+                <Icon style={{marginLeft: 15, marginRight:15}} name="bars" size={30} color="#022C18" onPress={this.voltar}/>
+                <Image style={{ width: 130, height:75, marginLeft: 20, marginRight:10}} source={require(caminhoImagem)} />
                 <Titulo titulo={this.props.titulo} nomeTela={this.props.nomeTela} />
             </View>
         );
