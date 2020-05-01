@@ -73,6 +73,24 @@ class ClienteViewSet(viewsets.ModelViewSet, permissions.BasePermission):
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '')
             return Response(retorno.json())
 
+    @action(detail=False, methods=['post'])
+    def alterar(self, request):
+        try:
+            v_gerenciador_log = GerenciadorLogViewSet()
+            v_gerenciador_log.registrar_do_cliente(request)
+            
+            m_cliente = ClienteViewSet.apropriar_dados_http(request)
+            
+            retorno = m_cliente.alterar()
+
+            return Response(retorno.json())
+
+        except Exception as e:
+            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
+                    
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '')
+            return Response(retorno.json())
+
     @classmethod
     def apropriar_dados_http_chave(cls, request):
         m_cliente = Cliente()
@@ -97,6 +115,7 @@ class ClienteViewSet(viewsets.ModelViewSet, permissions.BasePermission):
         m_cliente.numero = d_cliente['numero']
         m_cliente.bairro = d_cliente['bairro']
         m_cliente.cidade = d_cliente['cidade']
+        m_cliente.complemento = d_cliente['complemento']
         m_cliente.cep = d_cliente['cep']
         m_cliente.uf = d_cliente['uf']
 

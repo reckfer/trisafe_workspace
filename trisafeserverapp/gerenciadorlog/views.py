@@ -36,21 +36,27 @@ class GerenciadorLogViewSet(viewsets.ModelViewSet, permissions.BasePermission):
                 d_registros_log = request.data['registros_log']
             
                 if(len(d_registros_log) > 0):
-                    data_hora = datetime.now()
 
                     d_registro_inicial = [{
                         'data_hora' : '',
                         'mensagem_log' : ''
-                    }, 
+                    },
                     {
                         'data_hora' : '',
                         'mensagem_log' : '++++++++  REGISTROS DO CLIENTE +++++++'
+                    },
+                    {
+                        'data_hora' : '',
+                        'mensagem_log' : ''
                     }]
                     retorno = m_gerenciador_log.registrar(d_registro_inicial)
                     
                     retorno = m_gerenciador_log.registrar(d_registros_log)
-
-                    d_registro_final = [
+                    
+                    d_registro_final = [{
+                        'data_hora' : '',
+                        'mensagem_log' : ''
+                    },
                     {
                         'data_hora' : '',
                         'mensagem_log' : '++++++++  FIM DOS REGISTROS DO CLIENTE +++++++'

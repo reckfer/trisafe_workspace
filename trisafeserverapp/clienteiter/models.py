@@ -33,8 +33,29 @@ class ClienteIter():
         respostaJson = r.json()
         return respostaJson["token"]
 
-    #TODO: passar para a classe ClienteIter
     def incluir(self, cliente):
+        d_cliente_iter = self._montar_dic_cliente(cliente)
+
+        token = ClienteIter.autenticarIter(self)
+        headers = {'Authorization': 'Bearer %s' %token,
+                   'Content-Type' : 'application/json' }
+        
+        r = requests.post("https://cnxs-api.itertelemetria.com/v1/users", headers=headers, data=d_cliente_iter)
+        
+        return ClienteIter.tratarRespostaHTTP(r)
+    
+    def alterar(self, cliente):
+        d_cliente_iter = self._montar_dic_cliente(cliente)
+
+        token = ClienteIter.autenticarIter(self)
+        headers = {'Authorization': 'Bearer %s' %token,
+                   'Content-Type' : 'application/json' }
+        
+        r = requests.put("https://cnxs-api.itertelemetria.com/v1/users/%s" % (cliente.id_cliente_iter), headers=headers, data=d_cliente_iter)
+        
+        return ClienteIter.tratarRespostaHTTP(r)
+
+    def _montar_dic_cliente(self, cliente):
         jsonCliente = json.dumps({
             "user": {
                 "email": cliente.email,
@@ -52,17 +73,11 @@ class ClienteIter():
                 "zipcode": cliente.cep,
                 "street": cliente.rua,
                 "number": cliente.numero,
+                "complement_address": cliente.complemento,
                 "district": cliente.bairro,
                 "city": cliente.cidade,
                 "state": cliente.uf,
                 "active": True
             }
         })
-
-        token = ClienteIter.autenticarIter(self)
-        headers = {'Authorization': 'Bearer %s' %token,
-                   'Content-Type' : 'application/json' }
-        
-        r = requests.post("https://cnxs-api.itertelemetria.com/v1/users", headers=headers, data=jsonCliente)
-        
-        return ClienteIter.tratarRespostaHTTP(r)
+        return jsonCliente

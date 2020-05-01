@@ -42,6 +42,7 @@ export const DADOS_BOLETO = {
 
 export const DADOS_CONTROLE_APP = {
     'processando_requisicao': false,
+    'novo_cadastro': true,
 };
 
 export const DADOS_APP_GERAL = {

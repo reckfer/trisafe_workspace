@@ -116,23 +116,31 @@ export default class TelaClienteInicio extends Component {
     }
 
     tratarDadosCliente(oDados, oEstado) {
-        
-        let oDadosAppGeral = this.state;
+        let irPara = true;
+        this.oDadosControleApp.processando_requisicao = false;
 
         if(oEstado.cod_mensagem === 'NaoCadastrado') {
-            Alert.alert('Seu cadastro não foi localizado. Preencha os dados solicitados para realizá-lo.');
-        } else if (oEstado.mensagem && oEstado.mensagem.trim()) {
-            Alert.alert(oEstado.mensagem);
-        }
-        if(oDados) {
-            
-            oDadosAppGeral = this.oGerenciadorContextoApp.atribuirDados('cliente', oDados);
-        }
+            this.oDadosControleApp.novo_cadastro = true;
+            Alert.alert('Trisafe', 'Informe seus dados para realizar o cadastro.');
+        } else {
+            if(oEstado.ok){
+                this.oDadosControleApp.novo_cadastro = false;
+            } else {
+                this.oGerenciadorContextoApp.atualizarEstadoTela(this);
+                irPara = false;
+            }
 
-        this.oDadosControleApp.processando_requisicao = false;
-        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
+            if (oEstado.mensagem && oEstado.mensagem.trim()) {
+                Alert.alert('Trisafe', oEstado.mensagem);
+            } else {
+                Alert.alert('Trisafe', 'Atualize seus dados cadastrais.');
+            }
+        }
+        this.oGerenciadorContextoApp.atribuirDados('cliente', oDados);
 
-        this.oNavegacao.navigate('Dados pessoais', oDadosAppGeral);
+        if(irPara) {            
+            this.oNavegacao.navigate('Dados pessoais', this.state);
+        }
     }
 
     irParaTestesRapidos() {

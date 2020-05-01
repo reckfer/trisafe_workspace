@@ -6,7 +6,7 @@
  */
 
 import React, { Component } from 'react';
-import { Input, Button} from 'react-native-elements';
+import { ThemeProvider, Input, Button, Card} from 'react-native-elements';
 import {
     ScrollView,
     Alert,
@@ -15,7 +15,7 @@ import {
 import Util from '../common/Util';
 import Cabecalho from '../common/CabecalhoTela';
 import AreaBotoes from '../common/AreaBotoes';
-import { styles } from '../common/Estilos';
+import { styles, theme } from '../common/Estilos';
 import UtilTests from './UtilTests';
 import { ContextoApp } from '../contexts/ContextoApp';
 
@@ -68,9 +68,7 @@ export default class TelaTestesInicio extends Component {
 
     irParaTesteCadastroIter() {
         
-        let oDados = this.gerarDadosTestes();
-
-        this.oNavegacao.navigate('Cadastro', oDados);
+        this.oNavegacao.navigate('Cadastro', this.state);
     }
 
     irParaTesteBoletoGerenciaNet() {
@@ -153,7 +151,6 @@ export default class TelaTestesInicio extends Component {
     }
 
     gerarDadosTestes() {
-        let oDadosAppGeral = this.oGerenciadorContextoApp.dadosAppGeral;
         let oDadosCliente = this.oDadosApp.cliente;
 
         let numAleatorio = Math.random();
@@ -172,7 +169,7 @@ export default class TelaTestesInicio extends Component {
         oDadosCliente.bairro = 'Bela Vista';
         oDadosCliente.cep = numAleatorio.toString().slice(10);
 
-        return oDadosAppGeral;
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
     }
 
     voltar() {
@@ -220,38 +217,35 @@ export class AreaDados extends Component {
         let oFuncoes = this.props.funcoes;
 
         return (
-            <ScrollView>
-                <View style={{flex: 1, flexDirection: 'column', }}>
-                    <View style={{flex: 1, flexDirection: 'row', alignItems: 'stretch', justifyContent: 'center' }}>
-                        <View style={{height:50}} >
-                            <Button title="Cadastro Iter" onPress={oFuncoes.irParaTesteCadastroIter} ></Button>
-                        </View>
-                        <View style={{height:50}} >
-                            <Button title="Gera Contrato" onPress={oFuncoes.irParaTesteGeraContratoPDF}></Button>
-                        </View>                        
-                    </View>
-                    <View style={{flex: 1, flexDirection: 'row', alignItems: 'stretch', justifyContent: 'center' }}>
-                        <View style={{height:50}} >
-                            <Button title="Boleto GerenciaNet" onPress={oFuncoes.irParaTesteBoletoGerenciaNet} ></Button>
-                        </View>
-                        <View style={{height:50}} >
-                            <Button title="Menu" ></Button>
-                        </View>
-                    </View>
-                    <View style={{flex: 1, flexDirection: 'row', alignItems: 'stretch', justifyContent: 'center' }}>
-                        <View style={{height:50}} >
-                            <Button title="Contrato PDF" onPress={oFuncoes.irParaTesteContratoPDF}></Button>
-                        </View>                    
-                    </View>
-                    <View style={{flex: 1, flexDirection: 'row', alignItems: 'stretch', justifyContent: 'center' }}>
-                        <View style={{flex: 1, flexDirection: 'column', alignItems: 'stretch', justifyContent: 'center' }}>
-                            <Input label="Nome Completo" style={styles.Input} value={oDadosCliente.nome} onChangeText={(valor) => { oDadosCliente.nome = valor; this.atualizarDados(oDadosCliente) }}></Input>                
-                            <Input label="E-mail" style={styles.Input} value={oDadosCliente.email} onChangeText={(valor) => { oDadosCliente.email = valor; this.atualizarDados(oDadosCliente) }}></Input>
-                            <Input label="CPF" style={styles.Input} value={oDadosCliente.cpf} onChangeText={(valor) => { oDadosCliente.cpf = valor; this.atualizarDados(oDadosCliente) }}></Input>
-                        </View>
-                    </View>
+            <View style={{flex: 1, flexDirection: 'column', }}>
+                <View style={{flexDirection: 'row', alignItems: 'stretch', justifyContent: 'center' }}>
+                    <Button title="Cadastro Iter" onPress={oFuncoes.irParaTesteCadastroIter} ></Button>
                 </View>
-            </ScrollView>
+                <View style={{flexDirection: 'row', alignItems: 'stretch', justifyContent: 'center' }}>
+                    <Button title="Gera Contrato" onPress={oFuncoes.irParaTesteGeraContratoPDF}></Button>
+                </View>
+                <View style={{flexDirection: 'row', alignItems: 'stretch', justifyContent: 'center' }}>
+                    <Button title="Contrato PDF" onPress={oFuncoes.irParaTesteContratoPDF}></Button>
+                </View>
+                <View style={{flexDirection: 'row', alignItems: 'stretch', justifyContent: 'center' }}>
+                    <Button title="Gerar Dados Teste" onPress={oFuncoes.gerarDadosTestes}></Button>
+                </View>
+                <View style={{flex: 1, flexDirection: 'row', alignItems: 'stretch', justifyContent: 'center' }}>
+                    <ScrollView>
+                        <ThemeProvider theme={theme}>                    
+                            <View>
+                                <Card title='Últimos dados de teste'>
+                                    <View style={{flex: 1, flexDirection: 'column', alignItems: 'stretch', justifyContent: 'center' }}>
+                                        <Input label="Nome Completo" style={styles.Input} value={oDadosCliente.nome} onChangeText={(valor) => { oDadosCliente.nome = valor; this.atualizarDados(oDadosCliente) }}></Input>                
+                                        <Input label="E-mail" style={styles.Input} value={oDadosCliente.email} onChangeText={(valor) => { oDadosCliente.email = valor; this.atualizarDados(oDadosCliente) }}></Input>
+                                        <Input label="CPF" style={styles.Input} value={oDadosCliente.cpf} onChangeText={(valor) => { oDadosCliente.cpf = valor; this.atualizarDados(oDadosCliente) }}></Input>
+                                    </View>
+                                </Card>
+                            </View>
+                        </ThemeProvider>
+                    </ScrollView>
+                </View>
+            </View>
         );
     }
 }

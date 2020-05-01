@@ -79,7 +79,7 @@ export default class TelaBoletoEmissao extends Component {
                     })
                     .then(this.oUtil.obterJsonResposta)
                     .then((oJsonDados) => {
-                        this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarRetornoBoleto);
+                        this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarRetornoBoleto, true);
                     })
         } catch (exc) {
             Alert.alert(exc);
@@ -88,7 +88,8 @@ export default class TelaBoletoEmissao extends Component {
 
     tratarRetornoBoleto(oDados) {
         this.oGerenciadorContextoApp.atribuirDados('boleto', oDados);
-        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
+        
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this);        
     }
 
     finalizar() {

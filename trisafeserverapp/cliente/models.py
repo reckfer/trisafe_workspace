@@ -14,6 +14,7 @@ class Cliente(models.Model):
     rg = models.CharField(max_length=10, blank=False, null=True)
     rua = models.CharField(max_length=200, blank=False, null=True)
     numero = models.IntegerField()
+    complemento = models.CharField(max_length=30, blank=False, null=True)
     cep = models.CharField(max_length=11, blank=False, null=True)
     bairro = models.CharField(max_length=200, blank=False, null=True) 
     cidade = models.CharField(max_length=200, blank=False, null=True) 
@@ -44,10 +45,11 @@ class Cliente(models.Model):
                     if not retorno_cliente_iter.estado.ok:
                         return retorno_cliente_iter
                     
-                    self.converter_de_cliente_iter(retorno_cliente_iter.json())
+                    m_cliente.converter_de_cliente_iter(retorno_cliente_iter.json())
+                    m_cliente.nome_usuario = m_cliente.nome_usuario
                     
                     retorno = Retorno(True)
-                    retorno.dados = self
+                    retorno.dados = m_cliente
             
             return retorno
         except Exception as e:
@@ -70,10 +72,11 @@ class Cliente(models.Model):
                     if not retorno_cliente_iter.estado.ok:
                         return retorno_cliente_iter
                     
-                    self.converter_de_cliente_iter(retorno_cliente_iter.json())
+                    m_cliente.converter_de_cliente_iter(retorno_cliente_iter.json())
+                    m_cliente.nome_usuario = m_cliente.nome_usuario
                     
                     retorno = Retorno(True)
-                    retorno.dados = self
+                    retorno.dados = m_cliente
             
             return retorno
         except Exception as e:
@@ -120,6 +123,42 @@ class Cliente(models.Model):
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.')
             return retorno
     
+    def alterar(self):
+        try:
+            retorno = Cliente.validar_dados_obrigatorios(self)
+            
+            if not retorno.estado.ok:
+                return retorno
+
+            # Valida se o cliente já está cadastrado.
+            retorno = Cliente.obter(self)
+
+            if not retorno.estado.ok:
+                return retorno
+            
+            m_cliente = retorno.dados
+            self.id_cliente_iter = m_cliente.id_cliente_iter
+
+            # Alteracao na Iter.
+            cIter = ClienteIter()
+            retorno = cIter.alterar(self)
+            
+            if not retorno.estado.ok:
+                return retorno
+
+            m_cliente.converter_de_cliente_iter(retorno.json())
+            m_cliente.save()
+            
+            retorno = Retorno(True, 'Cadastro realizado com sucesso.', 200)
+            retorno.dados = m_cliente
+
+            return retorno
+        except Exception as e:
+            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
+                    
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.')
+            return retorno
+    
     def converter_de_cliente_iter(self, d_cliente_iter):
         if d_cliente_iter:
             dados = d_cliente_iter['dados']
@@ -130,6 +169,7 @@ class Cliente(models.Model):
                 self.cpf = dados['document']
                 self.rua = dados['street']
                 self.numero = dados['number']
+                self.complemento = dados['complement_address']
                 self.cep = dados['zipcode']
                 self.bairro = dados['district']
                 self.cidade = dados['city']
@@ -166,6 +206,7 @@ class Cliente(models.Model):
             "rg": self.rg,
             "rua": self.rua,
             "numero": self.numero,
+            "complemento": self.complemento,
             "cep": self.cep,
             "bairro": self.bairro,
             "cidade": self.cidade,

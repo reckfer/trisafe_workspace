@@ -93,12 +93,17 @@ export default class TelaContratoAceite extends Component {
         }
     }
 
-    tratarDadosRetorno(oDados) {
+    tratarDadosRetorno(oDados, oEstado) {
+        this.oDadosControleApp.processando_requisicao = false;
 
         this.oGerenciadorContextoApp.atribuirDados('contrato', oDados);
         this.oGerenciadorContextoApp.atribuirDados('boleto', oDados);
 
-        this.oNavegacao.navigate('Boleto', this.state);
+        if(oEstado.ok) {
+            this.oNavegacao.navigate('Boleto', this.state);
+        } else {            
+            this.oGerenciadorContextoApp.atualizarEstadoTela(this);
+        }
     }
 
     voltar() {

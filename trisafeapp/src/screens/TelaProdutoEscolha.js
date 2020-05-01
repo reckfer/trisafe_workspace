@@ -14,7 +14,6 @@ import {
 } from 'react-native';
 import Util from './../common/Util';
 import { ThemeProvider, Button, Card, CheckBox, Divider } from 'react-native-elements';
-// import { Card, CardTitle, CardContent, CardAction, CardButton, CardImage } from 'react-native-cards';
 import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
 import AreaBotoes from './../common/AreaBotoes';
@@ -108,7 +107,7 @@ export default class TelaProdutoEscolha extends Component {
             
             oDadosAppGeral.dados_app.contrato.valor_total = valorTotal;
             
-            this.setState(oDadosAppGeral);
+            this.oGerenciadorContextoApp.atualizarEstadoTela(this);
         }
     }
 
@@ -140,8 +139,16 @@ export default class TelaProdutoEscolha extends Component {
         }
     }
 
-    tratarIncluirContrato(oDados) {
+    tratarIncluirContrato(oDados, oEstado) {
+        this.oDadosControleApp.processando_requisicao = false;
+        
         this.oGerenciadorContextoApp.atribuirDados('contrato', oDados);
+
+        if(oEstado.ok) {
+            this.oNavegacao.navigate('Contrato', this.state);
+        } else {            
+            this.oGerenciadorContextoApp.atualizarEstadoTela(this);
+        }
     }
     
     voltar() {

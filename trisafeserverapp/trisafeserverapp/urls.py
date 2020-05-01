@@ -31,6 +31,7 @@ from rest_framework import routers
 router = routers.DefaultRouter()
 router.register(r'clientes', ClienteViewSet)
 router.register(r'clientes/incluir/', ClienteViewSet)
+router.register(r'clientes/alterar/', ClienteViewSet)
 router.register(r'clientes/obter/', ClienteViewSet)
 router.register(r'clientes/obter_ultimo/', ClienteViewSet)
 router.register(r'produtos', ProdutoViewSet)

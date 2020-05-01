@@ -51,6 +51,10 @@ export default class TelaClienteConfirmacao extends Component {
     salvar() {
         try {
             let url = this.oUtil.getURL('/clientes/incluir/');
+
+            if(!this.oDadosControleApp.novo_cadastro) {
+                url = this.oUtil.getURL('/clientes/alterar/');
+            }
             
             this.oDadosControleApp.processando_requisicao = true;
 
@@ -70,21 +74,24 @@ export default class TelaClienteConfirmacao extends Component {
                   })
                   .then(this.oUtil.obterJsonResposta)
                   .then((oJsonDados) => {
-                      this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno);
+                      this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno, true);
                   })
         } catch (exc) {
             Alert.alert(exc);
         }
     }
 
-    tratarDadosRetorno(oDados) {
+    tratarDadosRetorno(oDados, oEstado) {
 
-        if(oDados && oDados.id_cliente_iter) {
-            Alert.alert("Cod. cliente Iter: " + oDados.id_cliente_iter);
+        if (oEstado.mensagem && oEstado.mensagem.trim()){
+            Alert.alert(oEstado.mensagem);
         }
-
-        this.oDadosControleApp.processando_requisicao = false;
-        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
+        if(oEstado.ok) {
+            this.oNavegacao.navigate('Produtos', this.state);
+        } else {
+            this.oDadosControleApp.processando_requisicao = false;
+            this.oGerenciadorContextoApp.atualizarEstadoTela(this);
+        }
     }
      
     voltar() {
