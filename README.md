@@ -7,6 +7,7 @@ Baixar as dependencias para navegação entre telas:
 	npm install @react-navigation/native --save
 	npm install react-native-reanimated react-native-gesture-handler react-native-screens react-native-safe-area-context @react-native-community/masked-view
 	npm install @react-navigation/stack --save
+	npm install @react-navigation/drawer --save
 
 Baixar as dependencias para elementos de construção de telas:
 	npm install react-native-elements --save

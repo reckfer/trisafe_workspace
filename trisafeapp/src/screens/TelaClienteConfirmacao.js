@@ -106,7 +106,7 @@ export default class TelaClienteConfirmacao extends Component {
 
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho titulo='Meus dados' nomeTela='Confirmação' />
+                <Cabecalho titulo='Meus dados' nomeTela='Confirmação' navigation={this.oNavegacao} />
                 <AreaDados dadosApp={this.oDadosApp}/>
                 <AreaBotoes botoes={botoesTela} />
             </View>

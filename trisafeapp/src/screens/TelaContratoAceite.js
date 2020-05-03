@@ -119,7 +119,7 @@ export default class TelaContratoAceite extends Component {
         
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho titulo='Contrato' nomeTela='Confirmação' />
+                <Cabecalho titulo='Contrato' nomeTela='Confirmação' navigation={this.oNavegacao} />
                 <AreaDados dadosApp={this.oDadosApp}/>
                 <AreaBotoes botoes={botoesTela} />
             </View>

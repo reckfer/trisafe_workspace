@@ -135,7 +135,7 @@ export default class TelaBoletoEmissao extends Component {
         
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho titulo='Boleto' nomeTela='Visualização' />
+                <Cabecalho titulo='Boleto' nomeTela='Visualização' navigation={this.oNavegacao} />
                 <AreaDados dadosApp={this.oDadosApp}/>
                 <AreaBotoes botoes={botoesTela} />
             </View>

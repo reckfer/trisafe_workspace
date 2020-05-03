@@ -68,7 +68,7 @@ export default class TelaClienteEndereco extends Component {
 
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho titulo='Meus dados' nomeTela='Endereço' />
+                <Cabecalho titulo='Meus dados' nomeTela='Endereço' navigation={this.oNavegacao} />
                 <AreaDados dadosApp={this.oDadosApp}/>
                 <AreaBotoes botoes={botoesTela} />
             </View>

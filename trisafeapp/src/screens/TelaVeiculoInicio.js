@@ -104,8 +104,8 @@ export default class TelaVeiculoInicio extends Component {
         
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho titulo='Meus veículos' nomeTela='Início' />
-                <AreaDados botoes={botoesTela}/>
+                <Cabecalho titulo='Meus veículos' nomeTela='Início' navigation={this.oNavegacao} />
+                <AreaDados botoes={botoesTela} />
             </View>
         )
     }

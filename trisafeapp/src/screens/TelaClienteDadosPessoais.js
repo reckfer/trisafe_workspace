@@ -68,7 +68,7 @@ export default class TelaClienteDadosPessoais extends Component {
         
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho titulo='Meus dados' nomeTela='Identificação' />
+                <Cabecalho titulo='Meus dados' nomeTela='Identificação' navigation={this.oNavegacao} />
                 <AreaDados dadosApp={this.oDadosApp}/>
                 <AreaBotoes botoes={botoesTela}/>
             </View>

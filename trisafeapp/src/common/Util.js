@@ -21,7 +21,7 @@ export default class Util {
 
         if (__DEV__) {
             protocol = 'http://';
-            domain = '192.168.0.4:8000';
+            domain = '10.0.0.100:8000';
         }
         return protocol + domain + metodo;
     }

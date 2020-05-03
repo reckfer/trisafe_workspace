@@ -191,7 +191,7 @@ export default class TelaTestesInicio extends Component {
         }
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho titulo='Testes' nomeTela='Início' />
+                <Cabecalho titulo='Testes' nomeTela='Início' navigation={this.oNavegacao} />
                 <AreaDados dadosApp={this.oDadosApp} funcoes={funcoes} />
                 <AreaBotoes botoes={botoesTela} />
             </View>

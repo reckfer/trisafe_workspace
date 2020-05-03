@@ -163,7 +163,7 @@ export default class TelaProdutoEscolha extends Component {
         
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho titulo='Produtos' nomeTela='Seleção' />
+                <Cabecalho titulo='Produtos' nomeTela='Seleção' navigation={this.oNavegacao} />
                 <AreaDados dadosApp={this.oDadosApp}/>
                 <AreaBotoes botoes={botoesTela} />
             </View>

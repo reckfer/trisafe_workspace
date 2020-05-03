@@ -104,7 +104,7 @@ export default class TelaMenuInicio extends Component {
         
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho titulo='Bem vindo' nomeTela='Menu' />
+                <Cabecalho titulo='Bem vindo' nomeTela='Menu' navigation={this.oNavegacao}/>
                 <AreaDados botoes={botoesTela}/>
             </View>
         )
