@@ -4,6 +4,8 @@ Guia para o desenvolvedor configurar a workspace na estação de trabalho, apena
 
 # Prerequisitos
 
+Os seguintes pacotes devem estar instalados na estação de trabalho.
+
 - Python 3.5.1 ou superior
 - React-Native
 - Emulador Android
