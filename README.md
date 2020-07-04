@@ -1,9 +1,9 @@
 # trisafe_workspace
 Guia para configurar a workspace, apenas a primeira vez:
 
-#React-Native:
+# React-Native:
 
-##Baixar as dependencias para navegação entre telas:
+## Baixar as dependencias para navegação entre telas:
 
 	npm install @react-navigation/native --save
 	
