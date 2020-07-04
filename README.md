@@ -1,5 +1,15 @@
-# trisafe_workspace
-Guia para configurar a workspace, apenas a primeira vez:
+# Manual do desenvolvedor da trisafe_workspace
+
+Guia para o desenvolvedor configurar a workspace na estação de trabalho, apenas a primeira vez:
+
+# Prerequisitos
+
+- Python 3.5.1 ou superior
+- React-Native
+- Emulador Android
+- Android Studio
+- Visual Studio Code
+- Git
 
 # React-Native
 
