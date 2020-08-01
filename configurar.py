@@ -9,7 +9,7 @@ import subprocess
 PROD = 'P'
 DESENV = 'D'
 ind_debug = "DEBUG = True"
-secret_key_django_app = '4coujo21&xdamy+in7!lwakm%@u*-%jz_ou4qgbqe1)zktrkqz'
+secret_key_django_app = 'substituir_do_django'
 
 ambiente = DESENV
 
@@ -74,13 +74,13 @@ if (sys.argv and len(sys.argv) > 1):
     if(sys.argv[1].upper() == 'P'):
         ambiente = PROD
 
-chave_iter_d1 = 'bUZk1V9YjNFjYQWD' # Usada no app.
-chave_iter_d2 = 'jloWTdV25tHI1dzO'
+chave_iter_d1 = 'substituir' # Usada no app.
+chave_iter_d2 = 'substituir'
 credenciais_d = u'documentacao@iter.sc:documentacao123'
 
-chave_iter_p1 = 'YjNQWDFjYk1VbUZ9' # Usada no app.
-chave_iter_p2 = 'V25tdjloWTdzOHI1'
-credenciais_p = u'financeiro@trisafe.com.br:4!ciZSC&'
+chave_iter_p1 = 'substituir' # Usada no app.
+chave_iter_p2 = 'substituir'
+credenciais_p = u'substituir'
 
 credenciais = credenciais_d
 chave_iter = chave_iter_d1 + chave_iter_d2
