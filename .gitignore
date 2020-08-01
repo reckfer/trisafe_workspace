@@ -192,6 +192,7 @@ typings/
 # dotenv environment variables file
 .env
 .env.test
+.env_cred_iter
 
 # parcel-bundler cache (https://parceljs.org/)
 
@@ -572,4 +573,6 @@ pip-selfcheck.json
 *.pdf
 *.txt
 *.log
+autenticar.py
+configurar.py
 # End of https://www.gitignore.io/api/node,code,python,django,reactnative,sublimetext,venv
