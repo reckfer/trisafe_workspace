@@ -119,6 +119,7 @@ export default class TelaBoletoEmissao extends Component {
 
     tratarRetornoEmail() {
         this.oDadosControleApp.processando_requisicao = false;
+        this.oGerenciadorContextoApp.setTelaAnterior(this);
         this.oNavegacao.navigate('Cadastro', this.state);
     }
 

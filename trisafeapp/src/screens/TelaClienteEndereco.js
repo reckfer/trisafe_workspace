@@ -51,12 +51,14 @@ export default class TelaClienteEndereco extends Component {
         // const { navigation } = this.props;
         
         // if(this.validarDadosPessoais()) {
+            this.oGerenciadorContextoApp.setTelaAnterior(this);
             this.oNavegacao.navigate('Confirmação dos dados', this.state);
         // }
     }
 
     voltar() {
-        
+        console.log('TelaClienteEndereco.voltar() => Voltando...');
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this.oGerenciadorContextoApp.getTelaAnterior());
         this.oNavegacao.goBack();
     }
 

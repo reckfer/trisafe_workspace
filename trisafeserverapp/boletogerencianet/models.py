@@ -70,7 +70,7 @@ class BoletoGerenciaNet(models.Model):
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.')
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return retorno
     
     def obter(self, m_contrato):
@@ -107,7 +107,7 @@ class BoletoGerenciaNet(models.Model):
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.')
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return retorno
 
     def tratar_retorno_gerencia_net(self, d_billet):

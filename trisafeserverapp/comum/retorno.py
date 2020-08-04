@@ -5,8 +5,8 @@ import json
 
 class Retorno:
                         
-    def __init__(self, ind_ok = False, msg = '', codMensagem = '', httpStatus = 500):        
-        self.estado = EstadoExecucao(ind_ok, msg, codMensagem, httpStatus)
+    def __init__(self, ind_ok = False, msg = '', codMensagem = '', httpStatus = 500, ex = None):        
+        self.estado = EstadoExecucao(ind_ok, msg, codMensagem, httpStatus, ex)
         self.dados = None
         
     def json(self):
@@ -15,9 +15,6 @@ class Retorno:
     def __criar_json__(self):
         oDados = self.dados
         
-        # if type(self.dados) == 'dict':
-        # if isinstance(self.dados, dict):
-        #     oDados = model_to_dict(self.dados)
         if isinstance(self.dados, QuerySet):
             oDados = list(self.dados.values())
         elif isinstance(self.dados, models.Model):
@@ -33,11 +30,12 @@ class Retorno:
         return json.dumps(self.__criar_json__())
 
 class EstadoExecucao:
-    def __init__(self, indOK = False, msg = '', codMensagem = '', httpStatus = 500):
+    def __init__(self, indOK = False, msg = '', codMensagem = '', httpStatus = 500, ex = None):
         
         self.ok = indOK
         self.mensagem = msg
         self.codMensagem = codMensagem
+        self.excecao = ex
 
         if self.ok:            
             self.httpStatus = 200

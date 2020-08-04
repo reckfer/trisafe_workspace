@@ -1,4 +1,5 @@
 export const DADOS_CLIENTE = {
+    'id_cliente_iter': '',
     'cpf': '', 
     'email': '', 
     'nome': '', 
@@ -41,17 +42,23 @@ export const DADOS_BOLETO = {
 };
 
 export const DADOS_CONTROLE_APP = {
+    'em_producao': false,
     'processando_requisicao': false,
     'novo_cadastro': true,
 };
 
+export const CHAVES = {
+    'chave_iter': 'bUZk1V9YjNFjYQWD'
+}
+
 export const DADOS_APP_GERAL = {
-    'dados_app': {
-        'cliente': DADOS_CLIENTE,
-        'contrato': DADOS_CONTRATO,
-        'produtos_contratados': DADOS_PRODUTOS_CONTRATADOS,
-        'boleto': DADOS_BOLETO,
-        'controle_app': DADOS_CONTROLE_APP,
+    dados_app: {
+        cliente: DADOS_CLIENTE,
+        contrato: DADOS_CONTRATO,
+        produtos_contratados: DADOS_PRODUTOS_CONTRATADOS,
+        boleto: DADOS_BOLETO,
+        controle_app: DADOS_CONTROLE_APP,
+        chaves: CHAVES,
     },
-    'registros_log': null,
+    registros_log: null,
 };

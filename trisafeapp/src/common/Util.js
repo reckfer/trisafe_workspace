@@ -21,11 +21,11 @@ export default class Util {
 
         if (__DEV__) {
             protocol = 'http://';
-            domain = '10.0.0.100:8000';
+            domain = '192.168.0.2:8000';
         }
         return protocol + domain + metodo;
     }
-
+    
     obterJsonResposta(oRespostaHTTP) {
 
         this.oRegistradorLog.registrar('Util.obterJsonResposta() => Iniciou.');

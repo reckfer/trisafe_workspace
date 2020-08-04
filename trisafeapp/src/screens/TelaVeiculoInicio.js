@@ -80,10 +80,12 @@ export default class TelaVeiculoInicio extends Component {
     // }
 
     irParaMeusDados() {
+        this.oGerenciadorContextoApp.setTelaAnterior(this);
         this.oNavegacao.navigate('Cadastro', this.state);
     }
 
     irParaMeusVeiculos() {
+        this.oGerenciadorContextoApp.setTelaAnterior(this);
         this.oNavegacao.navigate('Veiculos', this.state);
     }
 

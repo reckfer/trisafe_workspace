@@ -48,6 +48,13 @@ export default class TelaClienteConfirmacao extends Component {
         this.oRegistradorLog.registrar('TelaClienteConfirmacao.constructor() => Finalizou.');
     }
 
+    componentDidUpdate() {
+
+        if(!this.oDadosControleApp.novo_cadastro) {
+            
+        }
+    }
+
     salvar() {
         try {
             let url = this.oUtil.getURL('/clientes/incluir/');
@@ -86,11 +93,14 @@ export default class TelaClienteConfirmacao extends Component {
         if (oEstado.mensagem && oEstado.mensagem.trim()){
             Alert.alert('Trisafe', oEstado.mensagem);
         }
+        
+        this.oDadosControleApp.processando_requisicao = false;
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
+        
         if(oEstado.ok) {
+            this.oDadosControleApp.novo_cadastro = false;
+            this.oGerenciadorContextoApp.setTelaAnterior(this);
             this.oNavegacao.navigate('Produtos', this.state);
-        } else {
-            this.oDadosControleApp.processando_requisicao = false;
-            this.oGerenciadorContextoApp.atualizarEstadoTela(this);
         }
     }
      

@@ -7,5 +7,7 @@
 			"path": "trisafeserverapp"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"python.pythonPath": "D:\\Workspace\\trisafe_workspace\\.venv\\Scripts\\python.exe"
+	}
 }

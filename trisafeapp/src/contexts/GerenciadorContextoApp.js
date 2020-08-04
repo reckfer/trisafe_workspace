@@ -17,7 +17,9 @@ export default class GerenciadorContextoApp {
         this._atribuir = this._atribuir.bind(this);
         this._clonarObjeto = this._clonarObjeto.bind(this);
         this._transportarLogServidor = this._transportarLogServidor.bind(this);
-        
+        this.oTelaAnterior = null;
+        this.getTelaAnterior = this.getTelaAnterior.bind(this);
+        this.setTelaAnterior = this.setTelaAnterior.bind(this);
 
         AppState.addEventListener('change', this._transportarLogServidor);
     };
@@ -48,7 +50,16 @@ export default class GerenciadorContextoApp {
         }
 
         return true;
-    };
+    }
+
+    getTelaAnterior() {
+        return this.oTelaAnterior;
+    }
+
+    setTelaAnterior(objTela) {
+        this.oTelaAnterior = objTela;
+    }
+
 
     /*** FUNCOES DE ATRIBUICOES ****/
     atualizarEstadoTela(objetoTela) {
@@ -63,8 +74,7 @@ export default class GerenciadorContextoApp {
         let oItemArray;
         let oDadosItemModelo;
         let oDadosItem;
-        let oArrayAtribuir;                        
-        let campoItem;
+        let oArrayAtribuir;
         let campo;
         let pilhaObjetosContinuar = [];
         let oObjetoPreencher = oDados;

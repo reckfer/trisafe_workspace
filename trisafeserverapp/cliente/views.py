@@ -36,7 +36,7 @@ class ClienteViewSet(viewsets.ModelViewSet, permissions.BasePermission):
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '')
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return Response(retorno.json())
     
     @action(detail=False, methods=['post'])
@@ -45,14 +45,14 @@ class ClienteViewSet(viewsets.ModelViewSet, permissions.BasePermission):
             v_gerenciador_log = GerenciadorLogViewSet()
             v_gerenciador_log.registrar_do_cliente(request)
 
-            m_cliente = Cliente()
+            m_cliente = ClienteViewSet.apropriar_dados_http(request)
             retorno_cliente = m_cliente.obter_ultimo()
             
             return Response(retorno_cliente.json())
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '')
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return Response(retorno.json())
 
     @action(detail=False, methods=['post'])
@@ -70,7 +70,7 @@ class ClienteViewSet(viewsets.ModelViewSet, permissions.BasePermission):
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '')
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return Response(retorno.json())
 
     @action(detail=False, methods=['post'])
@@ -88,7 +88,7 @@ class ClienteViewSet(viewsets.ModelViewSet, permissions.BasePermission):
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '')
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return Response(retorno.json())
 
     @classmethod
@@ -99,7 +99,9 @@ class ClienteViewSet(viewsets.ModelViewSet, permissions.BasePermission):
         d_cliente = d_dados_app['cliente']
         m_cliente.cpf = d_cliente['cpf']
         m_cliente.email = d_cliente['email']
-
+    
+        d_chaves = d_dados_app['chaves']
+        m_cliente.chave_iter = d_chaves['chave_iter']
         return m_cliente
 
     @classmethod
@@ -118,5 +120,4 @@ class ClienteViewSet(viewsets.ModelViewSet, permissions.BasePermission):
         m_cliente.complemento = d_cliente['complemento']
         m_cliente.cep = d_cliente['cep']
         m_cliente.uf = d_cliente['uf']
-
         return m_cliente

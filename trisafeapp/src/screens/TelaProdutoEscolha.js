@@ -145,6 +145,7 @@ export default class TelaProdutoEscolha extends Component {
         this.oGerenciadorContextoApp.atribuirDados('contrato', oDados);
 
         if(oEstado.ok) {
+            this.oGerenciadorContextoApp.setTelaAnterior(this);
             this.oNavegacao.navigate('Contrato', this.state);
         } else {            
             this.oGerenciadorContextoApp.atualizarEstadoTela(this);

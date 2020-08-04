@@ -67,22 +67,22 @@ export default class TelaTestesInicio extends Component {
     }
 
     irParaTesteCadastroIter() {
-        
+        this.oGerenciadorContextoApp.setTelaAnterior(this);
         this.oNavegacao.navigate('Cadastro', this.state);
     }
 
     irParaTesteBoletoGerenciaNet() {
-        
+        this.oGerenciadorContextoApp.setTelaAnterior(this);
         this.oNavegacao.navigate('Boleto', this.state);
     }
 
     irParaTesteGeraContratoPDF() {
-
+        this.oGerenciadorContextoApp.setTelaAnterior(this);
         this.oNavegacao.navigate('Produtos', this.state);
     }
 
     irParaTesteContratoPDF() {
-        
+        this.oGerenciadorContextoApp.setTelaAnterior(this);
         this.oNavegacao.navigate('Contrato', this.state);
     }
 
@@ -92,7 +92,7 @@ export default class TelaTestesInicio extends Component {
             
             let dadosParametros = JSON.stringify(this.oDadosApp);
 
-            this.oRegistradorLog.registrar(`TelaBoletoEmissao.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
+            this.oRegistradorLog.registrar(`TelaTestesInicio.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
 
             fetch(url, {
                     method: 'POST',
@@ -125,7 +125,7 @@ export default class TelaTestesInicio extends Component {
             
             let dadosParametros = JSON.stringify(this.oDadosApp);
 
-            this.oRegistradorLog.registrar(`TelaBoletoEmissao.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
+            this.oRegistradorLog.registrar(`TelaTestesInicio.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
 
             fetch(url, {
                     method: 'POST',

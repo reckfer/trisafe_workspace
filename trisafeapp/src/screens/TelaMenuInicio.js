@@ -80,10 +80,12 @@ export default class TelaMenuInicio extends Component {
     // }
 
     irParaMeusDados() {
+        this.oGerenciadorContextoApp.setTelaAnterior(this);
         this.oNavegacao.navigate('Cadastro', this.state);
     }
 
     irParaMeusVeiculos() {
+        this.oGerenciadorContextoApp.setTelaAnterior(this);
         this.oNavegacao.navigate('Veiculo Inicio', this.state);
     }
 

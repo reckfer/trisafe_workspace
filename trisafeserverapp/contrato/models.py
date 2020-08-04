@@ -72,7 +72,7 @@ class Contrato(models.Model):
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.')
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return retorno
 
     def aceitar(self):
@@ -90,7 +90,7 @@ class Contrato(models.Model):
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.')
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return retorno
     
     def obter(self):
@@ -108,7 +108,7 @@ class Contrato(models.Model):
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.')
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return retorno
     
     def obter_por_cliente(self):
@@ -130,7 +130,7 @@ class Contrato(models.Model):
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.')
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return retorno
 
     def calcular_valor_total(self, m_produtos):
@@ -197,7 +197,7 @@ class Contrato(models.Model):
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.')
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return retorno
     
     def montar_contrato(self):
@@ -247,7 +247,7 @@ class Contrato(models.Model):
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.')
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return retorno
     
     def atribuir_do_modelo(self, m_contrato):

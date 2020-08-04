@@ -42,7 +42,7 @@ class Produto(models.Model):
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.')
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return retorno
     
     def listar(self):
@@ -64,7 +64,7 @@ class Produto(models.Model):
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.')
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return retorno
 
     def listar_especificos(self, chaves_produtos):
@@ -92,7 +92,7 @@ class Produto(models.Model):
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.')
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return retorno
 
     def incluir(self):
@@ -117,7 +117,7 @@ class Produto(models.Model):
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.')
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return retorno
     
     def validar_dados_obrigatorios_chaves(self):

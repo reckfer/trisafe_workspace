@@ -100,6 +100,7 @@ export default class TelaContratoAceite extends Component {
         this.oGerenciadorContextoApp.atribuirDados('boleto', oDados);
 
         if(oEstado.ok) {
+            this.oGerenciadorContextoApp.setTelaAnterior(this);
             this.oNavegacao.navigate('Boleto', this.state);
         } else {            
             this.oGerenciadorContextoApp.atualizarEstadoTela(this);

@@ -87,6 +87,7 @@ export default class TelaClienteInicio extends Component {
     tratarDadosCliente(oDados, oEstado) {
         let irPara = true;
         this.oDadosControleApp.processando_requisicao = false;
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
 
         if(oEstado.cod_mensagem === 'NaoCadastrado') {
             this.oDadosControleApp.novo_cadastro = true;
@@ -95,7 +96,6 @@ export default class TelaClienteInicio extends Component {
             if(oEstado.ok){
                 this.oDadosControleApp.novo_cadastro = false;
             } else {
-                this.oGerenciadorContextoApp.atualizarEstadoTela(this);
                 irPara = false;
             }
 
@@ -107,13 +107,14 @@ export default class TelaClienteInicio extends Component {
         }
         this.oGerenciadorContextoApp.atribuirDados('cliente', oDados);
 
-        if(irPara) {            
+        if(irPara) {
+            this.oGerenciadorContextoApp.setTelaAnterior(this);
             this.oNavegacao.navigate('Dados pessoais', this.state);
         }
     }
 
     irParaTestesRapidos() {
-
+        this.oGerenciadorContextoApp.setTelaAnterior(this);
         this.oNavegacao.navigate('Testes', this.state);
     }
 

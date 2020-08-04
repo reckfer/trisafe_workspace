@@ -1,3 +1,8 @@
+import cryptography
+from cryptography.fernet import Fernet
+from decouple import config
+import base64
+import encodings
 import requests
 import json
 from comum.retorno import Retorno
@@ -11,32 +16,68 @@ class ClienteIter():
             retorno = Retorno(False, respostaHTTP.text, respostaHTTP.status_code)
         else:
             retorno = Retorno(True)
-            retorno.dados = respostaHTTP.json()['user']
+            dadosRetorno = respostaHTTP.json()
+            
+            if isinstance(dadosRetorno, list) and len(dadosRetorno) > 0:
+                retorno.dados = dadosRetorno[0]
+            elif 'user' in dadosRetorno:
+                retorno.dados = dadosRetorno['user']
 
         return retorno
 
-    def obter(self, idCliente):
-        token = ClienteIter.autenticarIter(self)
+    def obter(self, m_cliente):
+        token = ClienteIter.autenticarIter(self, m_cliente.chave_iter)
         headers = {'Authorization': 'Bearer %s' %token,
                 'Content-Type' : 'application/json' }
-        url = "https://cnxs-api.itertelemetria.com/v1/users/{0}".format(idCliente)
-        print(url)
-        print(headers)
+        url = "https://cnxs-api.itertelemetria.com/v1/users/{0}".format(m_cliente.id_cliente_iter)
+        
+        r = requests.get(url, headers=headers)
+        m_cliente_iter = ClienteIter()
+        # tenta obter por id_iter.
+        retorno = m_cliente_iter.tratarRespostaHTTP(r)
+        
+        if not retorno.estado.ok:
+            # tenta obter por cpf.
+            retorno = m_cliente_iter.obterPorDocumento(m_cliente)
+        
+        return retorno
+    
+    def obterPorDocumento(self, m_cliente):
+        token = ClienteIter.autenticarIter(self, m_cliente.chave_iter)
+        headers = {'Authorization': 'Bearer %s' %token,
+                'Content-Type' : 'application/json' }
+        url = "https://cnxs-api.itertelemetria.com/v1/users/?by_document={0}".format(m_cliente.cpf)
+        
         r = requests.get(url, headers=headers)
         return ClienteIter.tratarRespostaHTTP(r)
         
-    def autenticarIter(self):
-        headers = {'Authorization': 'Basic ZG9jdW1lbnRhY2FvQGl0ZXIuc2M6ZG9jdW1lbnRhY2FvMTIz'}
+    def autenticarIter(self, chave_iter_cliente):
+        print('chave_iter_cliente = ' + chave_iter_cliente)
+        
+        chave_iter_servidor = config('CHAVE_ITER')
+        print('chave_iter_servidor =' + chave_iter_servidor)
+        
+        arquivo_iter = open('.env_cred_iter', 'rb')
+        cred_iter_cripto = arquivo_iter.read()
+        
+        chave_iter = chave_iter_cliente + chave_iter_servidor
+        print('chave_iter = ' + chave_iter)
+
+        chaveb64 = base64.b64encode(chave_iter.encode())
+        f = Fernet(chaveb64)
+
+        credenciais_iter = f.decrypt(cred_iter_cripto)
+        headers = {'Authorization': 'Basic %s' %credenciais_iter.decode()}
         r = requests.get("http://cnxs-api.itertelemetria.com/v1/sign_in", headers=headers)
         
         #TODO:Fazer tratamentos de erro.
         respostaJson = r.json()
         return respostaJson["token"]
 
-    def incluir(self, cliente):
-        d_cliente_iter = self._montar_dic_cliente(cliente)
+    def incluir(self, m_cliente):
+        d_cliente_iter = self._montar_dic_cliente(m_cliente)
 
-        token = ClienteIter.autenticarIter(self)
+        token = ClienteIter.autenticarIter(self, m_cliente.chave_iter)
         headers = {'Authorization': 'Bearer %s' %token,
                    'Content-Type' : 'application/json' }
         
@@ -47,7 +88,7 @@ class ClienteIter():
     def alterar(self, cliente):
         d_cliente_iter = self._montar_dic_cliente(cliente)
 
-        token = ClienteIter.autenticarIter(self)
+        token = ClienteIter.autenticarIter(self, cliente.chave_iter)
         headers = {'Authorization': 'Bearer %s' %token,
                    'Content-Type' : 'application/json' }
         

@@ -24,6 +24,7 @@ class Cliente(models.Model):
     senha = models.CharField(max_length=20, blank=False, null=True)
     dt_hr_inclusao = models.DateTimeField(blank=False, null=False, auto_now_add=True)
     ult_atualizacao = models.DateTimeField(blank=False, null=False, auto_now=True)
+    chave_iter = None
     
     def obter(self):
         try:
@@ -39,8 +40,10 @@ class Cliente(models.Model):
             if lista_clientes:
                 m_cliente = lista_clientes[0]
                 if m_cliente:
+                    m_cliente.chave_iter = self.chave_iter
+                    m_cliente_iter = ClienteIter()
                     # Obtem o cadastro na Iter.
-                    retorno_cliente_iter = ClienteIter.obter(self, m_cliente.id_cliente_iter)
+                    retorno_cliente_iter = m_cliente_iter.obter(m_cliente)
                     
                     if not retorno_cliente_iter.estado.ok:
                         return retorno_cliente_iter
@@ -55,7 +58,7 @@ class Cliente(models.Model):
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.')
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return retorno
 
     def obter_ultimo(self):
@@ -66,8 +69,9 @@ class Cliente(models.Model):
             if lista_clientes:
                 m_cliente = lista_clientes[lista_clientes.count()-1]
                 if m_cliente:
+                    m_cliente.chave_iter = self.chave_iter
                     # Obtem o cadastro na Iter.
-                    retorno_cliente_iter = ClienteIter.obter(self, m_cliente.id_cliente_iter)
+                    retorno_cliente_iter = ClienteIter.obter(self, m_cliente)
                     
                     if not retorno_cliente_iter.estado.ok:
                         return retorno_cliente_iter
@@ -82,7 +86,7 @@ class Cliente(models.Model):
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.')
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return retorno
                 
     def incluir(self):
@@ -94,23 +98,39 @@ class Cliente(models.Model):
 
             # Valida se o cliente já está cadastrado.
             retorno = Cliente.obter(self)
-
-            if retorno.estado.codMensagem != 'NaoCadastrado':
-                return retorno
+    
+            if retorno.estado.excecao or retorno.estado.codMensagem != 'NaoCadastrado':
+                return Retorno(False, 
+                                'Erro ao validar cadastro. %s' % (retorno.estado.mensagem), 
+                                retorno.estado.codMensagem, 
+                                retorno.estado.excecao)
             
             # Inclusao na Iter.
             cIter = ClienteIter()
-            retorno = cIter.incluir(self)
+            retorno = cIter.obter(self)
+            
+            if retorno.estado.excecao or retorno.estado.httpStatus != '404':
+                return Retorno(False, 
+                                'Erro ao validar cadastro na Iter. %s' % (retorno.estado.mensagem), 
+                                retorno.estado.codMensagem, 
+                                retorno.estado.excecao)
+
+            # salva na base da Iter.
+            if retorno.estado.httpStatus == '404':
+                retorno = cIter.incluir(self)
+            else:
+                retorno = cIter.alterar(self)
             
             if not retorno.estado.ok:
-                return retorno
+                return Retorno(False, 
+                                'Erro ao efetivar cadastro na Iter. %s' % (retorno.estado.mensagem), 
+                                retorno.estado.codMensagem, 
+                                retorno.estado.excecao)
 
             d_cliente_iter = retorno.json()
             self.id_cliente_iter = d_cliente_iter['dados']['id']
-        
-            if not retorno.estado.ok:
-                return retorno
 
+            # salva na base da Trisafe
             self.save()
             
             retorno = Retorno(True, 'Cadastro realizado com sucesso.', 200)
@@ -120,7 +140,7 @@ class Cliente(models.Model):
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.')
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return retorno
     
     def alterar(self):
@@ -149,14 +169,14 @@ class Cliente(models.Model):
             m_cliente.converter_de_cliente_iter(retorno.json())
             m_cliente.save()
             
-            retorno = Retorno(True, 'Cadastro realizado com sucesso.', 200)
+            retorno = Retorno(True, 'Cadastro atualizado com sucesso.', 200)
             retorno.dados = m_cliente
 
             return retorno
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.')
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return retorno
     
     def converter_de_cliente_iter(self, d_cliente_iter):

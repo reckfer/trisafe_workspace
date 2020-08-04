@@ -43,7 +43,7 @@ class ContratoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '')
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return Response(retorno.json())
     
     @action(detail=False, methods=['post'])
@@ -78,7 +78,7 @@ class ContratoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '')
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return Response(retorno.json())
     
     @action(detail=False, methods=['post'])
@@ -95,7 +95,7 @@ class ContratoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '')
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return Response(retorno.json())
 
     @action(detail=False, methods=['post'])
@@ -112,7 +112,7 @@ class ContratoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '')
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return Response(retorno.json())
     
     @action(detail=False, methods=['post'])
@@ -139,7 +139,7 @@ class ContratoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '')
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return Response(retorno.json())
 
     @classmethod
@@ -162,6 +162,8 @@ class ContratoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
         d_cliente = d_dados_app['cliente']        
         m_cliente.cpf = d_cliente['cpf']
 
+        d_chaves = d_dados_app['chaves']
+        m_cliente.chave_iter = d_chaves['chave_iter']
         return m_cliente
 
     @classmethod
@@ -170,5 +172,5 @@ class ContratoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
         d_dados_app = request.data['dados_app']
         d_contrato = d_dados_app['contrato']
         d_produtos_contratados = d_contrato['produtos_contratados']
-                    
+        
         return d_produtos_contratados

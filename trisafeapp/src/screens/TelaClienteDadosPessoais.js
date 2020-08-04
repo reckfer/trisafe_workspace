@@ -45,14 +45,12 @@ export default class TelaClienteDadosPessoais extends Component {
         this.avancar = this.avancar.bind(this);
 
         this.oRegistradorLog.registrar('TelaClienteDadosPessoais.constructor() => Finalizou.');
+        console.log('TelaClienteDadosPessoais.constructor()');
     }
-
+    
     avancar() {
-        
-        // if(this.validarDadosPessoais()) {
-            // this.state.dados_app.emCadastro = false;
-            this.oNavegacao.navigate('Endereço', this.state);
-        // }
+        this.oGerenciadorContextoApp.setTelaAnterior(this);
+        this.oNavegacao.navigate('Endereço', this.state);
     }
 
     voltar() {
@@ -86,7 +84,8 @@ export class AreaDados extends Component {
     render() {
         let oDadosApp = this.props.dadosApp;
         let oDadosCliente = oDadosApp.cliente;
-
+        
+        console.log('TelaClienteDadosPessoais.render()');
         return (
             <ScrollView>
                 <ThemeProvider theme={theme}>
