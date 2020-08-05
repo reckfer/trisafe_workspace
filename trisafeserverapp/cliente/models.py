@@ -109,14 +109,14 @@ class Cliente(models.Model):
             cIter = ClienteIter()
             retorno = cIter.obter(self)
             
-            if retorno.estado.excecao or retorno.estado.httpStatus != '404':
+            if not retorno.estado.ok and (retorno.estado.excecao or retorno.estado.httpStatus != 404):
                 return Retorno(False, 
                                 'Erro ao validar cadastro na Iter. %s' % (retorno.estado.mensagem), 
                                 retorno.estado.codMensagem, 
                                 retorno.estado.excecao)
 
             # salva na base da Iter.
-            if retorno.estado.httpStatus == '404':
+            elif retorno.estado.httpStatus == 404:
                 retorno = cIter.incluir(self)
             else:
                 retorno = cIter.alterar(self)

@@ -55,8 +55,8 @@ class Contrato(models.Model):
                 return retorno_transacao
             
             self.charge_id = m_transacao_gerencia_net.id            
-            self.id_contrato = str(self.cliente.id_cliente_iter).rjust(6, '0') + str(self.charge_id).rjust(10, '0')
             self.cliente = retorno_cliente.dados
+            self.id_contrato = str(self.cliente.id_cliente_iter).rjust(6, '0') + str(self.charge_id).rjust(10, '0')
             self.calcular_valor_total(retorno_produtos.dados)
 
             # Inclui na base
@@ -64,6 +64,49 @@ class Contrato(models.Model):
 
             # Atualiza com os produtos
             self.produtos_contratados.add(*retorno_produtos.dados)
+
+            retorno = Retorno(True, 'Contrato gerado com sucesso. Selecione "Contratar" para aceitá-lo.')
+            retorno.dados = self
+
+            return retorno
+        except Exception as e:
+            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
+                    
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            return retorno
+    
+    def alterar(self, chaves_produtos):
+
+        try:
+            retorno_cliente = self.cliente.obter()
+
+            if not retorno_cliente.estado.ok:
+                return retorno_cliente
+
+            m_produto = Produto()
+            retorno_produtos = m_produto.listar_especificos(chaves_produtos)
+            
+            if not retorno_produtos.estado.ok:
+                return retorno_produtos
+
+            d_dados_pedido = self.gerar_dados_pedido_transacao_gerencia_net(retorno_produtos.dados)
+
+            m_transacao_gerencia_net = TransacaoGerenciaNet()
+
+            retorno_transacao = m_transacao_gerencia_net.incluir(d_dados_pedido)
+
+            if not retorno_transacao.estado.ok:
+                return retorno_transacao
+            
+            self.charge_id = m_transacao_gerencia_net.id
+            self.cliente = retorno_cliente.dados
+            self.calcular_valor_total(retorno_produtos.dados)
+            self.aceito = False
+            # Atualiza com os produtos
+            self.produtos_contratados.set(retorno_produtos.dados)
+
+            # Inclui na base
+            self.save()
 
             retorno = Retorno(True, 'Contrato gerado com sucesso. Selecione "Contratar" para aceitá-lo.')
             retorno.dados = self
@@ -113,7 +156,7 @@ class Contrato(models.Model):
     
     def obter_por_cliente(self):
         try:
-            retorno = Retorno(False, 'Contrato não localizado.')
+            retorno = Retorno(False, 'Contrato não localizado.', 'NaoCadastrado')
             
             m_contratos = Contrato.objects.filter(cliente__cpf=self.cliente.cpf)
             
@@ -121,12 +164,11 @@ class Contrato(models.Model):
                 m_contrato = m_contratos[0]
                 if m_contrato:
                     retorno = Retorno(True)
+                    m_contrato.cliente.chave_iter = self.cliente.chave_iter
                     retorno.dados = m_contrato
-            
-                    # email_cliente = EmailCliente()
-                    # email_cliente.enviar_com_anexos(m_contrato.cliente)
 
             return retorno
+
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     

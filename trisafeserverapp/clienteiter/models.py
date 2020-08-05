@@ -13,13 +13,17 @@ class ClienteIter():
     def tratarRespostaHTTP(cls, respostaHTTP):
         
         if respostaHTTP.status_code < 200 or respostaHTTP.status_code > 300:
-            retorno = Retorno(False, respostaHTTP.text, respostaHTTP.status_code)
+            retorno = Retorno(False, respostaHTTP.text, '', respostaHTTP.status_code)
         else:
             retorno = Retorno(True)
             dadosRetorno = respostaHTTP.json()
             
-            if isinstance(dadosRetorno, list) and len(dadosRetorno) > 0:
-                retorno.dados = dadosRetorno[0]
+            if isinstance(dadosRetorno, list):
+                if len(dadosRetorno) > 0:
+                    retorno.dados = dadosRetorno[0]
+                else:
+                    # nao localizado
+                    retorno = Retorno(False, respostaHTTP.text, '', 404)
             elif 'user' in dadosRetorno:
                 retorno.dados = dadosRetorno['user']
 

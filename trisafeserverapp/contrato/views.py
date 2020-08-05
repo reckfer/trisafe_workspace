@@ -35,10 +35,18 @@ class ContratoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
             v_gerenciador_log.registrar_do_cliente(request)
 
             m_contrato = ContratoViewSet.apropriar_dados_http(request)
-            
             lista_produtos = ContratoViewSet.extrair_produtos_dados_http(request)
-            retorno = m_contrato.incluir(lista_produtos)
             
+            retorno = m_contrato.obter_por_cliente()
+
+            if retorno.estado.codMensagem == 'NaoCadastrado':
+                retorno = m_contrato.incluir(lista_produtos)
+            elif retorno.estado.ok:
+                m_contrato = retorno.dados
+                retorno = m_contrato.alterar(lista_produtos)
+            else:    
+                return retorno
+
             return Response(retorno.json())
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)

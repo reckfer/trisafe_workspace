@@ -141,14 +141,12 @@ export default class TelaProdutoEscolha extends Component {
 
     tratarIncluirContrato(oDados, oEstado) {
         this.oDadosControleApp.processando_requisicao = false;
-        
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
         this.oGerenciadorContextoApp.atribuirDados('contrato', oDados);
 
         if(oEstado.ok) {
             this.oGerenciadorContextoApp.setTelaAnterior(this);
             this.oNavegacao.navigate('Contrato', this.state);
-        } else {            
-            this.oGerenciadorContextoApp.atualizarEstadoTela(this);
         }
     }
     
