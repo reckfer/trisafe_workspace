@@ -125,7 +125,7 @@ export default class TelaTestesInicio extends Component {
             
             let dadosParametros = JSON.stringify(this.oDadosApp);
 
-            this.oRegistradorLog.registrar(`TelaTestesInicio.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
+            this.oRegistradorLog.registrar(`TelaTestesInicio.obterContratoPorCliente => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
 
             fetch(url, {
                     method: 'POST',

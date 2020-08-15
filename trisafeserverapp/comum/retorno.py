@@ -1,13 +1,17 @@
 from django.forms.models import model_to_dict
 from django.db.models.query import QuerySet
 from django.db import models
+from comum.credencial import Credencial
 import json
 
 class Retorno:
                         
-    def __init__(self, ind_ok = False, msg = '', codMensagem = '', httpStatus = 500, ex = None):        
+    def __init__(self, ind_ok = False, msg = '', codMensagem = '', httpStatus = 500, ex = None, credencial = None):        
         self.estado = EstadoExecucao(ind_ok, msg, codMensagem, httpStatus, ex)
         self.dados = None
+        self.credencial = Credencial()
+        if(credencial):
+            self.credencial = credencial
         
     def json(self):
         return self.__criar_json__()
@@ -23,6 +27,7 @@ class Retorno:
         ret = {
             "estado": self.estado.json(),
             "dados": oDados,
+            "credencial": self.credencial.json()
             }
         return ret
     

@@ -1,4 +1,4 @@
 from django.apps import AppConfig
 
-class ClienteiterConfig(AppConfig):
+class ClienteIterConfig(AppConfig):
     name = 'clienteiter'

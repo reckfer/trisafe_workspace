@@ -48,7 +48,8 @@ export const DADOS_CONTROLE_APP = {
 };
 
 export const CHAVES = {
-    'chave_iter': 'bUZk1V9YjNFjYQWD'
+    'chave_iter': 'bUZk1V9YjNFjYQWD',
+    'token_iter': ''
 }
 
 export const DADOS_APP_GERAL = {

@@ -5,6 +5,7 @@ from django.db import models
 from rest_framework import status
 from clienteiter.models import ClienteIter
 from comum.retorno import Retorno
+from comum.credencial import Credencial
 
 class Cliente(models.Model):
     id_cliente_iter = models.IntegerField(primary_key=True)
@@ -24,7 +25,7 @@ class Cliente(models.Model):
     senha = models.CharField(max_length=20, blank=False, null=True)
     dt_hr_inclusao = models.DateTimeField(blank=False, null=False, auto_now_add=True)
     ult_atualizacao = models.DateTimeField(blank=False, null=False, auto_now=True)
-    chave_iter = None
+    credencial = Credencial()
     
     def obter(self):
         try:
@@ -40,18 +41,16 @@ class Cliente(models.Model):
             if lista_clientes:
                 m_cliente = lista_clientes[0]
                 if m_cliente:
-                    m_cliente.chave_iter = self.chave_iter
-                    m_cliente_iter = ClienteIter()
+                    m_cliente_iter = ClienteIter(self.credencial)
                     # Obtem o cadastro na Iter.
-                    retorno_cliente_iter = m_cliente_iter.obter(m_cliente)
+                    retorno = m_cliente_iter.obter(m_cliente)
                     
-                    if not retorno_cliente_iter.estado.ok:
-                        return retorno_cliente_iter
+                    if not retorno.estado.ok:
+                        return retorno
                     
-                    m_cliente.converter_de_cliente_iter(retorno_cliente_iter.json())
+                    m_cliente.converter_de_cliente_iter(retorno.json())
                     m_cliente.nome_usuario = m_cliente.nome_usuario
                     
-                    retorno = Retorno(True)
                     retorno.dados = m_cliente
             
             return retorno
@@ -69,17 +68,16 @@ class Cliente(models.Model):
             if lista_clientes:
                 m_cliente = lista_clientes[lista_clientes.count()-1]
                 if m_cliente:
-                    m_cliente.chave_iter = self.chave_iter
+                    m_cliente_iter = ClienteIter(self.credencial)
                     # Obtem o cadastro na Iter.
-                    retorno_cliente_iter = ClienteIter.obter(self, m_cliente)
+                    retorno = m_cliente_iter.obter(m_cliente)
                     
-                    if not retorno_cliente_iter.estado.ok:
-                        return retorno_cliente_iter
+                    if not retorno.estado.ok:
+                        return retorno
                     
-                    m_cliente.converter_de_cliente_iter(retorno_cliente_iter.json())
+                    m_cliente.converter_de_cliente_iter(retorno.json())
                     m_cliente.nome_usuario = m_cliente.nome_usuario
                     
-                    retorno = Retorno(True)
                     retorno.dados = m_cliente
             
             return retorno
@@ -106,8 +104,8 @@ class Cliente(models.Model):
                                 retorno.estado.excecao)
             
             # Inclusao na Iter.
-            cIter = ClienteIter()
-            retorno = cIter.obter(self)
+            m_cliente_iter = ClienteIter(self.credencial)
+            retorno = m_cliente_iter.obter(self)
             
             if not retorno.estado.ok and (retorno.estado.excecao or retorno.estado.httpStatus != 404):
                 return Retorno(False, 
@@ -117,9 +115,9 @@ class Cliente(models.Model):
 
             # salva na base da Iter.
             elif retorno.estado.httpStatus == 404:
-                retorno = cIter.incluir(self)
+                retorno = m_cliente_iter.incluir(self)
             else:
-                retorno = cIter.alterar(self)
+                retorno = m_cliente_iter.alterar(self)
             
             if not retorno.estado.ok:
                 return Retorno(False, 
@@ -132,8 +130,8 @@ class Cliente(models.Model):
 
             # salva na base da Trisafe
             self.save()
-            
-            retorno = Retorno(True, 'Cadastro realizado com sucesso.', 200)
+
+            retorno = Retorno(True, 'Cadastro realizado com sucesso.', 200, None, retorno.credencial)
             retorno.dados = self
 
             return retorno
@@ -160,8 +158,8 @@ class Cliente(models.Model):
             self.id_cliente_iter = m_cliente.id_cliente_iter
 
             # Alteracao na Iter.
-            cIter = ClienteIter()
-            retorno = cIter.alterar(self)
+            m_cliente_iter = ClienteIter(self.credencial)
+            retorno = m_cliente_iter.alterar(self)
             
             if not retorno.estado.ok:
                 return retorno
@@ -169,7 +167,7 @@ class Cliente(models.Model):
             m_cliente.converter_de_cliente_iter(retorno.json())
             m_cliente.save()
             
-            retorno = Retorno(True, 'Cadastro atualizado com sucesso.', 200)
+            retorno = Retorno(True, 'Cadastro atualizado com sucesso.', 200, None, retorno.credencial)
             retorno.dados = m_cliente
 
             return retorno

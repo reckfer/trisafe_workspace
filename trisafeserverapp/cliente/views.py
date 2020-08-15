@@ -8,6 +8,7 @@ from cliente.models import Cliente
 from gerenciadorlog.views import GerenciadorLogViewSet
 from rest_framework.renderers import JSONRenderer
 from comum.retorno import Retorno
+from comum.credencial import Credencial
 import json
 import traceback
 import sys
@@ -29,6 +30,7 @@ class ClienteViewSet(viewsets.ModelViewSet, permissions.BasePermission):
             v_gerenciador_log.registrar_do_cliente(request)
 
             m_cliente = ClienteViewSet.apropriar_dados_http_chave(request)
+            m_cliente.credencial = ClienteViewSet.apropriar_credenciais_http(request)
 
             retorno_cliente = m_cliente.obter()
             return Response(retorno_cliente.json())
@@ -46,6 +48,8 @@ class ClienteViewSet(viewsets.ModelViewSet, permissions.BasePermission):
             v_gerenciador_log.registrar_do_cliente(request)
 
             m_cliente = ClienteViewSet.apropriar_dados_http(request)
+            m_cliente.credencial = ClienteViewSet.apropriar_credenciais_http(request)
+
             retorno_cliente = m_cliente.obter_ultimo()
             
             return Response(retorno_cliente.json())
@@ -62,6 +66,7 @@ class ClienteViewSet(viewsets.ModelViewSet, permissions.BasePermission):
             v_gerenciador_log.registrar_do_cliente(request)
             
             m_cliente = ClienteViewSet.apropriar_dados_http(request)
+            m_cliente.credencial = ClienteViewSet.apropriar_credenciais_http(request)
             
             retorno = m_cliente.incluir()
 
@@ -80,6 +85,7 @@ class ClienteViewSet(viewsets.ModelViewSet, permissions.BasePermission):
             v_gerenciador_log.registrar_do_cliente(request)
             
             m_cliente = ClienteViewSet.apropriar_dados_http(request)
+            m_cliente.credencial = ClienteViewSet.apropriar_credenciais_http(request)
             
             retorno = m_cliente.alterar()
 
@@ -100,8 +106,6 @@ class ClienteViewSet(viewsets.ModelViewSet, permissions.BasePermission):
         m_cliente.cpf = d_cliente['cpf']
         m_cliente.email = d_cliente['email']
     
-        d_chaves = d_dados_app['chaves']
-        m_cliente.chave_iter = d_chaves['chave_iter']
         return m_cliente
 
     @classmethod
@@ -121,3 +125,19 @@ class ClienteViewSet(viewsets.ModelViewSet, permissions.BasePermission):
         m_cliente.cep = d_cliente['cep']
         m_cliente.uf = d_cliente['uf']
         return m_cliente
+    
+    @classmethod
+    def apropriar_credenciais_http(cls, request):
+        chave_iter = ''
+        token_iter = ''
+        
+        d_dados_app = request.data['dados_app']
+        if 'chaves' in d_dados_app:
+            d_chaves = d_dados_app['chaves']
+            chave_iter = d_chaves['chave_iter']
+            token_iter = d_chaves['token_iter']
+
+        credencial = Credencial(chave_iter, '')
+        credencial.token_iter = token_iter
+
+        return credencial

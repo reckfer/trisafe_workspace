@@ -8,6 +8,7 @@ export default class Util {
         
         if(gerenciadorContexto) {
             this.oGerenciadorContextoApp = gerenciadorContexto;
+            this.oCredencial = this.oGerenciadorContextoApp.dadosApp.chaves
             this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;
         }
         
@@ -21,7 +22,7 @@ export default class Util {
 
         if (__DEV__) {
             protocol = 'http://';
-            domain = '192.168.0.2:8000';
+            domain = '192.168.1.118:8000';
         }
         return protocol + domain + metodo;
     }
@@ -67,8 +68,11 @@ export default class Util {
         if(oJsonRetorno) {
             this.oRegistradorLog.registrar('Util.tratarRetornoServidor() => Recebeu: ' + JSON.stringify(oJsonRetorno));
 
+            console.log('Util.tratarRetornoServidor() oJsonRetorno => ', oJsonRetorno);
+            
             let oEstado = oJsonRetorno.estado;
             let oDados = oJsonRetorno.dados;
+            this.oCredencial.token_iter = oJsonRetorno.credencial.token_iter
 
             if (!suprimirMsgServidor && oEstado.mensagem && oEstado.mensagem.trim()){
                 Alert.alert('Trisafe', oEstado.mensagem);

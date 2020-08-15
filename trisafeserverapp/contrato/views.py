@@ -150,6 +150,23 @@ class ContratoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return Response(retorno.json())
 
+    @action(detail=False, methods=['post'])
+    def excluir_arquivo_contrato(self, request):
+        try:
+            v_gerenciador_log = GerenciadorLogViewSet()
+            v_gerenciador_log.registrar_do_cliente(request)
+
+            m_contrato = ContratoViewSet.apropriar_dados_http(request)
+            
+            retorno = m_contrato.excluir_contrato()
+            
+            return Response(retorno.json())
+        except Exception as e:
+            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
+                    
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            return Response(retorno.json())
+
     @classmethod
     def apropriar_dados_http(cls, request):
         m_contrato = Contrato()

@@ -72,7 +72,7 @@ export default class TelaContratoAceite extends Component {
 
             let dadosParametros = JSON.stringify(this.oDadosApp);
 
-            this.oRegistradorLog.registrar(`TelaBoletoEmissao.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
+            this.oRegistradorLog.registrar(`TelaContratoAceite.contratar => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
 
             this.oGerenciadorContextoApp.atualizarEstadoTela(this);
 
@@ -131,8 +131,39 @@ TelaContratoAceite.contextType = ContextoApp;
 
 export class AreaDados extends Component {
 
-    constructor(props) {
+    constructor(props, value) {
         super(props);
+        
+        if(value && value.gerenciador) {
+            // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
+            this.oGerenciadorContextoApp = value.gerenciador;
+            this.oUtil = new Util(this.oGerenciadorContextoApp);
+        }
+
+        this.excluirArquivoContrato = this.excluirArquivoContrato.bind(this);
+    }
+
+    excluirArquivoContrato() {
+        try {
+            let url = this.oUtil.getURL('/contratos/excluir_arquivo_contrato/');
+            
+            let dadosParametros = JSON.stringify(this.oDadosApp);
+
+            this.oRegistradorLog.registrar(`TelaContratoAceite.excluirArquivoContrato => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
+
+            this.oGerenciadorContextoApp.atualizarEstadoTela(this);
+
+            fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(this.state),
+                    })
+        } catch (exc) {
+            Alert.alert('Trisafe', exc);
+        }
     }
 
     render() {
@@ -160,6 +191,7 @@ export class AreaDados extends Component {
                 <Pdf
                     source={source}
                     onLoadComplete={(numberOfPages,filePath)=>{
+                        this.excluirArquivoContrato();
                     }}
                     onPageChanged={(page,numberOfPages)=>{
                     }}
@@ -178,3 +210,4 @@ export class AreaDados extends Component {
         );
     }
 }
+AreaDados.contextType = ContextoApp;

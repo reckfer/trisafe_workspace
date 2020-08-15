@@ -244,6 +244,9 @@ class Contrato(models.Model):
     
     def montar_contrato(self):
         try:
+            # Exclui o arquivo anterior, se existir. 
+            self.excluir_contrato()
+            
             pdf = FPDF()
             pdf.add_page()
             pdf.set_font("Arial", size=12)
@@ -274,7 +277,7 @@ class Contrato(models.Model):
             pdf.cell(200, 10, txt= "Charge Id Boleto = %s" % self.charge_id, ln=1, align="C")
             
             nome_arquivo = "Contrato_%s.pdf" % self.id_contrato
-            caminho_arquivo = os.path.join(BASE_DIR, nome_arquivo)
+            caminho_arquivo = os.path.join(BASE_DIR, "data", "contratos", nome_arquivo)
             pdf.output(caminho_arquivo)
 
             dados_retorno = {
@@ -291,7 +294,17 @@ class Contrato(models.Model):
                     
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return retorno
-    
+
+    def excluir_contrato(self):
+        try:
+            nome_arquivo = "Contrato_%s.pdf" % self.id_contrato
+            os.remove(os.path.join(BASE_DIR, "data", "contratos", nome_arquivo))
+        except Exception as e:
+            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
+                    
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            return retorno
+
     def atribuir_do_modelo(self, m_contrato):
         if m_contrato:            
             self.id_contrato = m_contrato.id_contrato

@@ -51,6 +51,20 @@ export default class TelaClienteInicio extends Component {
         this.oRegistradorLog.registrar('TelaClienteInicio.constructor() => Finalizou.');
     }
 
+    tratarDadosAutenticacaoIter(oDados, oEstado) {
+        let irPara = true;
+        
+        if(!oEstado.ok){
+            if (oEstado.mensagem && oEstado.mensagem.trim()) {
+                Alert.alert('Trisafe', oEstado.mensagem);
+            }
+        } else {
+            irPara = false;
+        }
+    
+        this.oGerenciadorContextoApp.atribuirDados('chaves', oDados);
+    }
+
     obterCliente() {
         try {
             let url = this.oUtil.getURL('/clientes/obter/');
