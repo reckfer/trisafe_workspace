@@ -92,7 +92,7 @@ export default class TelaTestesInicio extends Component {
             
             let dadosParametros = JSON.stringify(this.oDadosApp);
 
-            this.oRegistradorLog.registrar(`TelaTestesInicio.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
+            this.oRegistradorLog.registrar(`TelaTestesInicio.obterUltimoCliente => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
 
             fetch(url, {
                     method: 'POST',
@@ -104,14 +104,14 @@ export default class TelaTestesInicio extends Component {
                   })
                   .then(this.oUtil.obterJsonResposta)
                   .then((oJsonDados) => {
-                      this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno);
+                      this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno, false, true);
                   })
         } catch (exc) {
             Alert.alert('Trisafe', exc);
         }
     }
 
-    tratarDadosRetorno(oDados) {
+    tratarDadosRetorno(oDados, oEstado) {
 
         this.oGerenciadorContextoApp.atribuirDados('cliente', oDados);
         

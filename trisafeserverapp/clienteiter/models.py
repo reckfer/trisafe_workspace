@@ -11,10 +11,111 @@ from comum.credencial import Credencial
 
 class ClienteIter(models.Model):
     
-    def __init__(self, credencial):
-        self.credencial = credencial
+    def __init__(self, credencial_cliente):
+        self.credencial = None
+        self.headers_iter = None
 
-    def tratarRespostaHTTP(self, respostaHTTP):
+        self.__autenticarIter(credencial_cliente)
+
+    def obter(self, m_cliente):
+        url = "https://cnxs-api.itertelemetria.com/v1/users/{0}".format(m_cliente.id_cliente_iter)
+
+        if(not self.headers_iter):
+            return self.retorno_autenticacao
+
+        r = requests.get(url, headers=self.headers_iter)
+
+        # tenta obter por id_iter.
+        retorno = self.__tratarRespostaHTTP(r)
+        
+        if retorno.estado.ok:
+            usuario = retorno.dados['user']
+            retorno.dados = usuario
+        else:
+            # tenta obter por cpf.
+            retorno = self.obterPorDocumento(m_cliente)
+        
+        return retorno
+    
+    def obterPorDocumento(self, m_cliente):
+        url = "https://cnxs-api.itertelemetria.com/v1/users/?by_document={0}".format(m_cliente.cpf)
+                
+        if(not self.headers_iter):
+            return self.retorno_autenticacao
+
+        r = requests.get(url, headers=self.headers_iter)
+        
+        retorno = self.__tratarRespostaHTTP(r)
+        
+        if(retorno.estado.ok):
+            usuario = retorno.dados['user']
+            retorno.dados = usuario
+        
+        return retorno
+        
+    def incluir(self, m_cliente):
+        url = "https://cnxs-api.itertelemetria.com/v1/users"
+
+        d_cliente_iter = self.__montar_dic_cliente(m_cliente)
+        
+        if(not self.headers_iter):
+            return self.retorno_autenticacao
+
+        r = requests.post(url, headers=self.headers_iter, data=d_cliente_iter)
+        
+        retorno = self.__tratarRespostaHTTP(r)
+
+        if retorno.estado.ok:
+            usuario = retorno.dados['user']
+            retorno.dados = usuario
+
+        return retorno
+    
+    def alterar(self, m_cliente):
+        url = "https://cnxs-api.itertelemetria.com/v1/users/%s" % (m_cliente.id_cliente_iter)
+        
+        if(not self.headers_iter):
+            return self.retorno_autenticacao
+
+        d_cliente_iter = self.__montar_dic_cliente(m_cliente)
+        r = requests.put(url, headers=self.headers_iter, data=d_cliente_iter)
+        
+        retorno = self.__tratarRespostaHTTP(r)
+
+        if retorno.estado.ok:
+            usuario = retorno.dados['user']
+            retorno.dados = usuario
+
+        return retorno
+
+    def __montar_dic_cliente(self, m_cliente):
+        jsonCliente = json.dumps({
+            "user": {
+                "email": m_cliente.email,
+                "username": m_cliente.nome_usuario,
+                "name": m_cliente.nome,
+                "document": m_cliente.cpf,
+                "expire_date": "2050-01-01 00:00:00",
+                "phone": m_cliente.telefone,
+                "language": "pt-BR",
+                "time_zone": "Brasilia",
+                "company_id": 8,
+                "password": "123456",
+                "password_confirmation": "123456",
+                "access_level": 0,
+                "zipcode": m_cliente.cep,
+                "street": m_cliente.rua,
+                "number": m_cliente.numero,
+                "complement_address": m_cliente.complemento,
+                "district": m_cliente.bairro,
+                "city": m_cliente.cidade,
+                "state": m_cliente.uf,
+                "active": True
+            }
+        })
+        return jsonCliente
+    
+    def __tratarRespostaHTTP(self, respostaHTTP):
         
         if respostaHTTP.status_code < 200 or respostaHTTP.status_code > 300:
             retorno = Retorno(False, 'Erro de comunicação com a Iter. %s' % respostaHTTP.text, 'ErroComunicacaoIter', respostaHTTP.status_code)
@@ -40,144 +141,14 @@ class ClienteIter(models.Model):
             
         return retorno
 
-    def obter(self, m_cliente):
-        retorno = self.__autenticarIter__()
- 
-        if not retorno.estado.ok:
-            return retorno
-        
-        credencial = retorno.credencial
-        token = credencial.get_token_iter()
-        
-        headers = {'Authorization': 'Bearer %s' %token,
-                'Content-Type' : 'application/json' }
-        url = "https://cnxs-api.itertelemetria.com/v1/users/{0}".format(m_cliente.id_cliente_iter)
-        
-        r = requests.get(url, headers=headers)
-       # m_cliente_iter = ClienteIter()
-        # tenta obter por id_iter.
-        retorno = self.tratarRespostaHTTP(r)
-        
-        if retorno.estado.ok:
-            usuario = retorno.dados['user']
-            retorno.dados = usuario
-        else:
-            # tenta obter por cpf.
-            retorno = self.obterPorDocumento(m_cliente)
-        
-        return retorno
-    
-    def obterPorDocumento(self, m_cliente):
-        retorno = self.__autenticarIter__()
-        
-        if not retorno.estado.ok:
-            return retorno
-
-        credencial = retorno.credencial    
-        token = credencial.get_token_iter()
-
-        headers = {'Authorization': 'Bearer %s' %token,
-                'Content-Type' : 'application/json' }
-        url = "https://cnxs-api.itertelemetria.com/v1/users/?by_document={0}".format(m_cliente.cpf)
-        
-        r = requests.get(url, headers=headers)
-        
-        retorno = self.tratarRespostaHTTP(r)
-        
-        if(retorno.estado.ok):
-            usuario = retorno.dados['user']
-            retorno.dados = usuario
-        
-        retorno.credencial = credencial
-
-        return retorno
-        
-    
-    def incluir(self, m_cliente):
-        d_cliente_iter = self._montar_dic_cliente(m_cliente)
-
-        retorno = self.__autenticarIter__()
-
-        if not retorno.estado.ok:
-            return retorno
-        
-        credencial = retorno.credencial
-        token = credencial.get_token_iter()
-
-        headers = {'Authorization': 'Bearer %s' %token,
-                   'Content-Type' : 'application/json' }
-        
-        r = requests.post("https://cnxs-api.itertelemetria.com/v1/users", headers=headers, data=d_cliente_iter)
-        
-        retorno = self.tratarRespostaHTTP(r)
-
-        if retorno.estado.ok:
-            usuario = retorno.dados['user']
-            retorno.dados = usuario
-
-        retorno.credencial = credencial
-        return retorno
-    
-    def alterar(self, cliente):
-        # d_cliente_iter = self._montar_dic_cliente(cliente)
-
-        retorno = self.__autenticarIter__()
-    
-        if not retorno.estado.ok:
-            return retorno
-        
-        credencial = retorno.credencial
-        token = credencial.get_token_iter()
-
-        headers = {'Authorization': 'Bearer %s' %token,
-                   'Content-Type' : 'application/json' }
-        
-        r = requests.put("https://cnxs-api.itertelemetria.com/v1/users/%s" % (cliente.id_cliente_iter), headers=headers, data=d_cliente_iter)
-        
-        retorno = self.tratarRespostaHTTP(r)
-
-        if retorno.estado.ok:
-            usuario = retorno.dados['user']
-            retorno.dados = usuario
-
-        retorno.credencial = credencial
-
-        return retorno
-
-    def _montar_dic_cliente(self, cliente):
-        jsonCliente = json.dumps({
-            "user": {
-                "email": cliente.email,
-                "username": cliente.nome_usuario,
-                "name": cliente.nome,
-                "document": cliente.cpf,
-                "expire_date": "2050-01-01 00:00:00",
-                "phone": cliente.telefone,
-                "language": "pt-BR",
-                "time_zone": "Brasilia",
-                "company_id": 8,
-                "password": "123456",
-                "password_confirmation": "123456",
-                "access_level": 0,
-                "zipcode": cliente.cep,
-                "street": cliente.rua,
-                "number": cliente.numero,
-                "complement_address": cliente.complemento,
-                "district": cliente.bairro,
-                "city": cliente.cidade,
-                "state": cliente.uf,
-                "active": True
-            }
-        })
-        return jsonCliente
-
-    def __autenticarIter__(self):
-        chave_iter_cliente = self.credencial.chave_iter_cli
+    def __autenticarIter(self, credencial_cliente):
+        self.headers_iter = None
+        chave_iter_cliente = credencial_cliente.chave_iter_cli
         chave_iter_servidor = config('CHAVE_ITER')
         token_iter = ''
 
-        if(self.credencial):
-            token_iter = self.credencial.token_iter
+        if(credencial_cliente):
+            token_iter = credencial_cliente.token_iter
         
         self.credencial = Credencial(chave_iter_cliente, chave_iter_servidor)
         self.credencial.token_iter = token_iter
@@ -196,17 +167,21 @@ class ClienteIter(models.Model):
             headers = {'Authorization': 'Basic %s' %self.credencial.get_token_iter()}
             r = requests.get("http://cnxs-api.itertelemetria.com/v1/sign_in", headers=headers)
             
-            retorno = self.tratarRespostaHTTP(r)
+            retorno = self.__tratarRespostaHTTP(r)
 
-            if not retorno.estado.ok:
-                return retorno
+        self.retorno_autenticacao = retorno
 
-        return retorno
+        if self.retorno_autenticacao.estado.ok:
+            self.credencial = retorno.credencial
+            token = self.credencial.get_token_iter()
+            
+            self.headers_iter = {'Authorization': 'Bearer %s' %token,
+                    'Content-Type' : 'application/json' }
 
     def json(self):
-        return self.__criar_json__()
+        return self.__criar_json()
 
-    def __criar_json__(self):
+    def __criar_json(self):
         ret = {
             "token_iter": self.token_iter,
             "chave_iter": self.chave_ter

@@ -12,6 +12,7 @@ from cliente.models import Cliente
 from rest_framework.renderers import JSONRenderer
 from comum.retorno import Retorno
 # from boleto.models import TransacaoGerenciaNet
+from cliente.views import ClienteViewSet
 from boletogerencianet.models import BoletoGerenciaNet
 from boletogerencianet.views import GerenciadorLogViewSet
 import json
@@ -187,8 +188,8 @@ class ContratoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
         d_cliente = d_dados_app['cliente']        
         m_cliente.cpf = d_cliente['cpf']
 
-        d_chaves = d_dados_app['chaves']
-        m_cliente.chave_iter = d_chaves['chave_iter']
+        m_cliente.credencial = ClienteViewSet.apropriar_credenciais_http(request)
+        
         return m_cliente
 
     @classmethod

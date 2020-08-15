@@ -118,7 +118,7 @@ export default class TelaProdutoEscolha extends Component {
             this.oDadosControleApp.processando_requisicao = true;
 
             let dadosParametros = JSON.stringify(this.oDadosApp);            
-            this.oRegistradorLog.registrar(`TelaProdutoEscolha.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
+            this.oRegistradorLog.registrar(`TelaProdutoEscolha.incluirContrato => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
 
             this.oGerenciadorContextoApp.atualizarEstadoTela(this);
 

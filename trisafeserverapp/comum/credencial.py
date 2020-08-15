@@ -19,11 +19,9 @@ class Credencial:
         cripto = self.__preparar_cripto__()
 
         if(cripto):
-            try:
+            if(isinstance(token, str)):
                 token = token.encode()
-            except (UnicodeDecodeError, AttributeError):
-                pass
-            #token = base64.b64encode(token)
+
             self.token_iter = cripto.encrypt(token)
         else:
             self.token_iter = token
@@ -32,6 +30,9 @@ class Credencial:
         cripto = self.__preparar_cripto__()
         
         if(cripto):
+            if(isinstance(self.token_iter, str)):
+                self.token_iter = self.token_iter.encode()
+
             token = cripto.decrypt(self.token_iter)
             return token.decode()
 

@@ -137,6 +137,7 @@ export class AreaDados extends Component {
         if(value && value.gerenciador) {
             // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
             this.oGerenciadorContextoApp = value.gerenciador;
+            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             this.oUtil = new Util(this.oGerenciadorContextoApp);
         }
 
@@ -145,13 +146,14 @@ export class AreaDados extends Component {
 
     excluirArquivoContrato() {
         try {
+            console.log('AreaDados.excluirArquivoContrato iniciou ...');
             let url = this.oUtil.getURL('/contratos/excluir_arquivo_contrato/');
             
             let dadosParametros = JSON.stringify(this.oDadosApp);
+            
+            console.log('AreaDados.excluirArquivoContrato dadosParametros = ', dadosParametros);
 
-            this.oRegistradorLog.registrar(`TelaContratoAceite.excluirArquivoContrato => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
-
-            this.oGerenciadorContextoApp.atualizarEstadoTela(this);
+            this.oRegistradorLog.registrar(`AreaDados.excluirArquivoContrato => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
 
             fetch(url, {
                     method: 'POST',
@@ -159,8 +161,8 @@ export class AreaDados extends Component {
                         Accept: 'application/json',
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(this.state),
-                    })
+                    body: dadosParametros,
+                    });
         } catch (exc) {
             Alert.alert('Trisafe', exc);
         }
@@ -191,11 +193,14 @@ export class AreaDados extends Component {
                 <Pdf
                     source={source}
                     onLoadComplete={(numberOfPages,filePath)=>{
+                        console.log('render() onLoadComplete', filePath);
                         this.excluirArquivoContrato();
                     }}
                     onPageChanged={(page,numberOfPages)=>{
+                        console.log('render() onPageChanged', page);
                     }}
                     onError={(error)=>{
+                        console.log('render() onError', error);
                         this.oUtil.obterJsonResposta(error);
                     }}
                     onPressLink={(uri)=>{

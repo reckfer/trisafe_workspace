@@ -81,7 +81,7 @@ export default class TelaClienteConfirmacao extends Component {
                   })
                   .then(this.oUtil.obterJsonResposta)
                   .then((oJsonDados) => {
-                      this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno, true);
+                      this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno, true, true);
                   })
         } catch (exc) {
             Alert.alert('Trisafe', exc);

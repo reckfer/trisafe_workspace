@@ -61,7 +61,7 @@ export default class Util {
         return null;
     }
 
-    tratarRetornoServidor(oJsonRetorno, oFuncaoTratarDados, suprimirMsgServidor) {
+    tratarRetornoServidor(oJsonRetorno, oFuncaoTratarDados, suprimirMsgServidor, ignorarCallbackSeErro) {
         
         this.oRegistradorLog.registrar('Util.tratarRetornoServidor() => Iniciou.');
 
@@ -72,8 +72,11 @@ export default class Util {
             
             let oEstado = oJsonRetorno.estado;
             let oDados = oJsonRetorno.dados;
-            this.oCredencial.token_iter = oJsonRetorno.credencial.token_iter
-
+            
+            if(oJsonRetorno.credencial.token_iter) {
+                this.oCredencial.token_iter = oJsonRetorno.credencial.token_iter
+            }
+            
             if (!suprimirMsgServidor && oEstado.mensagem && oEstado.mensagem.trim()){
                 Alert.alert('Trisafe', oEstado.mensagem);
             }
@@ -81,8 +84,13 @@ export default class Util {
             if(oDados && typeof(oDados) === 'string' && oDados.trim()) {
                 oDados = oDados.trim();
             }
-            
-            oFuncaoTratarDados(oDados, oEstado);
+            if(ignorarCallbackSeErro) {
+                if(oEstado.ok === true) {
+                    oFuncaoTratarDados(oDados, oEstado);
+                }
+            } else {
+                oFuncaoTratarDados(oDados, oEstado);
+            }
         } else {
             this.oRegistradorLog.registrar('Util.tratarRetornoServidor() => oJsonRetorno estava vazio.');
             

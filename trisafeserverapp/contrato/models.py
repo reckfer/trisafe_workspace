@@ -163,8 +163,8 @@ class Contrato(models.Model):
             if m_contratos:
                 m_contrato = m_contratos[0]
                 if m_contrato:
+                    m_contrato.cliente.credencial = self.cliente.credencial
                     retorno = Retorno(True)
-                    m_contrato.cliente.chave_iter = self.cliente.chave_iter
                     retorno.dados = m_contrato
 
             return retorno
