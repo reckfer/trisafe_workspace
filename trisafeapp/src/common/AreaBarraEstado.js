@@ -6,25 +6,22 @@
  */
 
 import React, { Component } from 'react';
+import { styles } from './Estilos';
 import {
     View,
+    Text,
 } from 'react-native';
-import { ButtonGroup } from 'react-native-elements';
 
-export default class AreaBotoes extends Component {
+export default class AreaBarraEstado extends Component {
 
     constructor(props) {
         super(props);
     }
             
     render() {
-
         return (
-            <View >
-                <ButtonGroup
-                    buttons={this.props.botoes}
-                    buttonStyle={ {alignItems: 'stretch'} }
-                />
+            <View style={styles.subAreaBarraEstado}>
+                <Text>{this.props.mensagem}</Text>
             </View>
         );
     }

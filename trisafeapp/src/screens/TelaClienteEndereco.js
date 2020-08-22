@@ -15,7 +15,7 @@ import { ThemeProvider, Input, Button } from 'react-native-elements';
 import Util from './../common/Util';
 import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
-import AreaBotoes from './../common/AreaBotoes';
+import AreaRodape from './../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
 
 export default class TelaClienteEndereco extends Component {
@@ -57,7 +57,6 @@ export default class TelaClienteEndereco extends Component {
     }
 
     voltar() {
-        console.log('TelaClienteEndereco.voltar() => Voltando...');
         this.oGerenciadorContextoApp.atualizarEstadoTela(this.oGerenciadorContextoApp.getTelaAnterior());
         this.oNavegacao.goBack();
     }
@@ -70,9 +69,9 @@ export default class TelaClienteEndereco extends Component {
 
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho titulo='Meus dados' nomeTela='Endereço' navigation={this.oNavegacao} />
+                <Cabecalho titulo='Cadastro' navigation={this.oNavegacao} />
                 <AreaDados dadosApp={this.oDadosApp}/>
-                <AreaBotoes botoes={botoesTela} />
+                <AreaRodape botoes={botoesTela} mensagem={''}/>
             </View>
         );
     }
@@ -90,19 +89,21 @@ export class AreaDados extends Component {
         let oDadosCliente = oDadosApp.cliente;
 
         return (
-            <ScrollView>
-                <ThemeProvider theme={theme}>
-                    <View style={styles.areaDadosCliente}>
-                        <Input placeholder="Informe sua Rua" label="Rua" value={oDadosCliente.rua} onChangeText={(valor) => { oDadosCliente.rua = valor; this.setState(this.props)}}></Input>
-                        <Input placeholder="Informe seu Número" label="Número" value={oDadosCliente.numero} onChangeText={(valor) => { oDadosCliente.numero = valor; this.setState(this.props)}}></Input>
-                        <Input placeholder="Informe seu Complemento" label="Complemento" value={oDadosCliente.complemento} onChangeText={(valor) => { oDadosCliente.complemento = valor; this.setState(this.props)}}></Input>
-                        <Input placeholder="Informe seu Bairro" label="Bairro" value={oDadosCliente.bairro} onChangeText={(valor) => { oDadosCliente.bairro = valor; this.setState(this.props)}}></Input>                
-                        <Input placeholder="Informe seu Cep" label="Cep" value={oDadosCliente.cep} onChangeText={(valor) => { oDadosCliente.cep = valor; this.setState(this.props)}}></Input>
-                        <Input placeholder="Informe sua Cidade" label="Cidade" value={oDadosCliente.cidade} onChangeText={(valor) => { oDadosCliente.cidade = valor; this.setState(this.props)}}></Input>
-                        <Input placeholder="Informe seu Estado" label="Estado" value={oDadosCliente.uf} onChangeText={(valor) => { oDadosCliente.uf = valor; this.setState(this.props)}}></Input>
-                    </View>
-                </ThemeProvider>
-            </ScrollView>
+            <View style={styles.areaDadosCliente}>
+                <ScrollView>
+                    <ThemeProvider theme={theme}>
+                        <View>
+                            <Input placeholder="Informe sua Rua" label="Rua" value={oDadosCliente.rua} onChangeText={(valor) => { oDadosCliente.rua = valor; this.setState(this.props)}}></Input>
+                            <Input placeholder="Informe seu Número" label="Número" value={oDadosCliente.numero} onChangeText={(valor) => { oDadosCliente.numero = valor; this.setState(this.props)}}></Input>
+                            <Input placeholder="Informe seu Complemento" label="Complemento" value={oDadosCliente.complemento} onChangeText={(valor) => { oDadosCliente.complemento = valor; this.setState(this.props)}}></Input>
+                            <Input placeholder="Informe seu Bairro" label="Bairro" value={oDadosCliente.bairro} onChangeText={(valor) => { oDadosCliente.bairro = valor; this.setState(this.props)}}></Input>                
+                            <Input placeholder="Informe seu Cep" label="Cep" value={oDadosCliente.cep} onChangeText={(valor) => { oDadosCliente.cep = valor; this.setState(this.props)}}></Input>
+                            <Input placeholder="Informe sua Cidade" label="Cidade" value={oDadosCliente.cidade} onChangeText={(valor) => { oDadosCliente.cidade = valor; this.setState(this.props)}}></Input>
+                            <Input placeholder="Informe seu Estado" label="Estado" value={oDadosCliente.uf} onChangeText={(valor) => { oDadosCliente.uf = valor; this.setState(this.props)}}></Input>
+                        </View>
+                    </ThemeProvider>
+                </ScrollView>
+            </View>
         );
     }
 }

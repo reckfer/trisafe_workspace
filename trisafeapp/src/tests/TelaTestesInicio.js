@@ -6,7 +6,7 @@
  */
 
 import React, { Component } from 'react';
-import { ThemeProvider, Input, Button, Card} from 'react-native-elements';
+import { ThemeProvider, Input, Button, Card, ButtonGroup} from 'react-native-elements';
 import {
     ScrollView,
     Alert,
@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import Util from '../common/Util';
 import Cabecalho from '../common/CabecalhoTela';
-import AreaBotoes from '../common/AreaBotoes';
+import AreaRodape from '../common/AreaRodape';
 import { styles, theme } from '../common/Estilos';
 import UtilTests from './UtilTests';
 import { ContextoApp } from '../contexts/ContextoApp';
@@ -90,18 +90,11 @@ export default class TelaTestesInicio extends Component {
         try {
             let url = this.oUtil.getURL('/clientes/obter_ultimo/');
             
-            let dadosParametros = JSON.stringify(this.oDadosApp);
+            let dadosParametros = JSON.stringify(this.state);
 
             this.oRegistradorLog.registrar(`TelaTestesInicio.obterUltimoCliente => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
 
-            fetch(url, {
-                    method: 'POST',
-                    headers: {
-                      Accept: 'application/json',
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(this.state)
-                  })
+            fetch(url, this.oUtil.getParametrosHTTPS(dadosParametros))
                   .then(this.oUtil.obterJsonResposta)
                   .then((oJsonDados) => {
                       this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno, false, true);
@@ -112,10 +105,11 @@ export default class TelaTestesInicio extends Component {
     }
 
     tratarDadosRetorno(oDados, oEstado) {
+        this.oDadosControleApp.processando_requisicao = false;
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
 
         this.oGerenciadorContextoApp.atribuirDados('cliente', oDados);
         
-        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
         this.obterContratoPorCliente();
     }
 
@@ -123,18 +117,11 @@ export default class TelaTestesInicio extends Component {
         try {
             let url = this.oUtil.getURL('/contratos/obter_por_cliente/');
             
-            let dadosParametros = JSON.stringify(this.oDadosApp);
+            let dadosParametros = JSON.stringify(this.state);
 
             this.oRegistradorLog.registrar(`TelaTestesInicio.obterContratoPorCliente => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
 
-            fetch(url, {
-                    method: 'POST',
-                    headers: {
-                      Accept: 'application/json',
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(this.state),
-                  })
+            fetch(url, this.oUtil.getParametrosHTTPS(dadosParametros))
                   .then(this.oUtil.obterJsonResposta)
                   .then((oJsonDados) => {
                       this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetornoContrato);
@@ -145,9 +132,10 @@ export default class TelaTestesInicio extends Component {
     }
     
     tratarDadosRetornoContrato(oDados) {
+        this.oDadosControleApp.processando_requisicao = false;
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
 
         this.oGerenciadorContextoApp.atribuirDados('contrato', oDados);
-        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
     }
 
     gerarDadosTestes() {
@@ -173,27 +161,38 @@ export default class TelaTestesInicio extends Component {
     }
 
     voltar() {
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this.oGerenciadorContextoApp.getTelaAnterior());
         this.oNavegacao.goBack();
     }
-
+    
+    botaoGerarDados = () => <Button title="Gerar Dados Teste" onPress={this.gerarDadosTestes} ></Button>
+    botaoCadastro = () => <Button title="Testar Cadastro" onPress={this.irParaTesteCadastroIter} ></Button>
+    botaoContrato = () => <Button title="Testar Contrato" onPress={this.irParaTesteContratoPDF} ></Button>
+    botaoBoleto = () => <Button title="Testar Boleto" onPress={this.irParaTesteBoletoGerenciaNet} ></Button>
     botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;
     
     render() {
+        let botoesTestes1 = [ 
+            { element: this.botaoGerarDados }, { element: this.botaoCadastro } 
+        ];
+        let botoesTestes2 = [ 
+            { element: this.botaoContrato }, { element: this.botaoBoleto } 
+        ];
         let botoesTela = [ 
             { element: this.botaoVoltar }, 
         ];
-        let funcoes = {
-            'irParaTesteCadastroIter': this.irParaTesteCadastroIter,
-            'irParaTesteGeraContratoPDF' : this.irParaTesteGeraContratoPDF,
-            'irParaTesteBoletoGerenciaNet': this.irParaTesteBoletoGerenciaNet,
-            'irParaTesteContratoPDF': this.irParaTesteContratoPDF,
-            'gerarDadosTestes': this.gerarDadosTestes,
-        }
+        // let funcoes = {
+        //     'irParaTesteCadastroIter': this.irParaTesteCadastroIter,
+        //     'irParaTesteGeraContratoPDF' : this.irParaTesteGeraContratoPDF,
+        //     'irParaTesteBoletoGerenciaNet': this.irParaTesteBoletoGerenciaNet,
+        //     'irParaTesteContratoPDF': this.irParaTesteContratoPDF,
+        //     'gerarDadosTestes': this.gerarDadosTestes,
+        // }
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Testes' nomeTela='Início' navigation={this.oNavegacao} />
-                <AreaDados dadosApp={this.oDadosApp} funcoes={funcoes} />
-                <AreaBotoes botoes={botoesTela} />
+                <AreaDados dadosApp={this.oDadosApp} botoesTestes1={botoesTestes1} botoesTestes2={botoesTestes2}/>
+                <AreaRodape botoes={botoesTela} mensagem={''}/>
             </View>
         );
     }
@@ -214,37 +213,31 @@ export class AreaDados extends Component {
 
     render() {
         let oDadosCliente = this.props.dadosApp.cliente;
-        let oFuncoes = this.props.funcoes;
+        //let oFuncoes = this.props.funcoes;
 
         return (
-            <View style={{flex: 1, flexDirection: 'column', }}>
-                <View style={{flexDirection: 'row', alignItems: 'stretch', justifyContent: 'center' }}>
-                    <Button title="Cadastro Iter" onPress={oFuncoes.irParaTesteCadastroIter} ></Button>
-                </View>
-                <View style={{flexDirection: 'row', alignItems: 'stretch', justifyContent: 'center' }}>
-                    <Button title="Gera Contrato" onPress={oFuncoes.irParaTesteGeraContratoPDF}></Button>
-                </View>
-                <View style={{flexDirection: 'row', alignItems: 'stretch', justifyContent: 'center' }}>
-                    <Button title="Contrato PDF" onPress={oFuncoes.irParaTesteContratoPDF}></Button>
-                </View>
-                <View style={{flexDirection: 'row', alignItems: 'stretch', justifyContent: 'center' }}>
-                    <Button title="Gerar Dados Teste" onPress={oFuncoes.gerarDadosTestes}></Button>
-                </View>
-                <View style={{flex: 1, flexDirection: 'row', alignItems: 'stretch', justifyContent: 'center' }}>
-                    <ScrollView>
-                        <ThemeProvider theme={theme}>                    
-                            <View>
-                                <Card title='Últimos dados de teste'>
-                                    <View style={{flex: 1, flexDirection: 'column', alignItems: 'stretch', justifyContent: 'center' }}>
-                                        <Input label="Nome Completo" style={styles.Input} value={oDadosCliente.nome} onChangeText={(valor) => { oDadosCliente.nome = valor; this.atualizarDados(oDadosCliente) }}></Input>                
-                                        <Input label="E-mail" style={styles.Input} value={oDadosCliente.email} onChangeText={(valor) => { oDadosCliente.email = valor; this.atualizarDados(oDadosCliente) }}></Input>
-                                        <Input label="CPF" style={styles.Input} value={oDadosCliente.cpf} onChangeText={(valor) => { oDadosCliente.cpf = valor; this.atualizarDados(oDadosCliente) }}></Input>
-                                    </View>
-                                </Card>
-                            </View>
-                        </ThemeProvider>
-                    </ScrollView>
-                </View>
+            <View style={styles.areaDadosCliente}>
+                <ButtonGroup
+                    buttons={this.props.botoesTestes1}
+                    buttonStyle={ {alignItems: 'stretch'} }
+                />
+                <ButtonGroup
+                    buttons={this.props.botoesTestes2}
+                    buttonStyle={ {alignItems: 'stretch'} }
+                />
+                <ScrollView>
+                    <ThemeProvider theme={theme}>                    
+                        <View>
+                            <Card title='Últimos dados de teste'>
+                                <View style={{flex: 1, flexDirection: 'column', alignItems: 'stretch', justifyContent: 'center' }}>
+                                    <Input label="Nome Completo" style={styles.Input} value={oDadosCliente.nome} onChangeText={(valor) => { oDadosCliente.nome = valor; this.atualizarDados(oDadosCliente) }}></Input>                
+                                    <Input label="E-mail" style={styles.Input} value={oDadosCliente.email} onChangeText={(valor) => { oDadosCliente.email = valor; this.atualizarDados(oDadosCliente) }}></Input>
+                                    <Input label="CPF" style={styles.Input} value={oDadosCliente.cpf} onChangeText={(valor) => { oDadosCliente.cpf = valor; this.atualizarDados(oDadosCliente) }}></Input>
+                                </View>
+                            </Card>
+                        </View>
+                    </ThemeProvider>
+                </ScrollView>
             </View>
         );
     }

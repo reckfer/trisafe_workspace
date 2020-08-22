@@ -15,7 +15,7 @@ import Util from './../common/Util';
 import { ThemeProvider, Input, Button } from 'react-native-elements';
 import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
-import AreaBotoes from './../common/AreaBotoes';
+import AreaRodape from './../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
 
 export default class TelaClienteDadosPessoais extends Component {
@@ -45,7 +45,6 @@ export default class TelaClienteDadosPessoais extends Component {
         this.avancar = this.avancar.bind(this);
 
         this.oRegistradorLog.registrar('TelaClienteDadosPessoais.constructor() => Finalizou.');
-        console.log('TelaClienteDadosPessoais.constructor()');
     }
     
     avancar() {
@@ -54,7 +53,7 @@ export default class TelaClienteDadosPessoais extends Component {
     }
 
     voltar() {
-        
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this.oGerenciadorContextoApp.getTelaAnterior());
         this.oNavegacao.goBack();
     }
     
@@ -66,9 +65,9 @@ export default class TelaClienteDadosPessoais extends Component {
         
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho titulo='Meus dados' nomeTela='Identificação' navigation={this.oNavegacao} />
+                <Cabecalho titulo='Cadastro' navigation={this.oNavegacao} />
                 <AreaDados dadosApp={this.oDadosApp}/>
-                <AreaBotoes botoes={botoesTela}/>
+                <AreaRodape botoes={botoesTela} mensagem={''}/>
             </View>
         );
     }
@@ -85,19 +84,20 @@ export class AreaDados extends Component {
         let oDadosApp = this.props.dadosApp;
         let oDadosCliente = oDadosApp.cliente;
         
-        console.log('TelaClienteDadosPessoais.render()');
         return (
-            <ScrollView>
-                <ThemeProvider theme={theme}>
-                    <View style={styles.areaDadosCliente}>
-                        <Input placeholder="Informe seu Nome Completo" label="Nome Completo" value={oDadosCliente.nome} onChangeText={(valor) => { oDadosCliente.nome = valor; this.setState(this.props);}}></Input>
-                        <Input placeholder="Informe seu E-Mail" label="E-mail" value={oDadosCliente.email} onChangeText={(valor) => {oDadosCliente.email = valor; this.setState(this.props);}}></Input>
-                        <Input placeholder="Informe seu CPF" label="CPF" value={oDadosCliente.cpf} onChangeText={(valor) => { oDadosCliente.cpf = valor; this.setState(this.props);}}></Input>
-                        <Input placeholder="Informe seu Telefone" label="Telefone" value={oDadosCliente.telefone} onChangeText={(valor) => { oDadosCliente.telefone = valor; this.setState(this.props);}}></Input>
-                        <Input placeholder="Informe seu Nome de Usuário" label="Nome de Usuário" value={oDadosCliente.nome_usuario} onChangeText={(valor) => { oDadosCliente.nome_usuario = valor; this.setState(this.props);}}></Input>
-                    </View>
-                </ThemeProvider>
-            </ScrollView>
+            <View style={styles.areaDadosCliente}>
+                <ScrollView >
+                    <ThemeProvider theme={theme}>
+                        <View>
+                            <Input placeholder="Informe seu Nome Completo" label="Nome Completo" value={oDadosCliente.nome} onChangeText={(valor) => { oDadosCliente.nome = valor; this.setState(this.props);}}></Input>
+                            <Input placeholder="Informe seu E-Mail" label="E-mail" value={oDadosCliente.email} onChangeText={(valor) => {oDadosCliente.email = valor; this.setState(this.props);}}></Input>
+                            <Input placeholder="Informe seu CPF" label="CPF" value={oDadosCliente.cpf} onChangeText={(valor) => { oDadosCliente.cpf = valor; this.setState(this.props);}}></Input>
+                            <Input placeholder="Informe seu Telefone" label="Telefone" value={oDadosCliente.telefone} onChangeText={(valor) => { oDadosCliente.telefone = valor; this.setState(this.props);}}></Input>
+                            <Input placeholder="Informe seu Nome de Usuário" label="Nome de Usuário" value={oDadosCliente.nome_usuario} onChangeText={(valor) => { oDadosCliente.nome_usuario = valor; this.setState(this.props);}}></Input>
+                        </View>
+                    </ThemeProvider>
+                </ScrollView>
+            </View>
         );
     }
 }

@@ -17,7 +17,7 @@ import Pdf from 'react-native-pdf';
 // import { WebView } from 'react-native-webview';
 import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
-import AreaBotoes from './../common/AreaBotoes';
+import AreaRodape from './../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
 
 export default class TelaBoletoEmissao extends Component {
@@ -65,18 +65,11 @@ export default class TelaBoletoEmissao extends Component {
         try {
             let url = this.oUtil.getURL('/boletogerencianets/obter/');
 
-            let dadosParametros = JSON.stringify(this.oDadosApp);
+            let dadosParametros = JSON.stringify(this.state);
 
             this.oRegistradorLog.registrar(`TelaBoletoEmissao.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
 
-            fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        Accept: 'application/json',
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(this.state),
-                    })
+            fetch(url, this.oUtil.getParametrosHTTPS(dadosParametros))
                     .then(this.oUtil.obterJsonResposta)
                     .then((oJsonDados) => {
                         this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarRetornoBoleto, true);
@@ -96,18 +89,11 @@ export default class TelaBoletoEmissao extends Component {
         try {
             let url = this.oUtil.getURL('/emailclientes/enviar_com_anexos/');
             
-            let dadosParametros = JSON.stringify(this.oDadosApp);
+            let dadosParametros = JSON.stringify(this.state);
 
             this.oRegistradorLog.registrar(`TelaBoletoEmissao.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
 
-            fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        Accept: 'application/json',
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(this.state),
-                    })
+            fetch(url, this.oUtil.getParametrosHTTPS(dadosParametros))
                     .then(this.oUtil.obterJsonResposta)
                     .then((oJsonDados) => {
                         this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarRetornoEmail);
@@ -124,6 +110,7 @@ export default class TelaBoletoEmissao extends Component {
     }
 
     voltar() {
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this.oGerenciadorContextoApp.getTelaAnterior());
         this.oNavegacao.goBack();
     }
 
@@ -136,9 +123,9 @@ export default class TelaBoletoEmissao extends Component {
         
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho titulo='Boleto' nomeTela='Visualização' navigation={this.oNavegacao} />
+                <Cabecalho titulo='Boleto' navigation={this.oNavegacao} />
                 <AreaDados dadosApp={this.oDadosApp}/>
-                <AreaBotoes botoes={botoesTela} />
+                <AreaRodape botoes={botoesTela} mensagem={''}/>
             </View>
         );
     }
@@ -161,12 +148,7 @@ export class AreaDados extends Component {
             source.uri = oDadosBoleto.url_pdf;
         }
         return (
-            <View style={{
-                flex: 1,
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                marginTop: 25,
-            }}>
+            <View style={styles.areaDadosCliente}>
                 <Pdf
                     source={source}
                     onLoadComplete={(numberOfPages,filePath)=>{

@@ -60,7 +60,6 @@ export default class GerenciadorContextoApp {
         this.oTelaAnterior = objTela;
     }
 
-
     /*** FUNCOES DE ATRIBUICOES ****/
     atualizarEstadoTela(objetoTela) {
         if(this.oDadosReferencia) {

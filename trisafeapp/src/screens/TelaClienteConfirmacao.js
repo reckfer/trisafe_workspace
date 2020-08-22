@@ -15,7 +15,7 @@ import Util from './../common/Util';
 import { ThemeProvider, Input, Button } from 'react-native-elements';
 import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
-import AreaBotoes from './../common/AreaBotoes';
+import AreaRodape from './../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
 
 export default class TelaClienteConfirmacao extends Component {
@@ -64,25 +64,17 @@ export default class TelaClienteConfirmacao extends Component {
             }
             
             this.oDadosControleApp.processando_requisicao = true;
+            this.oGerenciadorContextoApp.atualizarEstadoTela(this);
 
-            let dadosParametros = JSON.stringify(this.oDadosApp);
+            let dadosParametros = JSON.stringify(this.state);
 
             this.oRegistradorLog.registrar(`TelaClienteConfirmacao.salvar() => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
 
-            this.oGerenciadorContextoApp.atualizarEstadoTela(this);
-
-            fetch(url, {
-                    method: 'POST',
-                    headers: {
-                      Accept: 'application/json',
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(this.state),
-                  })
+            fetch(url, this.oUtil.getParametrosHTTPS(dadosParametros))
                   .then(this.oUtil.obterJsonResposta)
                   .then((oJsonDados) => {
                       this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno, true, true);
-                  })
+                  });
         } catch (exc) {
             Alert.alert('Trisafe', exc);
         }
@@ -105,6 +97,7 @@ export default class TelaClienteConfirmacao extends Component {
     }
      
     voltar() {
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this.oGerenciadorContextoApp.getTelaAnterior());
         this.oNavegacao.goBack();
     }
 
@@ -116,9 +109,9 @@ export default class TelaClienteConfirmacao extends Component {
 
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho titulo='Meus dados' nomeTela='Confirmação' navigation={this.oNavegacao} />
+                <Cabecalho titulo='Cadastro' navigation={this.oNavegacao} />
                 <AreaDados dadosApp={this.oDadosApp}/>
-                <AreaBotoes botoes={botoesTela} />
+                <AreaRodape botoes={botoesTela} mensagem={''}/>
             </View>
         );
     }
@@ -136,24 +129,26 @@ export class AreaDados extends Component {
         let oDadosCliente = oDadosApp.cliente;
 
         return (
-            <ScrollView>
-                <ThemeProvider theme={theme}>
-                    <View style={styles.areaDadosCliente}>
-                        <Input label="Nome Completo" disabled={true} style={styles.Input} value={oDadosCliente.nome} ></Input>                
-                        <Input label="E-mail" disabled={true} style={styles.Input} value={oDadosCliente.email} ></Input>
-                        <Input label="CPF" disabled={true} style={styles.Input} value={oDadosCliente.cpf} ></Input>
-                        <Input label="Telefone" disabled={true} style={styles.Input} value={oDadosCliente.telefone} ></Input>
-                        <Input label="Nome Usuário" disabled={true} style={styles.Input} value={oDadosCliente.nome_usuario} ></Input>
-                        <Input label="Rua" disabled={true} style={styles.Input} value={oDadosCliente.rua} ></Input>
-                        <Input label="Número" disabled={true} style={styles.Input} value={oDadosCliente.numero} ></Input>
-                        <Input label="Complemento" disabled={true} style={styles.Input} value={oDadosCliente.complemento} ></Input>
-                        <Input label="Bairro" disabled={true} style={styles.Input} value={oDadosCliente.bairro} ></Input>                
-                        <Input label="Cep" disabled={true} style={styles.Input} value={oDadosCliente.cep} ></Input>
-                        <Input label="Cidade" disabled={true} style={styles.Input} value={oDadosCliente.cidade} ></Input>
-                        <Input label="Estado" disabled={true} style={styles.Input} value={oDadosCliente.uf} ></Input>
-                    </View>
-                </ThemeProvider>
-            </ScrollView>       
+            <View style={styles.areaDadosCliente}>
+                <ScrollView>
+                    <ThemeProvider theme={theme}>
+                        <View>
+                            <Input label="Nome Completo" disabled={true} style={styles.Input} value={oDadosCliente.nome} ></Input>                
+                            <Input label="E-mail" disabled={true} style={styles.Input} value={oDadosCliente.email} ></Input>
+                            <Input label="CPF" disabled={true} style={styles.Input} value={oDadosCliente.cpf} ></Input>
+                            <Input label="Telefone" disabled={true} style={styles.Input} value={oDadosCliente.telefone} ></Input>
+                            <Input label="Nome Usuário" disabled={true} style={styles.Input} value={oDadosCliente.nome_usuario} ></Input>
+                            <Input label="Rua" disabled={true} style={styles.Input} value={oDadosCliente.rua} ></Input>
+                            <Input label="Número" disabled={true} style={styles.Input} value={oDadosCliente.numero} ></Input>
+                            <Input label="Complemento" disabled={true} style={styles.Input} value={oDadosCliente.complemento} ></Input>
+                            <Input label="Bairro" disabled={true} style={styles.Input} value={oDadosCliente.bairro} ></Input>                
+                            <Input label="Cep" disabled={true} style={styles.Input} value={oDadosCliente.cep} ></Input>
+                            <Input label="Cidade" disabled={true} style={styles.Input} value={oDadosCliente.cidade} ></Input>
+                            <Input label="Estado" disabled={true} style={styles.Input} value={oDadosCliente.uf} ></Input>
+                        </View>
+                    </ThemeProvider>
+                </ScrollView>
+            </View>
         );
     }
 }

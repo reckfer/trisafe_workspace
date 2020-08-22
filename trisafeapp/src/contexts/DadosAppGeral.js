@@ -47,10 +47,16 @@ export const DADOS_CONTROLE_APP = {
     'novo_cadastro': true,
 };
 
+export const DADOS_INSTRUCAO_USUARIO = {
+    'texto_instrucao': 'Bem vindo a Trisafe.'
+};
+
 export const CHAVES = {
-    'chave_iter': 'bUZk1V9YjNFjYQWD',
+    'chave_trisafe': 'jNFjYQWDbUZk1V9Y',    
+    'token_trisafe': '',
+    'chave_iter': 'bUZk1V9YjNFjYQWD',    
     'token_iter': ''
-}
+};
 
 export const DADOS_APP_GERAL = {
     dados_app: {
@@ -59,6 +65,7 @@ export const DADOS_APP_GERAL = {
         produtos_contratados: DADOS_PRODUTOS_CONTRATADOS,
         boleto: DADOS_BOLETO,
         controle_app: DADOS_CONTROLE_APP,
+        instrucao_usuario: DADOS_INSTRUCAO_USUARIO,
         chaves: CHAVES,
     },
     registros_log: null,

@@ -1,8 +1,4 @@
-import cryptography
-from cryptography.fernet import Fernet
 from decouple import config
-import base64
-import encodings
 import requests
 import json
 from django.db import models
@@ -14,6 +10,7 @@ class ClienteIter(models.Model):
     def __init__(self, credencial_cliente):
         self.credencial = None
         self.headers_iter = None
+        self.retorno_autenticacao = None
 
         self.__autenticarIter(credencial_cliente)
 
@@ -150,6 +147,8 @@ class ClienteIter(models.Model):
         if(credencial_cliente):
             token_iter = credencial_cliente.token_iter
         
+        # Cria uma credencial completa, com a chave parcial do servidor, 
+        # pois o parametro "credencial_cliente" vem soh com a chave parcial do cliente.
         self.credencial = Credencial(chave_iter_cliente, chave_iter_servidor)
         self.credencial.token_iter = token_iter
 
@@ -178,15 +177,15 @@ class ClienteIter(models.Model):
             self.headers_iter = {'Authorization': 'Bearer %s' %token,
                     'Content-Type' : 'application/json' }
 
-    def json(self):
-        return self.__criar_json()
+    # def json(self):
+    #     return self.__criar_json()
 
-    def __criar_json(self):
-        ret = {
-            "token_iter": self.token_iter,
-            "chave_iter": self.chave_ter
-            }
-        return ret
+    # def __criar_json(self):
+    #     ret = {
+    #         "token_iter": self.token_iter,
+    #         "chave_iter": self.chave_ter
+    #         }
+    #     return ret
 
-    def __str__(self):
-        return self.nome
+    # def __str__(self):
+    #     return self.nome

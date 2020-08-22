@@ -29,6 +29,14 @@ class EmailCliente:
         try:
             retorno = Retorno()
 
+            retorno = m_contrato.gerar_contrato_pdf()
+
+            if not retorno.estado.ok:
+                return retorno
+
+            caminho_arquivo = retorno.dados['caminho_arquivo']
+            nome_arquivo = retorno.dados['nome_arquivo']
+
             subject = "Bem vindo a TriSafe"
             body = "Veja seus anexos."
             smtp_server = "smtp.gmail.com"
@@ -46,10 +54,10 @@ class EmailCliente:
             # Add body to email
             message.attach(MIMEText(body, "plain"))
             
-            num_contrato = m_contrato.id_contrato
-            nome_arquivo = "Contrato_%s.%s" % (str(num_contrato), "pdf")  # In same directory as script
+            # num_contrato = m_contrato.id_contrato
+            # nome_arquivo = "Contrato_%s.%s" % (str(num_contrato), "pdf")  # In same directory as script
             
-            caminho_arquivo = os.path.join(BASE_DIR, nome_arquivo)
+            # caminho_arquivo = os.path.join(BASE_DIR, nome_arquivo)
             
             # Open PDF file in binary mode
             with open(caminho_arquivo, "rb") as attachment:
@@ -76,6 +84,8 @@ class EmailCliente:
             with smtplib.SMTP_SSL(smtp_server, 465, context=context) as server:
                 server.login(sender_email, password)
                 server.sendmail(sender_email, receiver_email, text)
+
+            m_contrato.excluir_contrato()
 
             return retorno
         except Exception as e:

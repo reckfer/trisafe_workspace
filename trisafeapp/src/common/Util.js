@@ -8,7 +8,7 @@ export default class Util {
         
         if(gerenciadorContexto) {
             this.oGerenciadorContextoApp = gerenciadorContexto;
-            this.oCredencial = this.oGerenciadorContextoApp.dadosApp.chaves
+            this.oDadosChaves = this.oGerenciadorContextoApp.dadosApp.chaves
             this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;
         }
         
@@ -25,6 +25,20 @@ export default class Util {
             domain = '192.168.1.118:8000';
         }
         return protocol + domain + metodo;
+    }
+
+    getParametrosHTTPS(oDados) {
+        let metodo = 'POST';
+
+        return {
+            method: metodo,
+            headers: {
+                Authorization: 'Token 23012c910306ed668eed49155e8651f8ec92220a',
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: oDados,
+        }
     }
     
     obterJsonResposta(oRespostaHTTP) {
@@ -67,29 +81,34 @@ export default class Util {
 
         if(oJsonRetorno) {
             this.oRegistradorLog.registrar('Util.tratarRetornoServidor() => Recebeu: ' + JSON.stringify(oJsonRetorno));
-
-            console.log('Util.tratarRetornoServidor() oJsonRetorno => ', oJsonRetorno);
-            
+    
             let oEstado = oJsonRetorno.estado;
             let oDados = oJsonRetorno.dados;
             
             if(oJsonRetorno.credencial.token_iter) {
-                this.oCredencial.token_iter = oJsonRetorno.credencial.token_iter
+                this.oDadosChaves.token_iter = oJsonRetorno.credencial.token_iter;
+            }
+            if(oJsonRetorno.credencial.token_trisafe) {
+                this.oDadosChaves.token_trisafe = oJsonRetorno.credencial.token_trisafe;
             }
             
-            if (!suprimirMsgServidor && oEstado.mensagem && oEstado.mensagem.trim()){
+            if (!suprimirMsgServidor && oEstado.mensagem && oEstado.mensagem.trim()) {
                 Alert.alert('Trisafe', oEstado.mensagem);
             }
             
             if(oDados && typeof(oDados) === 'string' && oDados.trim()) {
                 oDados = oDados.trim();
             }
-            if(ignorarCallbackSeErro) {
-                if(oEstado.ok === true) {
+
+            if(oFuncaoTratarDados) {
+             
+                if(ignorarCallbackSeErro) {
+                    if(oEstado.ok === true) {
+                        oFuncaoTratarDados(oDados, oEstado);
+                    }
+                } else {
                     oFuncaoTratarDados(oDados, oEstado);
                 }
-            } else {
-                oFuncaoTratarDados(oDados, oEstado);
             }
         } else {
             this.oRegistradorLog.registrar('Util.tratarRetornoServidor() => oJsonRetorno estava vazio.');
@@ -97,4 +116,10 @@ export default class Util {
             Alert.alert('Trisafe', "O retorno do servidor foi vazio.");
         }
     }
+}
+
+export function clonarObjeto(obj) {
+    let objString = JSON.stringify(obj);
+    
+    return JSON.parse(objString);
 }

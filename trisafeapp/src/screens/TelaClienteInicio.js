@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import Util from '../common/Util';
 import Cabecalho from '../common/CabecalhoTela';
-import AreaBotoes from '../common/AreaBotoes';
+import AreaRodape from '../common/AreaRodape';
 import { styles, theme } from '../common/Estilos';
 import { ContextoApp } from '../contexts/ContextoApp';
 
@@ -67,23 +67,17 @@ export default class TelaClienteInicio extends Component {
 
     obterCliente() {
         try {
+            this.oNavegacao.navigate('Dados pessoais', this.state);
             let url = this.oUtil.getURL('/clientes/obter/');
 
             this.oDadosControleApp.processando_requisicao = true;
-            let dadosParametros = JSON.stringify(this.oDadosApp);
+            this.oGerenciadorContextoApp.atualizarEstadoTela(this);
+
+            let dadosParametros = JSON.stringify(this.state);
 
             this.oRegistradorLog.registrar(`TelaBoletoEmissao.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
 
-            this.oGerenciadorContextoApp.atualizarEstadoTela(this);
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                  Accept: 'application/json',
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(this.state),
-              })
+            fetch(url, this.oUtil.getParametrosHTTPS(dadosParametros))
                 .then(this.oUtil.obterJsonResposta)
                 .then((oJsonDados) => {
                     this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosCliente, true);
@@ -140,9 +134,9 @@ export default class TelaClienteInicio extends Component {
         
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho titulo='Meus dados' nomeTela='Início' navigation={this.oNavegacao} />
+                <Cabecalho titulo='Cadastro' navigation={this.oNavegacao} />
                 <AreaDados dadosApp={this.oDadosApp}/>
-                <AreaBotoes botoes={botoesTela} />
+                <AreaRodape botoes={botoesTela} mensagem={''}/>
             </View>
         )
     }
@@ -161,14 +155,16 @@ export class AreaDados extends Component {
         let oDadosCliente = oDadosApp.cliente;
         
         return (
-            <ScrollView>
-                <ThemeProvider theme={theme}>
-                    <View style={styles.areaDadosCliente}>
-                        <Input placeholder="Informe seu E-Mail" label="E-Mail" value={oDadosCliente.email} onChangeText={(valor) => { oDadosCliente.email = valor; this.setState(this.props)}}></Input>
-                        <Input placeholder="Informe seu CPF" label="CPF" value={oDadosCliente.cpf} onChangeText={(valor) => { oDadosCliente.cpf = valor; this.setState(this.props)}}></Input>
-                    </View>
-                </ThemeProvider>
-            </ScrollView>
+            <View style={styles.areaDadosCliente}>
+                <ScrollView>
+                    <ThemeProvider theme={theme}>
+                        <View>
+                            <Input placeholder="Informe seu E-Mail" label="E-Mail" value={oDadosCliente.email} onChangeText={(valor) => { oDadosCliente.email = valor; this.setState(this.props)}}></Input>
+                            <Input placeholder="Informe seu CPF" label="CPF" value={oDadosCliente.cpf} onChangeText={(valor) => { oDadosCliente.cpf = valor; this.setState(this.props)}}></Input>
+                        </View>
+                    </ThemeProvider>
+                </ScrollView>
+            </View>
         );
     }
 }

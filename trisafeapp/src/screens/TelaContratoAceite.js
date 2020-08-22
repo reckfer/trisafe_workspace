@@ -16,7 +16,7 @@ import { Button } from 'react-native-elements';
 import Pdf from 'react-native-pdf';
 import Cabecalho from '../common/CabecalhoTela';
 import { styles } from '../common/Estilos';
-import AreaBotoes from '../common/AreaBotoes';
+import AreaRodape from '../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
 
 export default class TelaContratoAceite extends Component {
@@ -69,25 +69,17 @@ export default class TelaContratoAceite extends Component {
             let url = this.oUtil.getURL('/contratos/aceitar/');
             
             this.oDadosControleApp.processando_requisicao = true;
+            this.oGerenciadorContextoApp.atualizarEstadoTela(this);
 
-            let dadosParametros = JSON.stringify(this.oDadosApp);
+            let dadosParametros = JSON.stringify(this.state);
 
             this.oRegistradorLog.registrar(`TelaContratoAceite.contratar => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
 
-            this.oGerenciadorContextoApp.atualizarEstadoTela(this);
-
-            fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        Accept: 'application/json',
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(this.state),
-                    })
+            fetch(url, this.oUtil.getParametrosHTTPS(dadosParametros))
                     .then(this.oUtil.obterJsonResposta)
                     .then((oJsonDados) => {
                         this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno);
-                    })
+                    });
         } catch (exc) {
             Alert.alert('Trisafe', exc);
         }
@@ -95,6 +87,7 @@ export default class TelaContratoAceite extends Component {
 
     tratarDadosRetorno(oDados, oEstado) {
         this.oDadosControleApp.processando_requisicao = false;
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
 
         this.oGerenciadorContextoApp.atribuirDados('contrato', oDados);
         this.oGerenciadorContextoApp.atribuirDados('boleto', oDados);
@@ -102,12 +95,11 @@ export default class TelaContratoAceite extends Component {
         if(oEstado.ok) {
             this.oGerenciadorContextoApp.setTelaAnterior(this);
             this.oNavegacao.navigate('Boleto', this.state);
-        } else {            
-            this.oGerenciadorContextoApp.atualizarEstadoTela(this);
         }
     }
 
     voltar() {
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this.oGerenciadorContextoApp.getTelaAnterior());
         this.oNavegacao.goBack();
     }
 
@@ -120,9 +112,9 @@ export default class TelaContratoAceite extends Component {
         
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho titulo='Contrato' nomeTela='Confirmação' navigation={this.oNavegacao} />
+                <Cabecalho titulo='Contrato' navigation={this.oNavegacao} />
                 <AreaDados dadosApp={this.oDadosApp}/>
-                <AreaBotoes botoes={botoesTela} />
+                <AreaRodape botoes={botoesTela} mensagem={''}/>
             </View>
         );
     }
@@ -138,7 +130,13 @@ export class AreaDados extends Component {
             // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
             this.oGerenciadorContextoApp = value.gerenciador;
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
+            
             this.oUtil = new Util(this.oGerenciadorContextoApp);
+
+            this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
+            this.oRegistradorLog.registrar('TelaContratoAceite.constructor() => Iniciou.');
+
+            this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
 
         this.excluirArquivoContrato = this.excluirArquivoContrato.bind(this);
@@ -146,22 +144,17 @@ export class AreaDados extends Component {
 
     excluirArquivoContrato() {
         try {
-            console.log('AreaDados.excluirArquivoContrato iniciou ...');
+            
             let url = this.oUtil.getURL('/contratos/excluir_arquivo_contrato/');
             
-            let dadosParametros = JSON.stringify(this.oDadosApp);
+            let dadosParametros = JSON.stringify(this.state);
             
-            console.log('AreaDados.excluirArquivoContrato dadosParametros = ', dadosParametros);
-
             this.oRegistradorLog.registrar(`AreaDados.excluirArquivoContrato => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
 
-            fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        Accept: 'application/json',
-                        'Content-Type': 'application/json',
-                    },
-                    body: dadosParametros,
+            fetch(url, this.oUtil.getParametrosHTTPS(dadosParametros))
+                    .then(this.oUtil.obterJsonResposta)
+                    .then((oJsonDados) => {
+                        this.oUtil.tratarRetornoServidor(oJsonDados, null, true);
                     });
         } catch (exc) {
             Alert.alert('Trisafe', exc);
@@ -184,12 +177,7 @@ export class AreaDados extends Component {
                         }
 
         return (
-            <View style={{
-                flex: 1,
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-                marginTop: 25,
-            }}>
+            <View style={styles.areaDadosCliente}>
                 <Pdf
                     source={source}
                     onLoadComplete={(numberOfPages,filePath)=>{

@@ -299,6 +299,9 @@ class Contrato(models.Model):
         try:
             nome_arquivo = "Contrato_%s.pdf" % self.id_contrato
             os.remove(os.path.join(BASE_DIR, "data", "contratos", nome_arquivo))
+
+            retorno = Retorno(True)
+            return retorno
         except Exception as e:
             print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     

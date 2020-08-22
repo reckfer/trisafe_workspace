@@ -28,11 +28,16 @@ DEBUG = True
 ALLOWED_HOSTS = ["192.168.43.84", "192.168.1.118", "192.168.1.118", "localhost"]
 
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        #'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ],
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated'
         #'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-        'rest_framework.permissions.AllowAny'
+        #'rest_framework.permissions.AllowAny'
     ]
 }
 
@@ -45,6 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework.authtoken',
     'rest_framework',
     'cliente',
     'clienteiter',
@@ -52,6 +58,7 @@ INSTALLED_APPS = [
     'contrato',
     'transacaogerencianet',
     'boletogerencianet',
+    'configuracao'
 ]
 
 MIDDLEWARE = [

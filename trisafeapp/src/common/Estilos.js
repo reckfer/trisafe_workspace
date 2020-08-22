@@ -15,29 +15,46 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'flex-start',
         alignItems: 'stretch',
-        backgroundColor: '#f5f5f5'
-    },
-    areaDadosCliente: {
-        padding: 10,       
+        backgroundColor: '#f5f5f5',
     },
     areaCabecalho: {
+        flex: .14,
         backgroundColor: '#f5f5f5',
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
-        padding: 10
     },
-    areaTitulo: {
-        flex: 1,
+    subAreaTitulo: {
+        width:125,
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        alignSelf: "stretch",
+    },
+    areaDadosCliente: {
+        flex: .75,
+        padding: 10,
+        borderRadius: 0,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.22,
+        shadowRadius: 2.22,
+        elevation: 1,
+    },
+    areaRodape: {
+        flex: .11,
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
     },
-    areaCentralizadoEmLinha: {
-        flex: 1,
+    subAreaBarraEstado: {
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
+        alignSelf: "stretch",
     },
     textoTitulo: {
         fontSize: 20,
@@ -53,21 +70,15 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop: 10,
     },
-    botao: {
-        padding: 20,
-    },
-    input: {
-        borderColor: '#add8e6'
-    },
 });
 
 const theme = {
     Input: {
         containerStyle: {
-            marginTop: 12,
+            margin: 5,
             backgroundColor: '#fffafa',
             borderRadius: 7,
-            alignSelf: 'stretch',
+            alignSelf: 'center',
             shadowColor: "#000",
             shadowOffset: {
                 width: 0,
@@ -75,7 +86,7 @@ const theme = {
             },
             shadowOpacity: 0.22,
             shadowRadius: 2.22,
-            elevation: 3,
+            elevation: 2,
         },
         inputContainerStyle: {
             borderWidth: 0,

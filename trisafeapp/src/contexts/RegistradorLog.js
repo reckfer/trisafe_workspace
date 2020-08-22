@@ -28,6 +28,9 @@ export default class RegistradorLog {
             'data_hora': oDH.toLocaleString(),
             'mensagem_log' : registroLog,
         }
+        
+        console.log(oMensagemLog);
+
         this.oRegistrosLogs.push(oMensagemLog);
     }
 
@@ -44,14 +47,7 @@ export default class RegistradorLog {
 
                 let dadosParametros = JSON.stringify(oMensagensLog);
                 
-                fetch(url, {
-                        method: 'POST',
-                        headers: {
-                        Accept: 'application/json',
-                        'Content-Type': 'application/json',
-                        },
-                        body: dadosParametros,
-                    })
+                fetch(url, this.oUtil.getParametrosHTTPS(dadosParametros))
                     .then(this._obterJsonResposta);
             }
         } catch (exc) {

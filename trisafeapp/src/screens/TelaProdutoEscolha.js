@@ -16,7 +16,7 @@ import Util from './../common/Util';
 import { ThemeProvider, Button, Card, CheckBox, Divider } from 'react-native-elements';
 import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
-import AreaBotoes from './../common/AreaBotoes';
+import AreaRodape from './../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -59,18 +59,11 @@ export default class TelaProdutoEscolha extends Component {
 
             let url = this.oUtil.getURL('/produtos/listar/');
             
-            let dadosParametros = JSON.stringify({});
+            let dadosParametros = JSON.stringify(this.state);
 
             this.oRegistradorLog.registrar(`TelaProdutoEscolha.listarProdutos => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
 
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                  Accept: 'application/json',
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(this.state),
-              })
+            fetch(url, this.oUtil.getParametrosHTTPS(dadosParametros))
                 .then(this.oUtil.obterJsonResposta)
                 .then((oJsonDados) => {
                     this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarListarProdutos, true);
@@ -106,9 +99,9 @@ export default class TelaProdutoEscolha extends Component {
             let oDadosAppGeral = this.oGerenciadorContextoApp.dadosAppGeral;
             
             oDadosAppGeral.dados_app.contrato.valor_total = valorTotal;
-            
-            this.oGerenciadorContextoApp.atualizarEstadoTela(this);
         }
+        this.oDadosControleApp.processando_requisicao = false;
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
     }
 
     incluirContrato() {
@@ -116,20 +109,12 @@ export default class TelaProdutoEscolha extends Component {
             let url = this.oUtil.getURL('/contratos/incluir/');
 
             this.oDadosControleApp.processando_requisicao = true;
-
-            let dadosParametros = JSON.stringify(this.oDadosApp);            
-            this.oRegistradorLog.registrar(`TelaProdutoEscolha.incluirContrato => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
-
             this.oGerenciadorContextoApp.atualizarEstadoTela(this);
 
-            fetch(url, {
-                    method: 'POST',
-                    headers: {
-                      Accept: 'application/json',
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(this.state)
-                  })
+            let dadosParametros = JSON.stringify(this.state);            
+            this.oRegistradorLog.registrar(`TelaProdutoEscolha.incluirContrato => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
+
+            fetch(url, this.oUtil.getParametrosHTTPS(dadosParametros))
                   .then(this.oUtil.obterJsonResposta)
                   .then((oJsonDados) => {
                       this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarIncluirContrato);
@@ -151,20 +136,21 @@ export default class TelaProdutoEscolha extends Component {
     }
     
     voltar() {
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this.oGerenciadorContextoApp.getTelaAnterior());
         this.oNavegacao.goBack();
     }
 
     botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;
-    botaoIncluirContrato = () => <Button title="Avançar" onPress={this.incluirContrato} ></Button>;
+    botaoIncluirContrato = () => <Button title="Avançar" onPress={this.incluirContrato} loading={this.oDadosControleApp.processando_requisicao} ></Button>;
     
     render() {
         let botoesTela = [ { element: this.botaoVoltar }, { element: this.botaoIncluirContrato }];
         
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho titulo='Produtos' nomeTela='Seleção' navigation={this.oNavegacao} />
+                <Cabecalho titulo='Produtos' navigation={this.oNavegacao} />
                 <AreaDados dadosApp={this.oDadosApp}/>
-                <AreaBotoes botoes={botoesTela} />
+                <AreaRodape botoes={botoesTela} mensagem={''}/>
             </View>
         );
     }
