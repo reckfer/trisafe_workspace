@@ -12,13 +12,14 @@ import {
     View,
     Text,
 } from 'react-native';
-import Util from './../common/Util';
+import ComunicacaoHTTP from './../common/ComunicacaoHTTP';
 import { ThemeProvider, Button, Card, CheckBox, Divider } from 'react-native-elements';
 import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
 import AreaRodape from './../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Util from '../common/Util';
 
 export default class TelaProdutoEscolha extends Component {
     
@@ -28,14 +29,13 @@ export default class TelaProdutoEscolha extends Component {
         if(value && value.gerenciador) {
             // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
             this.oGerenciadorContextoApp = value.gerenciador;
-            
             this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
             this.oRegistradorLog.registrar('TelaProdutoEscolha.constructor() => Iniciou.');
 
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
-
+            this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
+            this.oUtil = new Util();
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
         
@@ -50,31 +50,21 @@ export default class TelaProdutoEscolha extends Component {
         this.voltar = this.voltar.bind(this);
         
         this.oRegistradorLog.registrar('TelaProdutoEscolha.constructor() => Finalizou.');
-        
+    }
+
+    componentDidMount() {
         this.listarProdutos();
     }
 
     listarProdutos(){
         try {
-
-            let url = this.oUtil.getURL('/produtos/listar/');
+            let metodoHTTP = '/produtos/listar/';
             
-            let dadosParametros = JSON.stringify(this.state);
+            let oDadosParametros = JSON.stringify(this.state);
 
-            this.oRegistradorLog.registrar(`TelaProdutoEscolha.listarProdutos => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
-
-            fetch(url, this.oUtil.getParametrosHTTPS(dadosParametros))
-                .then(this.oUtil.obterJsonResposta)
-                .then((oJsonDados) => {
-                    this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarListarProdutos, true);
-                })
-                .catch(function (erro) {
-                    Alert.alert('Trisafe', erro.message);
-                    throw erro;
-                });
-        } catch (exc) {
-            Alert.alert('Trisafe', exc.message);
-            throw exc;
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoHTTP, oDadosParametros, this.tratarListarProdutos, true);
+        } catch (oExcecao) {
+            this.oUtil.tratarExcecao(oExcecao);
         }
     }
 
@@ -87,7 +77,7 @@ export default class TelaProdutoEscolha extends Component {
         }
 
         if(oDados && Array.isArray(oDados)) {
-            this.oGerenciadorContextoApp.atribuirDados('produtos_contratados', oDados);
+            this.oGerenciadorContextoApp.atribuirDados('produtos_contratados', oDados, this);
             let oProduto;
             let valorTotal = 0.00;
 
@@ -100,43 +90,30 @@ export default class TelaProdutoEscolha extends Component {
             
             oDadosAppGeral.dados_app.contrato.valor_total = valorTotal;
         }
-        this.oDadosControleApp.processando_requisicao = false;
-        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
     }
 
     incluirContrato() {
         try {
-            let url = this.oUtil.getURL('/contratos/incluir/');
+            let metodoHTTP = '/contratos/incluir/';
 
-            this.oDadosControleApp.processando_requisicao = true;
-            this.oGerenciadorContextoApp.atualizarEstadoTela(this);
-
-            let dadosParametros = JSON.stringify(this.state);            
-            this.oRegistradorLog.registrar(`TelaProdutoEscolha.incluirContrato => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
-
-            fetch(url, this.oUtil.getParametrosHTTPS(dadosParametros))
-                  .then(this.oUtil.obterJsonResposta)
-                  .then((oJsonDados) => {
-                      this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarIncluirContrato);
-                  });
-        } catch (exc) {
-            Alert.alert('Trisafe', exc);
+            let oDadosParametros = JSON.stringify(this.state);
+            
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoHTTP, oDadosParametros, this.tratarIncluirContrato);
+        } catch (oExcecao) {
+            this.oUtil.tratarExcecao(oExcecao);
         }
     }
 
     tratarIncluirContrato(oDados, oEstado) {
-        this.oDadosControleApp.processando_requisicao = false;
-        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
+        
         this.oGerenciadorContextoApp.atribuirDados('contrato', oDados);
 
         if(oEstado.ok) {
-            this.oGerenciadorContextoApp.setTelaAnterior(this);
             this.oNavegacao.navigate('Contrato', this.state);
         }
     }
     
     voltar() {
-        this.oGerenciadorContextoApp.atualizarEstadoTela(this.oGerenciadorContextoApp.getTelaAnterior());
         this.oNavegacao.goBack();
     }
 
@@ -150,7 +127,7 @@ export default class TelaProdutoEscolha extends Component {
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Produtos' navigation={this.oNavegacao} />
                 <AreaDados dadosApp={this.oDadosApp}/>
-                <AreaRodape botoes={botoesTela} mensagem={''}/>
+                <AreaRodape botoes={botoesTela} />
             </View>
         );
     }
@@ -174,45 +151,47 @@ export class AreaDados extends Component {
         }
                 
         return (
-            <ScrollView>
-                <ThemeProvider theme={theme}>                    
-                    <View>
-                        <Card title={<CheckBox title="Serviço de Rastreamento Veicular" checked={true}/>} >
-                            <View>
-                            {
-                                listaProdutos.map(
-                                    (oProduto, indice) => {
-                                        let nomeProduto = '';
-                                        let valor = 0.00;
+            <View style={styles.areaDadosCliente}>
+                <ScrollView>
+                    <ThemeProvider theme={theme}>                    
+                        <View>
+                            <Card title={<CheckBox title="Serviço de Rastreamento Veicular" checked={true}/>} >
+                                <View>
+                                {
+                                    listaProdutos.map(
+                                        (oProduto, indice) => {
+                                            let nomeProduto = '';
+                                            let valor = 0.00;
 
-                                        if(oProduto.nome) {
-                                            nomeProduto = oProduto.nome;
-                                        }
+                                            if(oProduto.nome) {
+                                                nomeProduto = oProduto.nome;
+                                            }
 
-                                        if((typeof oProduto.valor === 'number') && !isNaN(oProduto.valor)) {
-                                            valor = oProduto.valor.toFixed(2).replace('.', ',');
-                                        }
-                                        return (
-                                            <View key={indice} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginRight: 10 }}>
-                                                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
-                                                    <CheckBox checked={true} checkedIcon={<Icon name="check" color="#022C18"/>}/>
-                                                    <Text>{`${nomeProduto}`}</Text>
+                                            if((typeof oProduto.valor === 'number') && !isNaN(oProduto.valor)) {
+                                                valor = oProduto.valor.toFixed(2).replace('.', ',');
+                                            }
+                                            return (
+                                                <View key={indice} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginRight: 10 }}>
+                                                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start' }}>
+                                                        <CheckBox checked={true} checkedIcon={<Icon name="check" color="#022C18"/>}/>
+                                                        <Text>{`${nomeProduto}`}</Text>
+                                                    </View>
+                                                    <Text style={{fontWeight:'bold'}}>{`R$ ${valor}`}</Text>
                                                 </View>
-                                                <Text style={{fontWeight:'bold'}}>{`R$ ${valor}`}</Text>
-                                            </View>
-                                        )
-                                    }
-                                )
-                            }
-                            </View>
-                            <Divider />
-                            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 10, marginRight: 10 }}>
-                                <Text style={{fontWeight:'bold'}}>{`Total = R$ ${valorTotal}`}</Text>
-                            </View>
-                        </Card>
-                    </View>
-                </ThemeProvider>
-            </ScrollView>            
+                                            )
+                                        }
+                                    )
+                                }
+                                </View>
+                                <Divider />
+                                <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 10, marginRight: 10 }}>
+                                    <Text style={{fontWeight:'bold'}}>{`Total = R$ ${valorTotal}`}</Text>
+                                </View>
+                            </Card>
+                        </View>
+                    </ThemeProvider>
+                </ScrollView>
+            </View>         
         );
     }
 }

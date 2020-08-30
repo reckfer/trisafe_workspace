@@ -11,7 +11,7 @@ import {
     Alert,
     View,
 } from 'react-native';
-import Util from './../common/Util';
+import ComunicacaoHTTP from './../common/ComunicacaoHTTP';
 import { ThemeProvider, Input, Button } from 'react-native-elements';
 import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
@@ -30,13 +30,12 @@ export default class TelaClienteDadosPessoais extends Component {
         if(value && value.gerenciador) {
             // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
             this.oGerenciadorContextoApp = value.gerenciador;
-            
             this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
             this.oRegistradorLog.registrar('TelaClienteDadosPessoais.constructor() => Iniciou.');
 
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
+            this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
 
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
@@ -48,12 +47,11 @@ export default class TelaClienteDadosPessoais extends Component {
     }
     
     avancar() {
-        this.oGerenciadorContextoApp.setTelaAnterior(this);
         this.oNavegacao.navigate('Endereço', this.state);
     }
 
     voltar() {
-        this.oGerenciadorContextoApp.atualizarEstadoTela(this.oGerenciadorContextoApp.getTelaAnterior());
+        //this.oGerenciadorContextoApp.atualizarEstadoTela(this.oGerenciadorContextoApp.telaAnterior);
         this.oNavegacao.goBack();
     }
     
@@ -67,7 +65,7 @@ export default class TelaClienteDadosPessoais extends Component {
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Cadastro' navigation={this.oNavegacao} />
                 <AreaDados dadosApp={this.oDadosApp}/>
-                <AreaRodape botoes={botoesTela} mensagem={''}/>
+                <AreaRodape botoes={botoesTela}/>
             </View>
         );
     }

@@ -120,19 +120,19 @@ class ClienteIter(models.Model):
             retorno = Retorno(True)
             dadosRetorno = respostaHTTP.json()
             
-            if dadosRetorno:
-                retorno.dados = dadosRetorno
+            if isinstance(dadosRetorno, list):
+                if len(dadosRetorno) > 0:
+                    dadosRetorno = dadosRetorno[0]
 
-                if isinstance(dadosRetorno, list):
-                    if len(dadosRetorno) > 0:
-                        retorno.dados = dadosRetorno[0]
-                    else:
-                        # nao localizado
-                        retorno = Retorno(False, respostaHTTP.text, '', 404)
-
+            if dadosRetorno:                
                 if 'token' in dadosRetorno:
                     self.credencial.set_token_iter(dadosRetorno['token'])
-                    
+                else:
+                    retorno.dados = dadosRetorno
+            else:
+                # nao localizado
+                retorno = Retorno(False, respostaHTTP.text, '', 404)
+
         if(self.credencial):
             retorno.credencial = self.credencial
             

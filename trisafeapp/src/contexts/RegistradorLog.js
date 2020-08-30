@@ -1,20 +1,21 @@
 import { DADOS_LOG_GERAL } from './DadosAppLog';
-import {
-    Alert
-} from 'react-native';
+import ComunicacaoHTTP from '../common/ComunicacaoHTTP';
 import Util from '../common/Util';
 
 export default class RegistradorLog {
     
-    constructor() {
+    constructor(gerenciadorContexto) {
+        this.oGerenciadorContextoApp = gerenciadorContexto;
         this.oDadosLog = DADOS_LOG_GERAL;
         this.oRegistrosLogs = this.oDadosLog.registros_log;
-        this.oUtil = new Util();
+        this.oGerenciadorContextoApp.registradorLog = this;
+        this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp);
+        this.oUtil = new Util(this.oGerenciadorContextoApp);
 
         this.registrar = this.registrar.bind(this);
         this.transportar = this.transportar.bind(this);
+        this.tratarRetornoLog = this.tratarRetornoLog.bind(this);
         this.limpar = this.limpar.bind(this);
-        this._obterJsonResposta = this._obterJsonResposta.bind(this);
         this.enviando = false;
     }
 
@@ -29,29 +30,21 @@ export default class RegistradorLog {
             'mensagem_log' : registroLog,
         }
         
-        console.log(oMensagemLog);
+        console.log(`[trisafeapp] ${registroLog}`);
 
         this.oRegistrosLogs.push(oMensagemLog);
     }
 
     transportar() {
         try {
+            console.log(`${this.enviando} ${this.oRegistrosLogs.length}`);
             if(!this.enviando && this.oRegistrosLogs.length > 0) {
                 this.enviando = true;
 
-                let url = this.oUtil.getURL('/gerenciadorlogs/registrar_do_cliente/');
-
-                let oMensagensLog = {
-                    'registros_log' : this.oRegistrosLogs,
-                }
-
-                let dadosParametros = JSON.stringify(oMensagensLog);
-                
-                fetch(url, this.oUtil.getParametrosHTTPS(dadosParametros))
-                    .then(this._obterJsonResposta);
+                this.oComunicacaoHTTP.fazerRequisicaoHTTPRegistrarLogs(this.tratarRetornoLog);
             }
-        } catch (exc) {
-            Alert.alert('Trisafe', exc);
+        } catch (oExcecao) {
+            this.oUtil.tratarExcecao(oExcecao);
         }
     };
 
@@ -59,24 +52,8 @@ export default class RegistradorLog {
         this.oRegistrosLogs.length = 0;
     }
 
-    _obterJsonResposta(oRespostaHTTP) {
+    tratarRetornoLog() {
         this.enviando = false;
         this.limpar();
-
-        if(oRespostaHTTP) {
-
-            if(!oRespostaHTTP.ok) {
-
-                if(oRespostaHTTP.status && oRespostaHTTP.url) {
-                    
-                    Alert.alert('Trisafe', "Erro HTTP status: " + oRespostaHTTP.status + 
-                    ". URL: " + oRespostaHTTP.url);
-                } else if (oRespostaHTTP instanceof Error) {
-                    
-                    Alert.alert('Trisafe', oRespostaHTTP.message);
-                }
-            }
-        }
-        return null;
-    };
+    }
 }

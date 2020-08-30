@@ -4,11 +4,13 @@
  * @format
  * @flow
  */
-import Util, { clonarObjeto } from '../common/Util';
+import ComunicacaoHTTP from './ComunicacaoHTTP';
+import { clonarObjeto } from '../contexts/DadosAppGeral';
 import {
     Alert
 } from 'react-native';
-//import AsyncStorage from '@react-native-community/async-storage';
+import Util from './Util';
+
 export default class Configuracao {
 
     constructor(gerenciadorContexto, oNavegacao) {
@@ -16,11 +18,16 @@ export default class Configuracao {
         if(gerenciadorContexto) {
             this.oGerenciadorContextoApp = gerenciadorContexto;
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
+            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
             this.oDadosChaves = this.oDadosApp.chaves;
+            this.oUtil = new Util(this.oGerenciadorContextoApp);
         }
         this.oNavegacao = oNavegacao;
         
-        this.oUtil = new Util(this.oGerenciadorContextoApp);
+        this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp);
+
+        this.configurarCredenciais = this.configurarCredenciais.bind(this);
+        this.apropriarToken = this.apropriarToken.bind(this);
     }
     
     // salvarChaves(callback) {
@@ -70,24 +77,32 @@ export default class Configuracao {
 
         try {
             if(!this.oDadosChaves.token_trisafe) {
-                let url = this.oUtil.getURL('/configuracoes/configurar_credenciais/');
+                
+                this.oDadosControleApp.autenticado = false;
+                let metodoHTTP = '/configuracoes/configurar_credenciais/';
                 
                 let oDadosChaves = {
+                    // Clona o objeto de chaves, para não manter a credencial_secundaria (atribuida abaixo) na instancia original do objeto.
                     'chaves' : clonarObjeto(this.oDadosChaves)
                 }
                 // Credencial secundaria.
                 oDadosChaves.chaves.credencial_secundaria = 'gAAAAABfQRrm33-jDVGFyH0c2pbFeAjh2oCjwq4xtdhMvDUES2v-9MJiBQjgbrjjQvHL468V-KT1MUDD_JEAODLS1KJaW_sNb5PZb0Xp00Ow3VknOcYnP1zlyjXbGU8IR3-jeqmDosXk-C35XkRePBrQeMwQ9jtJXQ==';
 
-                let dadosParametros = JSON.stringify(oDadosChaves);
-                
-                fetch(url, this.oUtil.getParametrosHTTPS(dadosParametros))
-                    .then(this.oUtil.obterJsonResposta)
-                    .then((oJsonDados) => {
-                        this.oUtil.tratarRetornoServidor(oJsonDados, null, true);
-                    });
+                let oDadosParametros = JSON.stringify(oDadosChaves);
+
+                this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoHTTP, oDadosParametros, this.apropriarToken, true, true);
             }
-        } catch (exc) {
-            Alert.alert('Trisafe', exc);
+        } catch (oExcecao) {
+            this.oUtil.tratarExcecao(oExcecao);
+        }
+    }
+
+    apropriarToken(oDados) {
+        
+        if(oDados && oDados.token_trisafe && oDados.token_trisafe.trim()) {
+            
+            this.oDadosChaves.token_trisafe = oDados.token_trisafe;
+            this.autenticado = true;
         }
     }
 }

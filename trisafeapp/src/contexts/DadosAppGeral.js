@@ -45,6 +45,7 @@ export const DADOS_CONTROLE_APP = {
     'em_producao': false,
     'processando_requisicao': false,
     'novo_cadastro': true,
+    'autenticado': false
 };
 
 export const DADOS_INSTRUCAO_USUARIO = {
@@ -70,3 +71,9 @@ export const DADOS_APP_GERAL = {
     },
     registros_log: null,
 };
+
+export function clonarObjeto(obj) {
+    let objString = JSON.stringify(obj);
+    
+    return JSON.parse(objString);
+}

@@ -12,12 +12,13 @@ import {
     Alert,
     View
 } from 'react-native';
-import Util from '../common/Util';
+import ComunicacaoHTTP from '../common/ComunicacaoHTTP';
 import Cabecalho from '../common/CabecalhoTela';
 import AreaRodape from '../common/AreaRodape';
 import { styles, theme } from '../common/Estilos';
 import UtilTests from './UtilTests';
 import { ContextoApp } from '../contexts/ContextoApp';
+import Util from '../common/Util';
 
 export default class TelaTestesInicio extends Component {
 
@@ -27,14 +28,13 @@ export default class TelaTestesInicio extends Component {
         if(value && value.gerenciador) {
             // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
             this.oGerenciadorContextoApp = value.gerenciador;
-            
             this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
             this.oRegistradorLog.registrar('TelaTestesInicio.constructor() => Iniciou.');
 
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
-
+            this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
+            this.oUtil = new Util();
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;            
         }
         
@@ -56,6 +56,9 @@ export default class TelaTestesInicio extends Component {
         this.voltar = this.voltar.bind(this);
         
         this.oRegistradorLog.registrar('TelaTestesInicio.constructor() => Finalizou.');
+    }
+
+    componentDidMount() {
         this.inicializarDadosTela();
     }
 
@@ -67,75 +70,62 @@ export default class TelaTestesInicio extends Component {
     }
 
     irParaTesteCadastroIter() {
-        this.oGerenciadorContextoApp.setTelaAnterior(this);
         this.oNavegacao.navigate('Cadastro', this.state);
     }
 
     irParaTesteBoletoGerenciaNet() {
-        this.oGerenciadorContextoApp.setTelaAnterior(this);
         this.oNavegacao.navigate('Boleto', this.state);
     }
 
     irParaTesteGeraContratoPDF() {
-        this.oGerenciadorContextoApp.setTelaAnterior(this);
         this.oNavegacao.navigate('Produtos', this.state);
     }
 
     irParaTesteContratoPDF() {
-        this.oGerenciadorContextoApp.setTelaAnterior(this);
         this.oNavegacao.navigate('Contrato', this.state);
     }
 
     obterUltimoCliente() {
         try {
-            let url = this.oUtil.getURL('/clientes/obter_ultimo/');
+            let metodoHTTP = '/clientes/obter_ultimo/';
             
-            let dadosParametros = JSON.stringify(this.state);
+            let oDadosParametros = JSON.stringify(this.state);
 
-            this.oRegistradorLog.registrar(`TelaTestesInicio.obterUltimoCliente => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoHTTP, oDadosParametros, this.tratarDadosRetorno);
 
-            fetch(url, this.oUtil.getParametrosHTTPS(dadosParametros))
-                  .then(this.oUtil.obterJsonResposta)
-                  .then((oJsonDados) => {
-                      this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno, false, true);
-                  })
-        } catch (exc) {
-            Alert.alert('Trisafe', exc);
+        } catch (oExcecao) {
+            this.oUtil.tratarExcecao(oExcecao);
         }
     }
 
     tratarDadosRetorno(oDados, oEstado) {
-        this.oDadosControleApp.processando_requisicao = false;
-        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
+        // this.oDadosControleApp.processando_requisicao = false;
+        // this.oGerenciadorContextoApp.atualizarEstadoTela(this);
 
-        this.oGerenciadorContextoApp.atribuirDados('cliente', oDados);
+        this.oGerenciadorContextoApp.atribuirDados('cliente', oDados, this);
         
         this.obterContratoPorCliente();
     }
 
     obterContratoPorCliente() {
+
         try {
-            let url = this.oUtil.getURL('/contratos/obter_por_cliente/');
+            let metodoHTTP = '/contratos/obter_por_cliente/';
             
-            let dadosParametros = JSON.stringify(this.state);
+            let oDadosParametros = JSON.stringify(this.state);
 
-            this.oRegistradorLog.registrar(`TelaTestesInicio.obterContratoPorCliente => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoHTTP, oDadosParametros, this.tratarDadosRetornoContrato);
 
-            fetch(url, this.oUtil.getParametrosHTTPS(dadosParametros))
-                  .then(this.oUtil.obterJsonResposta)
-                  .then((oJsonDados) => {
-                      this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetornoContrato);
-                  });
-        } catch (exc) {
-            Alert.alert('Trisafe', exc);
+        } catch (oExcecao) {
+            this.oUtil.tratarExcecao(oExcecao);
         }
     }
     
     tratarDadosRetornoContrato(oDados) {
-        this.oDadosControleApp.processando_requisicao = false;
-        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
+        // this.oDadosControleApp.processando_requisicao = false;
+        // this.oGerenciadorContextoApp.atualizarEstadoTela(this);
 
-        this.oGerenciadorContextoApp.atribuirDados('contrato', oDados);
+        this.oGerenciadorContextoApp.atribuirDados('contrato', oDados, this);
     }
 
     gerarDadosTestes() {
@@ -161,7 +151,7 @@ export default class TelaTestesInicio extends Component {
     }
 
     voltar() {
-        this.oGerenciadorContextoApp.atualizarEstadoTela(this.oGerenciadorContextoApp.getTelaAnterior());
+        // this.oGerenciadorContextoApp.atualizarEstadoTela(this.oGerenciadorContextoApp.telaAnterior);
         this.oNavegacao.goBack();
     }
     
@@ -181,13 +171,7 @@ export default class TelaTestesInicio extends Component {
         let botoesTela = [ 
             { element: this.botaoVoltar }, 
         ];
-        // let funcoes = {
-        //     'irParaTesteCadastroIter': this.irParaTesteCadastroIter,
-        //     'irParaTesteGeraContratoPDF' : this.irParaTesteGeraContratoPDF,
-        //     'irParaTesteBoletoGerenciaNet': this.irParaTesteBoletoGerenciaNet,
-        //     'irParaTesteContratoPDF': this.irParaTesteContratoPDF,
-        //     'gerarDadosTestes': this.gerarDadosTestes,
-        // }
+
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Testes' nomeTela='Início' navigation={this.oNavegacao} />
@@ -202,6 +186,8 @@ export class AreaDados extends Component {
 
     constructor(props) {
         super(props);
+
+        this.atualizarDados = this.atualizarDados.bind(this);
     }
 
     atualizarDados(oDadosCliente) {

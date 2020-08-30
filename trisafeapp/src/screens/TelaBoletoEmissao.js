@@ -11,7 +11,7 @@ import {
     Alert,
     View
 } from 'react-native';
-import Util from './../common/Util';
+import ComunicacaoHTTP from '../common/ComunicacaoHTTP';
 import { ThemeProvider, Button } from 'react-native-elements';
 import Pdf from 'react-native-pdf';
 // import { WebView } from 'react-native-webview';
@@ -19,6 +19,7 @@ import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
 import AreaRodape from './../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
+import Util from '../common/Util';
 
 export default class TelaBoletoEmissao extends Component {
 	
@@ -37,9 +38,9 @@ export default class TelaBoletoEmissao extends Component {
             this.oRegistradorLog.registrar('TelaBoletoEmissao.constructor() => Iniciou.');
 
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
-
+            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
+            this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
+            this.oUtil = new Util();
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
 
@@ -51,6 +52,10 @@ export default class TelaBoletoEmissao extends Component {
         this.voltar = this.voltar.bind(this);
 
         this.oRegistradorLog.registrar('TelaBoletoEmissao.constructor() => Finalizou.');
+    }
+
+    componentDidMount() {
+
         this.inicializarDadosTela();
     }
 
@@ -63,54 +68,39 @@ export default class TelaBoletoEmissao extends Component {
 
     obterBoleto() {
         try {
-            let url = this.oUtil.getURL('/boletogerencianets/obter/');
+            let metodoHTTP = '/boletogerencianets/obter/';
 
-            let dadosParametros = JSON.stringify(this.state);
+            let oDadosParametros = JSON.stringify(this.state);
 
-            this.oRegistradorLog.registrar(`TelaBoletoEmissao.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoHTTP, oDadosParametros, this.tratarRetornoBoleto, true);
+        } catch (oExcecao) {
+            this.oUtil.tratarExcecao(oExcecao);
 
-            fetch(url, this.oUtil.getParametrosHTTPS(dadosParametros))
-                    .then(this.oUtil.obterJsonResposta)
-                    .then((oJsonDados) => {
-                        this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarRetornoBoleto, true);
-                    })
-        } catch (exc) {
-            Alert.alert('Trisafe', exc);
         }
     }
 
     tratarRetornoBoleto(oDados) {
-        this.oGerenciadorContextoApp.atribuirDados('boleto', oDados);
-        
-        this.oGerenciadorContextoApp.atualizarEstadoTela(this);        
+        this.oGerenciadorContextoApp.atribuirDados('boleto', oDados, this);
     }
 
     finalizar() {
         try {
-            let url = this.oUtil.getURL('/emailclientes/enviar_com_anexos/');
+            let metodoHTTP = '/emailclientes/enviar_com_anexos/';
             
-            let dadosParametros = JSON.stringify(this.state);
+            let oDadosParametros = JSON.stringify(this.state);
 
-            this.oRegistradorLog.registrar(`TelaBoletoEmissao.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
-
-            fetch(url, this.oUtil.getParametrosHTTPS(dadosParametros))
-                    .then(this.oUtil.obterJsonResposta)
-                    .then((oJsonDados) => {
-                        this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarRetornoEmail);
-                    })
-        } catch (exc) {
-            Alert.alert('Trisafe', exc);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoHTTP, oDadosParametros, this.tratarRetornoEmail);
+        } catch (oExcecao) {
+            this.oUtil.tratarExcecao(oExcecao);
         }
     }
 
     tratarRetornoEmail() {
-        this.oDadosControleApp.processando_requisicao = false;
-        this.oGerenciadorContextoApp.setTelaAnterior(this);
+        
         this.oNavegacao.navigate('Cadastro', this.state);
     }
 
     voltar() {
-        this.oGerenciadorContextoApp.atualizarEstadoTela(this.oGerenciadorContextoApp.getTelaAnterior());
         this.oNavegacao.goBack();
     }
 
@@ -157,7 +147,7 @@ export class AreaDados extends Component {
                     }}
                     onError={(error)=>{
                         if(source.uri) {
-                            this.oUtil.obterJsonResposta(error);
+                            this.oComunicacaoHTTP.obterJsonResposta(error);
                         }
                     }}
                     onPressLink={(uri)=>{

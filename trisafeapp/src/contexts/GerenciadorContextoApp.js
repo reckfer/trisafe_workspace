@@ -7,9 +7,9 @@ export default class GerenciadorContextoApp {
     constructor() {
         this.oDadosReferencia = DADOS_APP_GERAL;
 
-        this.oRegistradorLog = new RegistradorLog();
+        this.oRegistradorLog = new RegistradorLog(this);
         this.oDadosReferencia.registros_log = this.oRegistradorLog.registrosLog;
-        this._transportarLogServidor = this._transportarLogServidor.bind(this);
+        
         this.atualizarEstadoTela = this.atualizarEstadoTela.bind(this);
         this.atribuirDados = this.atribuirDados.bind(this);
         this.temDados = this.temDados.bind(this);
@@ -17,9 +17,8 @@ export default class GerenciadorContextoApp {
         this._atribuir = this._atribuir.bind(this);
         this._clonarObjeto = this._clonarObjeto.bind(this);
         this._transportarLogServidor = this._transportarLogServidor.bind(this);
+        this.oTelaAtual = null;
         this.oTelaAnterior = null;
-        this.getTelaAnterior = this.getTelaAnterior.bind(this);
-        this.setTelaAnterior = this.setTelaAnterior.bind(this);
 
         AppState.addEventListener('change', this._transportarLogServidor);
     };
@@ -43,6 +42,10 @@ export default class GerenciadorContextoApp {
         return this.oRegistradorLog;
     }
 
+    set registradorLog(oRegistradorLog) {
+        this.oRegistradorLog = oRegistradorLog;
+    }
+
     get appAtivo() {
 
         if (AppState.currentState.match(/inactive|background/)) {
@@ -51,23 +54,30 @@ export default class GerenciadorContextoApp {
 
         return true;
     }
-
-    getTelaAnterior() {
-        return this.oTelaAnterior;
+    
+    set telaAtual(oTela) {
+        this.oTelaAnterior = this.oTelaAtual;
+        this.oTelaAtual = oTela;
     }
 
-    setTelaAnterior(objTela) {
-        this.oTelaAnterior = objTela;
+    get telaAnterior() {
+        return this.oTelaAnterior;
     }
 
     /*** FUNCOES DE ATRIBUICOES ****/
     atualizarEstadoTela(objetoTela) {
-        if(this.oDadosReferencia) {
-            objetoTela.setState(this.oDadosReferencia);
+        let oTela = objetoTela;
+        
+        if(!oTela) {
+           oTela = this.oTelaAtual; 
+        }
+
+        if(oTela && this.oDadosReferencia) {
+            oTela.setState(this.oDadosReferencia);
         }
     };
 
-    atribuirDados(nomeAtributo, oDadosAtribuir) {
+    atribuirDados(nomeAtributo, oDadosAtribuir, instanciaComponente) {
         let oDados = this.oDadosReferencia.dados_app;
         let oArrayDados;
         let oItemArray;
@@ -173,20 +183,28 @@ export default class GerenciadorContextoApp {
                 i = objContinuar.indice;
             }
         }
-
+        
+        if(instanciaComponente) {
+            this.atualizarEstadoTela(instanciaComponente);
+        }
         return this.oDadosReferencia;
     };
 
     temDados() {
+
         if(this.oDadosReferencia && this.oDadosReferencia.dados_app) {
             let oDadosApp = this.oDadosReferencia.dados_app;
             let campos = Object.keys(oDadosApp);
             let campo;
             let oCampo;
             let oPilhaPendencias = [];
+            let oCamposIgnorar = ['instrucao_usuario', 'chaves'];
 
             for(let i = 0; i < campos.length; i++) {
                 campo = campos[i];
+                if(oCamposIgnorar.find((valor) => {return (valor === campo)})) {
+                    continue;
+                }
                 oCampo = oDadosApp[campo];
             
                 if(oCampo) {
@@ -249,6 +267,8 @@ export default class GerenciadorContextoApp {
     };
 
     _transportarLogServidor() {
+        console.log(`[trisafeapp] App ativo = ${this.appAtivo}`);
+
         if(!this.appAtivo) {
             this.oRegistradorLog.transportar();
         }

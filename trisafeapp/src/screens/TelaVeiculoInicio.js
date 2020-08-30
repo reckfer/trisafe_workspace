@@ -15,7 +15,7 @@ import {
     View,
     // PermissionsAndroid
 } from 'react-native';
-import Util from '../common/Util';
+import ComunicacaoHTTP from '../common/ComunicacaoHTTP';
 import Cabecalho from '../common/CabecalhoTela';
 import { styles, theme } from '../common/Estilos';
 import { ContextoApp } from '../contexts/ContextoApp';
@@ -45,7 +45,7 @@ export default class TelaVeiculoInicio extends Component {
 
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
+            this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
 
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
@@ -80,12 +80,12 @@ export default class TelaVeiculoInicio extends Component {
     // }
 
     irParaMeusDados() {
-        this.oGerenciadorContextoApp.setTelaAnterior(this);
+        // this.oGerenciadorContextoApp.setTelaAnterior(this);
         this.oNavegacao.navigate('Cadastro', this.state);
     }
 
     irParaMeusVeiculos() {
-        this.oGerenciadorContextoApp.setTelaAnterior(this);
+        // this.oGerenciadorContextoApp.setTelaAnterior(this);
         this.oNavegacao.navigate('Veiculos', this.state);
     }
 

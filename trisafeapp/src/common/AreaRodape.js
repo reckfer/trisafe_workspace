@@ -13,7 +13,7 @@ import { ButtonGroup } from 'react-native-elements';
 import AreaBarraEstado from './AreaBarraEstado';
 import { ContextoApp } from '../contexts/ContextoApp';
 import { styles } from './Estilos';
-import Util from './Util';
+import ComunicacaoHTTP from './ComunicacaoHTTP';
 
 export default class AreaRodape extends Component {
 
@@ -27,24 +27,32 @@ export default class AreaRodape extends Component {
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
             this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
+            this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
         }
     }
-            
+    
     render() {
-        if(!this.props.semElementos) {
+        let semElementos = !this.oDadosInstrucao.texto_instrucao && !this.props.botoes;
+        let botoes = <View></View>;    
+
+        if(this.props.botoes && this.props.botoes.length > 0) {
+                                
+            botoes = <ButtonGroup
+                buttons={this.props.botoes}
+                buttonStyle={ {alignItems: 'stretch'} }
+            />;
+        }
+
+        if(semElementos) {
             return (
                 <View style={styles.areaRodape}>
-                    <AreaBarraEstado mensagem={this.oDadosInstrucao.texto_instrucao}/>
-                    <ButtonGroup
-                        buttons={this.props.botoes}
-                        buttonStyle={ {alignItems: 'stretch'} }
-                    />
                 </View>
             );
         } else {
             return (
                 <View style={styles.areaRodape}>
+                    <AreaBarraEstado mensagem={this.oDadosInstrucao.texto_instrucao}/>
+                    {botoes}
                 </View>
             );
         }

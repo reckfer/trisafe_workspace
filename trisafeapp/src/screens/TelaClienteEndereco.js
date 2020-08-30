@@ -12,7 +12,7 @@ import {
     View,
 } from 'react-native';
 import { ThemeProvider, Input, Button } from 'react-native-elements';
-import Util from './../common/Util';
+import ComunicacaoHTTP from './../common/ComunicacaoHTTP';
 import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
 import AreaRodape from './../common/AreaRodape';
@@ -36,7 +36,7 @@ export default class TelaClienteEndereco extends Component {
 
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
+            this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
 
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
@@ -51,13 +51,13 @@ export default class TelaClienteEndereco extends Component {
         // const { navigation } = this.props;
         
         // if(this.validarDadosPessoais()) {
-            this.oGerenciadorContextoApp.setTelaAnterior(this);
+            // this.oGerenciadorContextoApp.setTelaAnterior(this);
             this.oNavegacao.navigate('Confirmação dos dados', this.state);
         // }
     }
 
     voltar() {
-        this.oGerenciadorContextoApp.atualizarEstadoTela(this.oGerenciadorContextoApp.getTelaAnterior());
+        //this.oGerenciadorContextoApp.atualizarEstadoTela(this.oGerenciadorContextoApp.telaAnterior);
         this.oNavegacao.goBack();
     }
 

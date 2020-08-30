@@ -7,18 +7,18 @@
 
 import React, { Component } from 'react';
 import { ThemeProvider, Input, Button, ButtonGroup } from 'react-native-elements';
-import { clonarObjeto } from "../common/Util";
+import { clonarObjeto } from '../contexts/DadosAppGeral';
 import {
     
     View,
     // PermissionsAndroid
 } from 'react-native';
-import Util from '../common/Util';
 import Cabecalho from '../common/CabecalhoTela';
 import { styles, theme } from '../common/Estilos';
 import { ContextoApp } from '../contexts/ContextoApp';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Configuracao from '../common/Configuracao';
+import AreaRodape from '../common/AreaRodape';
 
 export default class TelaMenuInicio extends Component {
     
@@ -32,13 +32,11 @@ export default class TelaMenuInicio extends Component {
         if(value && value.gerenciador) {
             // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
             this.oGerenciadorContextoApp = value.gerenciador;
-            
             this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
-            this.oRegistradorLog.registrar('TelaMenuInicio.constructor() => Iniciou.');
+            this.oRegistradorLog.registrar('TelaMenuInicio.constructor() ++++++++++++ iniciou ++++++++++++');
 
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
+            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
             this.oConfiguracao = new Configuracao(this.oGerenciadorContextoApp, this.oNavegacao);
 
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
@@ -46,14 +44,16 @@ export default class TelaMenuInicio extends Component {
         
         this.irParaMeusDados = this.irParaMeusDados.bind(this);
         this.irParaMeusVeiculos = this.irParaMeusVeiculos.bind(this);
+        
+        this.oRegistradorLog.registrar('TelaMenuInicio.constructor() ------------ terminou ------------');
     }
 
     componentDidMount() {
-        this.oRegistradorLog.registrar('[trisafeapp] componentDidMount() ++++++++++++ iniciou ++++++++++++');
+        this.oRegistradorLog.registrar('TelaMenuInicio.componentDidMount() ++++++++++++ iniciou ++++++++++++');
         
-        this.inicializar();
+        //this.inicializar();
         
-        console.log('[trisafeapp] componentDidMount() ------------ terminou ------------');
+        this.oRegistradorLog.registrar('TelaMenuInicio.componentDidMount() ------------ terminou ------------');
     }
     
     inicializar() {
@@ -78,12 +78,10 @@ export default class TelaMenuInicio extends Component {
     }
 
     irParaMeusDados() {
-        this.oGerenciadorContextoApp.setTelaAnterior(this);
         this.oNavegacao.navigate('Cadastro', this.state);
     }
 
     irParaMeusVeiculos() {
-        this.oGerenciadorContextoApp.setTelaAnterior(this);
         this.oNavegacao.navigate('Veiculo Inicio', this.state);
     }
 
@@ -95,8 +93,9 @@ export default class TelaMenuInicio extends Component {
         
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho titulo='Menu' navigation={this.oNavegacao}/>
+                <Cabecalho titulo='' navigation={this.oNavegacao}/>
                 <AreaDados botoes={botoesTela}/>
+                <AreaRodape />
             </View>
         )
     }
@@ -112,7 +111,6 @@ export class AreaDados extends Component {
 
     render() {
         let estiloAreaDadosCliente = clonarObjeto(styles.areaDadosCliente);
-        //estiloAreaDadosCliente.margin = 30;
 
         return (
             <View style={estiloAreaDadosCliente} >

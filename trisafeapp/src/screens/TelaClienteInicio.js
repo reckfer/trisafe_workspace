@@ -7,19 +7,17 @@
 
 import React, { Component } from 'react';
 import { ThemeProvider, Input, Button } from 'react-native-elements';
-// import { PushNotification } from 'react-native-push-notification';
-// import RNFetchBlob from 'rn-fetch-blob';
 import {
     ScrollView,
     Alert,
     View,
-    // PermissionsAndroid
 } from 'react-native';
-import Util from '../common/Util';
+import ComunicacaoHTTP from '../common/ComunicacaoHTTP';
 import Cabecalho from '../common/CabecalhoTela';
 import AreaRodape from '../common/AreaRodape';
 import { styles, theme } from '../common/Estilos';
 import { ContextoApp } from '../contexts/ContextoApp';
+import Util from '../common/Util';
 
 export default class TelaClienteInicio extends Component {
     
@@ -39,8 +37,8 @@ export default class TelaClienteInicio extends Component {
 
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
-
+            this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
+            this.oUtil = new Util();
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
         
@@ -51,52 +49,22 @@ export default class TelaClienteInicio extends Component {
         this.oRegistradorLog.registrar('TelaClienteInicio.constructor() => Finalizou.');
     }
 
-    tratarDadosAutenticacaoIter(oDados, oEstado) {
-        let irPara = true;
-        
-        if(!oEstado.ok){
-            if (oEstado.mensagem && oEstado.mensagem.trim()) {
-                Alert.alert('Trisafe', oEstado.mensagem);
-            }
-        } else {
-            irPara = false;
-        }
-    
-        this.oGerenciadorContextoApp.atribuirDados('chaves', oDados);
-    }
-
     obterCliente() {
         try {
-            this.oNavegacao.navigate('Dados pessoais', this.state);
-            let url = this.oUtil.getURL('/clientes/obter/');
+            let metodoHTTP = '/clientes/obter/';
+            
+            let oDadosParametros = JSON.stringify(this.state);
 
-            this.oDadosControleApp.processando_requisicao = true;
-            this.oGerenciadorContextoApp.atualizarEstadoTela(this);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoHTTP, oDadosParametros, this.tratarDadosCliente, true);
 
-            let dadosParametros = JSON.stringify(this.state);
-
-            this.oRegistradorLog.registrar(`TelaBoletoEmissao.obterBoleto => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
-
-            fetch(url, this.oUtil.getParametrosHTTPS(dadosParametros))
-                .then(this.oUtil.obterJsonResposta)
-                .then((oJsonDados) => {
-                    this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosCliente, true);
-                })
-                .catch(function (erro) {
-                    Alert.alert('Trisafe', erro.message);
-                    throw erro;
-                });
-        } catch (exc) {
-            Alert.alert('Trisafe', exc.message);
-            throw exc;
+        } catch (oExcecao) {
+            this.oUtil.tratarExcecao(oExcecao);
         }
     }
 
     tratarDadosCliente(oDados, oEstado) {
         let irPara = true;
-        this.oDadosControleApp.processando_requisicao = false;
-        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
-
+        
         if(oEstado.cod_mensagem === 'NaoCadastrado') {
             this.oDadosControleApp.novo_cadastro = true;
             Alert.alert('Trisafe', 'Informe seus dados para realizar o cadastro.');
@@ -113,16 +81,14 @@ export default class TelaClienteInicio extends Component {
                 Alert.alert('Trisafe', 'Atualize seus dados cadastrais.');
             }
         }
-        this.oGerenciadorContextoApp.atribuirDados('cliente', oDados);
+        this.oGerenciadorContextoApp.atribuirDados('cliente', oDados, this);
 
         if(irPara) {
-            this.oGerenciadorContextoApp.setTelaAnterior(this);
             this.oNavegacao.navigate('Dados pessoais', this.state);
         }
     }
 
     irParaTestesRapidos() {
-        this.oGerenciadorContextoApp.setTelaAnterior(this);
         this.oNavegacao.navigate('Testes', this.state);
     }
 

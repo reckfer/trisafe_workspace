@@ -11,12 +11,13 @@ import {
     Alert,
     View
 } from 'react-native';
-import Util from './../common/Util';
+import ComunicacaoHTTP from './../common/ComunicacaoHTTP';
 import { ThemeProvider, Input, Button } from 'react-native-elements';
 import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
 import AreaRodape from './../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
+import Util from '../common/Util';
 
 export default class TelaClienteConfirmacao extends Component {
 	
@@ -36,8 +37,8 @@ export default class TelaClienteConfirmacao extends Component {
 
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
+            this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
             this.oUtil = new Util(this.oGerenciadorContextoApp);
-
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
         
@@ -48,35 +49,19 @@ export default class TelaClienteConfirmacao extends Component {
         this.oRegistradorLog.registrar('TelaClienteConfirmacao.constructor() => Finalizou.');
     }
 
-    componentDidUpdate() {
-
-        if(!this.oDadosControleApp.novo_cadastro) {
-            
-        }
-    }
-
     salvar() {
         try {
-            let url = this.oUtil.getURL('/clientes/incluir/');
+            let metodoHTTP = '/clientes/incluir/';
 
             if(!this.oDadosControleApp.novo_cadastro) {
-                url = this.oUtil.getURL('/clientes/alterar/');
+                metodoHTTP = '/clientes/alterar/';
             }
             
-            this.oDadosControleApp.processando_requisicao = true;
-            this.oGerenciadorContextoApp.atualizarEstadoTela(this);
+            let oDadosParametros = JSON.stringify(this.state);
 
-            let dadosParametros = JSON.stringify(this.state);
-
-            this.oRegistradorLog.registrar(`TelaClienteConfirmacao.salvar() => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
-
-            fetch(url, this.oUtil.getParametrosHTTPS(dadosParametros))
-                  .then(this.oUtil.obterJsonResposta)
-                  .then((oJsonDados) => {
-                      this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno, true, true);
-                  });
-        } catch (exc) {
-            Alert.alert('Trisafe', exc);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoHTTP, oDadosParametros, this.tratarDadosRetorno, true, true);
+        } catch (oExcecao) {
+            this.oUtil.tratarExcecao(oExcecao);
         }
     }
 
@@ -85,19 +70,15 @@ export default class TelaClienteConfirmacao extends Component {
         if (oEstado.mensagem && oEstado.mensagem.trim()){
             Alert.alert('Trisafe', oEstado.mensagem);
         }
-        
-        this.oDadosControleApp.processando_requisicao = false;
-        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
-        
+                
         if(oEstado.ok) {
             this.oDadosControleApp.novo_cadastro = false;
-            this.oGerenciadorContextoApp.setTelaAnterior(this);
             this.oNavegacao.navigate('Produtos', this.state);
         }
     }
      
     voltar() {
-        this.oGerenciadorContextoApp.atualizarEstadoTela(this.oGerenciadorContextoApp.getTelaAnterior());
+        //this.oGerenciadorContextoApp.atualizarEstadoTela(this.oGerenciadorContextoApp.telaAnterior);
         this.oNavegacao.goBack();
     }
 

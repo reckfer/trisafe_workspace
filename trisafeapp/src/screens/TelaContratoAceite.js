@@ -9,15 +9,17 @@ import React, { Component } from 'react';
 import {
     Dimensions,
     Alert,
-    View
+    View,
+    Text
 } from 'react-native';
-import Util from '../common/Util';
+import ComunicacaoHTTP from '../common/ComunicacaoHTTP';
 import { Button } from 'react-native-elements';
 import Pdf from 'react-native-pdf';
 import Cabecalho from '../common/CabecalhoTela';
 import { styles } from '../common/Estilos';
 import AreaRodape from '../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
+import Util from '../common/Util';
 
 export default class TelaContratoAceite extends Component {
 	
@@ -37,8 +39,8 @@ export default class TelaContratoAceite extends Component {
 
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
-
+            this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
+            this.oUtil = new Util();
             this.oDadosControleApp.processando_requisicao = false;
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
@@ -50,6 +52,9 @@ export default class TelaContratoAceite extends Component {
         this.voltar = this.voltar.bind(this);
 
         this.oRegistradorLog.registrar('TelaContratoAceite.constructor() => Finalizou.');
+    }
+    
+    componentDidMount() {
         this.inicializarDadosTela();
     }
 
@@ -61,45 +66,33 @@ export default class TelaContratoAceite extends Component {
     }
 
     obterArquivoContrato() {
-        this.oDadosApp.contrato.url_pdf = this.oUtil.getURL('/contratos/obter_arquivo_contrato/');
+        this.oDadosApp.contrato.url_pdf = this.oComunicacaoHTTP.getURL('/contratos/obter_arquivo_contrato/');
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
     }
 
     contratar() {
         try {
-            let url = this.oUtil.getURL('/contratos/aceitar/');
+            let metodoHTTP = '/contratos/aceitar/';
             
-            this.oDadosControleApp.processando_requisicao = true;
-            this.oGerenciadorContextoApp.atualizarEstadoTela(this);
+            let oDadosParametros = JSON.stringify(this.state);
 
-            let dadosParametros = JSON.stringify(this.state);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoHTTP, oDadosParametros, this.tratarDadosRetorno);
 
-            this.oRegistradorLog.registrar(`TelaContratoAceite.contratar => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
-
-            fetch(url, this.oUtil.getParametrosHTTPS(dadosParametros))
-                    .then(this.oUtil.obterJsonResposta)
-                    .then((oJsonDados) => {
-                        this.oUtil.tratarRetornoServidor(oJsonDados, this.tratarDadosRetorno);
-                    });
-        } catch (exc) {
-            Alert.alert('Trisafe', exc);
+        } catch (oExcecao) {
+            this.oUtil.tratarExcecao(oExcecao);
         }
     }
 
     tratarDadosRetorno(oDados, oEstado) {
-        this.oDadosControleApp.processando_requisicao = false;
-        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
-
         this.oGerenciadorContextoApp.atribuirDados('contrato', oDados);
         this.oGerenciadorContextoApp.atribuirDados('boleto', oDados);
 
         if(oEstado.ok) {
-            this.oGerenciadorContextoApp.setTelaAnterior(this);
             this.oNavegacao.navigate('Boleto', this.state);
         }
     }
 
     voltar() {
-        this.oGerenciadorContextoApp.atualizarEstadoTela(this.oGerenciadorContextoApp.getTelaAnterior());
         this.oNavegacao.goBack();
     }
 
@@ -131,11 +124,11 @@ export class AreaDados extends Component {
             this.oGerenciadorContextoApp = value.gerenciador;
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
-
             this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
             this.oRegistradorLog.registrar('TelaContratoAceite.constructor() => Iniciou.');
-
+            
+            this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp);
+            this.oUtil = new Util();
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
 
@@ -145,40 +138,43 @@ export class AreaDados extends Component {
     excluirArquivoContrato() {
         try {
             
-            let url = this.oUtil.getURL('/contratos/excluir_arquivo_contrato/');
+            let metodoHTTP = '/contratos/excluir_arquivo_contrato/';
             
-            let dadosParametros = JSON.stringify(this.state);
+            let oDadosParametros = JSON.stringify(this.state);
             
-            this.oRegistradorLog.registrar(`AreaDados.excluirArquivoContrato => Vai chamar a url ${url}, via POST. Parametros body: ${dadosParametros}`);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoHTTP, oDadosParametros, null, true);
 
-            fetch(url, this.oUtil.getParametrosHTTPS(dadosParametros))
-                    .then(this.oUtil.obterJsonResposta)
-                    .then((oJsonDados) => {
-                        this.oUtil.tratarRetornoServidor(oJsonDados, null, true);
-                    });
-        } catch (exc) {
-            Alert.alert('Trisafe', exc);
+        } catch (oExcecao) {
+            this.oUtil.tratarExcecao(oExcecao);
         }
     }
 
     render() {
         let oDadosApp = this.props.dadosApp;
         let oDadosContrato = oDadosApp.contrato;
+        let areaContrato = <View><Text>Gerando o contrato. Aguarde...</Text></View>
 
-        const source = { 'uri': oDadosContrato.url_pdf,
-                          method: 'POST',
-                          headers: {
-                            Accept: 'application/json',
-                            'Content-Type': 'application/json',
-                          },
-                          body: JSON.stringify({
-                              'dados_app' : oDadosApp,
-                          })
-                        }
+        if(oDadosContrato.url_pdf) {
+            let oDadosParametros = JSON.stringify({
+                    'dados_app' : oDadosApp,
+                });
 
-        return (
-            <View style={styles.areaDadosCliente}>
-                <Pdf
+            let parametrosHTTPS = this.oComunicacaoHTTP.getParametrosHTTPS(oDadosParametros);
+            parametrosHTTPS.uri = oDadosContrato.url_pdf;
+            const source = parametrosHTTPS;
+            //{ 
+               // uri: oDadosContrato.url_pdf,
+                // method: 'POST',
+                // headers: {
+                // Accept: 'application/json',
+                // 'Content-Type': 'application/json',
+                // },
+                // body: JSON.stringify({
+                //     'dados_app' : oDadosApp,
+                // })
+            //}
+        
+            areaContrato = <Pdf
                     source={source}
                     onLoadComplete={(numberOfPages,filePath)=>{
                         console.log('render() onLoadComplete', filePath);
@@ -187,9 +183,9 @@ export class AreaDados extends Component {
                     onPageChanged={(page,numberOfPages)=>{
                         console.log('render() onPageChanged', page);
                     }}
-                    onError={(error)=>{
+                    onError={(error, a)=>{
                         console.log('render() onError', error);
-                        this.oUtil.obterJsonResposta(error);
+                        this.oComunicacaoHTTP.obterJsonResposta(error);
                     }}
                     onPressLink={(uri)=>{
                     }}
@@ -199,6 +195,10 @@ export class AreaDados extends Component {
                         height:Dimensions.get('window').height,
                     }}
                 />
+        }
+        return (
+            <View style={styles.areaDadosCliente}>
+                {areaContrato}
             </View>
         );
     }
