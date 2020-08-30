@@ -35,10 +35,12 @@ export default class TelaClienteDadosPessoais extends Component {
 
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
+            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
             this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
 
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
+        this.oDadosInstrucao.texto_instrucao = 'Informe seus dados pessoais.';
 
         this.voltar = this.voltar.bind(this);
         this.avancar = this.avancar.bind(this);
@@ -51,7 +53,6 @@ export default class TelaClienteDadosPessoais extends Component {
     }
 
     voltar() {
-        //this.oGerenciadorContextoApp.atualizarEstadoTela(this.oGerenciadorContextoApp.telaAnterior);
         this.oNavegacao.goBack();
     }
     

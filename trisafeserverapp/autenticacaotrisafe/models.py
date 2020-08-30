@@ -25,7 +25,7 @@ from rest_framework.authtoken.models import Token
 
 ## Nao expor esta classe via URL.
 
-class Configuracao():
+class AutenticacaoTriSafe():
     def __init__(self, credencial_cliente):
         self.autenticado = False
         self.credencial = None
@@ -107,3 +107,6 @@ class Configuracao():
 
     # def __str__(self):
     #     return self.nome
+class ExceptionAutenticacaoTriSafe(Exception):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)

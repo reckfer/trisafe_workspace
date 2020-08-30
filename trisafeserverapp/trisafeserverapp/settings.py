@@ -58,7 +58,7 @@ INSTALLED_APPS = [
     'contrato',
     'transacaogerencianet',
     'boletogerencianet',
-    'configuracao'
+    'autenticacaotrisafe'
 ]
 
 MIDDLEWARE = [

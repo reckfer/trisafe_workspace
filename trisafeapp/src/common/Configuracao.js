@@ -13,73 +13,35 @@ import Util from './Util';
 
 export default class Configuracao {
 
-    constructor(gerenciadorContexto, oNavegacao) {
+    constructor(gerenciadorContexto, instanciaComponente) {
         
         if(gerenciadorContexto) {
             this.oGerenciadorContextoApp = gerenciadorContexto;
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
+            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
             this.oDadosChaves = this.oDadosApp.chaves;
             this.oUtil = new Util(this.oGerenciadorContextoApp);
         }
-        this.oNavegacao = oNavegacao;
+        this.oInstanciaComponente = instanciaComponente;
         
         this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp);
 
-        this.configurarCredenciais = this.configurarCredenciais.bind(this);
+        this.autenticarCliente = this.autenticarCliente.bind(this);
         this.apropriarToken = this.apropriarToken.bind(this);
+        this.texto_instrucao = '';
     }
-    
-    // salvarChaves(callback) {
 
-    //     this.oRegistradorLog.registrar('[trisafeapp] salvarChaves() ++++++++++++ iniciou ++++++++++++');
-        
-    //     try {
-    //         AsyncStorage.setItem('chaves', JSON.stringify(this.oDadosChaves))
-    //         .then(() => {
-            
-    //             if(callback) {
-    //                 callback();
-    //             };
-    //         });
-
-    //     } catch (error) {
-            
-    //         Alert.alert('TriSafe', `Erro ao salvar dados de segurança do app no dispositivo. Contate a administração da Trisafe. Detalhes do erro: ${error}`);
-    //     }
-        
-    //     this.oRegistradorLog.registrar('[trisafeapp] salvarChaves() ------------ terminou ------------');
-    // }
-
-    // obterChaves (callback) {
-    //     this.oRegistradorLog.registrar('[trisafeapp] obterChaves() ++++++++++++ iniciou ++++++++++++');
-
-    //     try {
-    //         AsyncStorage.getItem('chaves').then((valor) => {
-    //             console.log('[trisafeapp] obterChaves() valor =', valor);
-                
-    //             if(valor) {
-    //                 this.oDadosChaves = JSON.parse(valor);
-    //             } else {
-    //                 callback();
-    //             }
-    //         });
-
-    //     } catch (error) {
-
-    //         Alert.alert('TriSafe', `Erro ao ler dados de segurança do app no dispositivo. Contate a administração da Trisafe. Detalhes do erro: ${error}`);
-    //     }
-
-    //     this.oRegistradorLog.registrar('[trisafeapp] obterChaves() ------------ terminou ------------');
-    // }
-
-    configurarCredenciais() {
+    autenticarCliente() {
 
         try {
             if(!this.oDadosChaves.token_trisafe) {
-                
+                this.texto_instrucao = this.oDadosInstrucao.texto_instrucao;
+                this.oDadosInstrucao.texto_instrucao = 'Autenticando. Aguarde...';
                 this.oDadosControleApp.autenticado = false;
-                let metodoHTTP = '/configuracoes/configurar_credenciais/';
+                this.oGerenciadorContextoApp.atualizarEstadoTela(this.oInstanciaComponente);
+
+                let metodoURI = '/autenticacoestrisafe/autenticar_cliente/';
                 
                 let oDadosChaves = {
                     // Clona o objeto de chaves, para não manter a credencial_secundaria (atribuida abaixo) na instancia original do objeto.
@@ -90,19 +52,25 @@ export default class Configuracao {
 
                 let oDadosParametros = JSON.stringify(oDadosChaves);
 
-                this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoHTTP, oDadosParametros, this.apropriarToken, true, true);
+                this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.apropriarToken, true, true);
             }
         } catch (oExcecao) {
             this.oUtil.tratarExcecao(oExcecao);
         }
     }
 
-    apropriarToken(oDados) {
-        
-        if(oDados && oDados.token_trisafe && oDados.token_trisafe.trim()) {
+    apropriarToken(oDados, oEstado) {
+        this.oDadosInstrucao.texto_instrucao = 'A autenticação falhou.';
+
+        if(oEstado && oEstado.ok && 
+            this.oDadosChaves && 
+            this.oDadosChaves.token_trisafe && 
+            this.oDadosChaves.token_trisafe.trim()) {
             
-            this.oDadosChaves.token_trisafe = oDados.token_trisafe;
             this.autenticado = true;
+            this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
         }
+
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this.oInstanciaComponente);
     }
 }

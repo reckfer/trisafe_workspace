@@ -36,7 +36,8 @@ export default class TelaClienteConfirmacao extends Component {
             this.oRegistradorLog.registrar('TelaClienteConfirmacao.constructor() => Iniciou.');
 
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
+            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
+            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
             this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
             this.oUtil = new Util(this.oGerenciadorContextoApp);
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
@@ -46,20 +47,21 @@ export default class TelaClienteConfirmacao extends Component {
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
         this.voltar = this.voltar.bind(this);
 
+        this.oDadosInstrucao.texto_instrucao = 'Confirme seus dados.';
         this.oRegistradorLog.registrar('TelaClienteConfirmacao.constructor() => Finalizou.');
     }
 
     salvar() {
         try {
-            let metodoHTTP = '/clientes/incluir/';
+            let metodoURI = '/clientes/incluir/';
 
             if(!this.oDadosControleApp.novo_cadastro) {
-                metodoHTTP = '/clientes/alterar/';
+                metodoURI = '/clientes/alterar/';
             }
             
             let oDadosParametros = JSON.stringify(this.state);
 
-            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoHTTP, oDadosParametros, this.tratarDadosRetorno, true, true);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarDadosRetorno, true, true);
         } catch (oExcecao) {
             this.oUtil.tratarExcecao(oExcecao);
         }
@@ -78,7 +80,6 @@ export default class TelaClienteConfirmacao extends Component {
     }
      
     voltar() {
-        //this.oGerenciadorContextoApp.atualizarEstadoTela(this.oGerenciadorContextoApp.telaAnterior);
         this.oNavegacao.goBack();
     }
 

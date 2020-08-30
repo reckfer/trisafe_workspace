@@ -33,6 +33,8 @@ const styles = StyleSheet.create({
     },
     areaDadosCliente: {
         flex: .75,
+        justifyContent: "center",
+        //alignItems: "center",
         padding: 10,
         borderRadius: 0,
         shadowColor: "#000",

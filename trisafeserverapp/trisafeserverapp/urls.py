@@ -23,7 +23,7 @@ from boletogerencianet.views import BoletoViewSet
 from contrato.views import ContratoViewSet
 from emailcliente.views import EmailClienteViewSet
 from gerenciadorlog.views import GerenciadorLogViewSet
-from configuracao.views import ConfiguracaoViewSet
+from autenticacaotrisafe.views import AutenticacaoTriSafeViewSet
 from django.conf.urls import url, include
 from rest_framework import routers
 from rest_framework.authtoken import views
@@ -51,8 +51,8 @@ router.register(r'emailclientes', EmailClienteViewSet)
 router.register(r'emailclientes/enviar_com_anexos/', EmailClienteViewSet)
 router.register(r'gerenciadorlogs', GerenciadorLogViewSet)
 router.register(r'gerenciadorlogs/registrar_do_cliente/', GerenciadorLogViewSet)
-router.register(r'configuracoes', ConfiguracaoViewSet)
-router.register(r'configuracoes/configurar_credenciais/', ConfiguracaoViewSet)
+router.register(r'autenticacoestrisafe', AutenticacaoTriSafeViewSet)
+router.register(r'autenticacoestrisafe/autenticar_cliente/', AutenticacaoTriSafeViewSet)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),

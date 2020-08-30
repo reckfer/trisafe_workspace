@@ -50,14 +50,14 @@ export default class ComunicacaoHTTP {
         }
     };
 
-    fazerRequisicaoHTTP(metodoHTTP, oDadosParametros, oFuncaoCallback, suprimirMsgServidor, ignorarCallbackSeErro) {
+    fazerRequisicaoHTTP(metodoURI, oDadosParametros, oFuncaoCallback, suprimirMsgServidor, ignorarCallbackSeErro) {
         this.oDadosControleApp.processando_requisicao = true;
         
         if(this.oComponente) {
             this.oGerenciadorContextoApp.atualizarEstadoTela(this.oComponente);
         }
         
-        let url = this.getURL(metodoHTTP);
+        let url = this.getURL(metodoURI);
         
         this.oRegistradorLog.registrar(`ComunicacaoHTTP.fazerRequisicaoHTTP() Realizando requisicao para ${url}, parametros = ${oDadosParametros}`);
 
@@ -71,9 +71,9 @@ export default class ComunicacaoHTTP {
             });
     };
 
-    fazerRequisicaoHTTPSemDadosRetorno(metodoHTTP, oDadosParametros, oFuncaoCallback, ignorarErro) {
+    fazerRequisicaoHTTPSemDadosRetorno(metodoURI, oDadosParametros, oFuncaoCallback, ignorarErro) {
         
-        let url = this.getURL(metodoHTTP);
+        let url = this.getURL(metodoURI);
         
         this.oRegistradorLog.registrar(`ComunicacaoHTTP.fazerRequisicaoHTTPSemDadosRetorno() url = ${url}`);
         
@@ -92,8 +92,8 @@ export default class ComunicacaoHTTP {
 
     fazerRequisicaoHTTPRegistrarLogs(oFuncaoCallback) {
         
-        let metodoHTTP = '/gerenciadorlogs/registrar_do_cliente/';
-        let url = this.getURL(metodoHTTP);
+        let metodoURI = '/gerenciadorlogs/registrar_do_cliente/';
+        let url = this.getURL(metodoURI);
 
         this.oRegistradorLog.registrar(`ComunicacaoHTTP.fazerRequisicaoHTTPRegistrarLogs() url = ${url}`);
 

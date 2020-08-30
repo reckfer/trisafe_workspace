@@ -23,7 +23,7 @@ export default class TelaClienteInicio extends Component {
     
     constructor(props, value) {
         super(props);
-
+        
         if(props && props.navigation) {
             this.oNavegacao = props.navigation;
         }
@@ -36,7 +36,8 @@ export default class TelaClienteInicio extends Component {
             this.oRegistradorLog.registrar('TelaClienteInicio.constructor() => Iniciou.');
 
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
+            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
+            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
             this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
             this.oUtil = new Util();
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
@@ -45,17 +46,17 @@ export default class TelaClienteInicio extends Component {
         this.obterCliente = this.obterCliente.bind(this);
         this.tratarDadosCliente = this.tratarDadosCliente.bind(this);
         this.irParaTestesRapidos = this.irParaTestesRapidos.bind(this);
-
+        this.oDadosInstrucao.texto_instrucao = 'Informe seu CPF ou e-mail para iniciar.';
         this.oRegistradorLog.registrar('TelaClienteInicio.constructor() => Finalizou.');
     }
 
     obterCliente() {
         try {
-            let metodoHTTP = '/clientes/obter/';
+            let metodoURI = '/clientes/obter/';
             
             let oDadosParametros = JSON.stringify(this.state);
 
-            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoHTTP, oDadosParametros, this.tratarDadosCliente, true);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarDadosCliente, true);
 
         } catch (oExcecao) {
             this.oUtil.tratarExcecao(oExcecao);
@@ -125,8 +126,8 @@ export class AreaDados extends Component {
                 <ScrollView>
                     <ThemeProvider theme={theme}>
                         <View>
-                            <Input placeholder="Informe seu E-Mail" label="E-Mail" value={oDadosCliente.email} onChangeText={(valor) => { oDadosCliente.email = valor; this.setState(this.props)}}></Input>
                             <Input placeholder="Informe seu CPF" label="CPF" value={oDadosCliente.cpf} onChangeText={(valor) => { oDadosCliente.cpf = valor; this.setState(this.props)}}></Input>
+                            <Input placeholder="Informe seu E-Mail" label="E-Mail" value={oDadosCliente.email} onChangeText={(valor) => { oDadosCliente.email = valor; this.setState(this.props)}}></Input>
                         </View>
                     </ThemeProvider>
                 </ScrollView>

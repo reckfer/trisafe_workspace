@@ -36,6 +36,7 @@ export default class TelaClienteEndereco extends Component {
 
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
+            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
             this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
 
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
@@ -43,6 +44,8 @@ export default class TelaClienteEndereco extends Component {
         
         this.avancar = this.avancar.bind(this);
         this.voltar = this.voltar.bind(this);
+        
+        this.oDadosInstrucao.texto_instrucao = 'Informe seu endereço.';
 
         this.oRegistradorLog.registrar('TelaClienteEndereco.constructor() => Finalizou.');
     }
@@ -57,7 +60,6 @@ export default class TelaClienteEndereco extends Component {
     }
 
     voltar() {
-        //this.oGerenciadorContextoApp.atualizarEstadoTela(this.oGerenciadorContextoApp.telaAnterior);
         this.oNavegacao.goBack();
     }
 

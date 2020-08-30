@@ -15,6 +15,7 @@ from comum.retorno import Retorno
 from cliente.views import ClienteViewSet
 from boletogerencianet.models import BoletoGerenciaNet
 from boletogerencianet.views import GerenciadorLogViewSet
+from autenticacaotrisafe.views import AutenticacaoTriSafeViewSet
 import json
 import traceback
 import sys
@@ -25,7 +26,7 @@ class ContratoSerializer(serializers.HyperlinkedModelSerializer):
         fields = ()
 
 # ViewSets define the view behavior.
-class ContratoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
+class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissions.BasePermission):
     queryset = Contrato.objects.all()
     serializer_class = ContratoSerializer
     

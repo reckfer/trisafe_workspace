@@ -87,11 +87,11 @@ export default class TelaTestesInicio extends Component {
 
     obterUltimoCliente() {
         try {
-            let metodoHTTP = '/clientes/obter_ultimo/';
+            let metodoURI = '/clientes/obter_ultimo/';
             
             let oDadosParametros = JSON.stringify(this.state);
 
-            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoHTTP, oDadosParametros, this.tratarDadosRetorno);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarDadosRetorno);
 
         } catch (oExcecao) {
             this.oUtil.tratarExcecao(oExcecao);
@@ -99,9 +99,6 @@ export default class TelaTestesInicio extends Component {
     }
 
     tratarDadosRetorno(oDados, oEstado) {
-        // this.oDadosControleApp.processando_requisicao = false;
-        // this.oGerenciadorContextoApp.atualizarEstadoTela(this);
-
         this.oGerenciadorContextoApp.atribuirDados('cliente', oDados, this);
         
         this.obterContratoPorCliente();
@@ -110,11 +107,11 @@ export default class TelaTestesInicio extends Component {
     obterContratoPorCliente() {
 
         try {
-            let metodoHTTP = '/contratos/obter_por_cliente/';
+            let metodoURI = '/contratos/obter_por_cliente/';
             
             let oDadosParametros = JSON.stringify(this.state);
 
-            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoHTTP, oDadosParametros, this.tratarDadosRetornoContrato);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarDadosRetornoContrato);
 
         } catch (oExcecao) {
             this.oUtil.tratarExcecao(oExcecao);
@@ -122,9 +119,6 @@ export default class TelaTestesInicio extends Component {
     }
     
     tratarDadosRetornoContrato(oDados) {
-        // this.oDadosControleApp.processando_requisicao = false;
-        // this.oGerenciadorContextoApp.atualizarEstadoTela(this);
-
         this.oGerenciadorContextoApp.atribuirDados('contrato', oDados, this);
     }
 
@@ -151,7 +145,6 @@ export default class TelaTestesInicio extends Component {
     }
 
     voltar() {
-        // this.oGerenciadorContextoApp.atualizarEstadoTela(this.oGerenciadorContextoApp.telaAnterior);
         this.oNavegacao.goBack();
     }
     

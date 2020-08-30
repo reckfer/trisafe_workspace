@@ -68,11 +68,11 @@ export default class TelaBoletoEmissao extends Component {
 
     obterBoleto() {
         try {
-            let metodoHTTP = '/boletogerencianets/obter/';
+            let metodoURI = '/boletogerencianets/obter/';
 
             let oDadosParametros = JSON.stringify(this.state);
 
-            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoHTTP, oDadosParametros, this.tratarRetornoBoleto, true);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarRetornoBoleto, true);
         } catch (oExcecao) {
             this.oUtil.tratarExcecao(oExcecao);
 
@@ -85,11 +85,11 @@ export default class TelaBoletoEmissao extends Component {
 
     finalizar() {
         try {
-            let metodoHTTP = '/emailclientes/enviar_com_anexos/';
+            let metodoURI = '/emailclientes/enviar_com_anexos/';
             
             let oDadosParametros = JSON.stringify(this.state);
 
-            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoHTTP, oDadosParametros, this.tratarRetornoEmail);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarRetornoEmail);
         } catch (oExcecao) {
             this.oUtil.tratarExcecao(oExcecao);
         }

@@ -6,15 +6,14 @@
  */
 
 import React, { Component } from 'react';
-import { ThemeProvider, Input, Button, ButtonGroup } from 'react-native-elements';
+import { Button } from 'react-native-elements';
 import { clonarObjeto } from '../contexts/DadosAppGeral';
 import {
     
     View,
-    // PermissionsAndroid
 } from 'react-native';
 import Cabecalho from '../common/CabecalhoTela';
-import { styles, theme } from '../common/Estilos';
+import { styles } from '../common/Estilos';
 import { ContextoApp } from '../contexts/ContextoApp';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Configuracao from '../common/Configuracao';
@@ -37,7 +36,7 @@ export default class TelaMenuInicio extends Component {
 
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
-            this.oConfiguracao = new Configuracao(this.oGerenciadorContextoApp, this.oNavegacao);
+            this.oConfiguracao = new Configuracao(this.oGerenciadorContextoApp, this);
 
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
@@ -51,32 +50,15 @@ export default class TelaMenuInicio extends Component {
     componentDidMount() {
         this.oRegistradorLog.registrar('TelaMenuInicio.componentDidMount() ++++++++++++ iniciou ++++++++++++');
         
-        //this.inicializar();
+        this.inicializar();
         
         this.oRegistradorLog.registrar('TelaMenuInicio.componentDidMount() ------------ terminou ------------');
     }
     
     inicializar() {
-        this.oConfiguracao.configurarCredenciais();
+        this.oConfiguracao.autenticarCliente();
     }
     
-    montarStatusConfig() {
-
-        if(this.oConfiguracao.temIntervaloDefinido()) {
-            return(
-                <View style={{marginTop:1}}>
-                    <Text>Aguarde a próxima notificação</Text>
-                </View>
-            );
-        } else {
-            return(
-                <View style={{marginTop:1}}>
-                    <Text>Configure os intervalos</Text>
-                </View>
-            );
-        }
-    }
-
     irParaMeusDados() {
         this.oNavegacao.navigate('Cadastro', this.state);
     }

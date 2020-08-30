@@ -72,11 +72,11 @@ export default class TelaContratoAceite extends Component {
 
     contratar() {
         try {
-            let metodoHTTP = '/contratos/aceitar/';
+            let metodoURI = '/contratos/aceitar/';
             
             let oDadosParametros = JSON.stringify(this.state);
 
-            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoHTTP, oDadosParametros, this.tratarDadosRetorno);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarDadosRetorno);
 
         } catch (oExcecao) {
             this.oUtil.tratarExcecao(oExcecao);
@@ -122,27 +122,29 @@ export class AreaDados extends Component {
         if(value && value.gerenciador) {
             // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
             this.oGerenciadorContextoApp = value.gerenciador;
-            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             
             this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
             this.oRegistradorLog.registrar('TelaContratoAceite.constructor() => Iniciou.');
-            
+
+            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
+            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
             this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp);
             this.oUtil = new Util();
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
 
+        this.oDadosInstrucao.texto_instrucao = 'Contrato de serviço de rastreamento.';
         this.excluirArquivoContrato = this.excluirArquivoContrato.bind(this);
     }
 
     excluirArquivoContrato() {
         try {
             
-            let metodoHTTP = '/contratos/excluir_arquivo_contrato/';
+            let metodoURI = '/contratos/excluir_arquivo_contrato/';
             
             let oDadosParametros = JSON.stringify(this.state);
             
-            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoHTTP, oDadosParametros, null, true);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, null, true);
 
         } catch (oExcecao) {
             this.oUtil.tratarExcecao(oExcecao);
@@ -162,17 +164,6 @@ export class AreaDados extends Component {
             let parametrosHTTPS = this.oComunicacaoHTTP.getParametrosHTTPS(oDadosParametros);
             parametrosHTTPS.uri = oDadosContrato.url_pdf;
             const source = parametrosHTTPS;
-            //{ 
-               // uri: oDadosContrato.url_pdf,
-                // method: 'POST',
-                // headers: {
-                // Accept: 'application/json',
-                // 'Content-Type': 'application/json',
-                // },
-                // body: JSON.stringify({
-                //     'dados_app' : oDadosApp,
-                // })
-            //}
         
             areaContrato = <Pdf
                     source={source}

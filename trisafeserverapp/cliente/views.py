@@ -9,6 +9,7 @@ from gerenciadorlog.views import GerenciadorLogViewSet
 from rest_framework.renderers import JSONRenderer
 from comum.retorno import Retorno
 from comum.credencial import Credencial
+from autenticacaotrisafe.views import AutenticacaoTriSafeViewSet
 import json
 import traceback
 import sys
@@ -19,9 +20,14 @@ class ClienteSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('cpf', 'email', 'nome', 'endereco')
 
 # ViewSets define the view behavior.
-class ClienteViewSet(viewsets.ModelViewSet, permissions.BasePermission):
+class ClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissions.BasePermission):
     queryset = Cliente.objects.all()
     serializer_class = ClienteSerializer
+
+    # def initialize_request(self, request, *args, **kwargs):
+        
+    #     r = super().initialize_request(request, *args, **kwargs)
+    #     return r
     
     @action(detail=False, methods=['post'])
     def obter(self, request):
