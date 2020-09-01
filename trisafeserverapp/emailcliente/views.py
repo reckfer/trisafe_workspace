@@ -7,6 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import mixins
 from emailcliente.models import EmailCliente
+from autenticacaotrisafe.views import AutenticacaoTriSafeViewSet
 from gerenciadorlog.views import GerenciadorLogViewSet
 from contrato.models import Contrato
 from rest_framework.renderers import JSONRenderer
@@ -22,7 +23,7 @@ class EmailClienteSerializer(serializers.HyperlinkedModelSerializer):
         fields = ()
 
 # ViewSets define the view behavior.
-class EmailClienteViewSet(viewsets.ModelViewSet, permissions.BasePermission):
+class EmailClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissions.BasePermission):
     queryset = Contrato.objects.all() # Adequar esta queryset
     serializer_class = EmailClienteSerializer
     

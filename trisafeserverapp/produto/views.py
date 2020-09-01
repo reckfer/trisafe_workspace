@@ -7,6 +7,7 @@ from rest_framework import mixins
 from produto.models import Produto
 from cliente.models import Cliente
 from gerenciadorlog.views import GerenciadorLogViewSet
+from autenticacaotrisafe.views import AutenticacaoTriSafeViewSet
 from rest_framework.renderers import JSONRenderer
 from comum.retorno import Retorno
 import json
@@ -19,7 +20,7 @@ class ProdutoSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('codigo', 'nome')
 
 # ViewSets define the view behavior.
-class ProdutoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
+class ProdutoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissions.BasePermission):
     queryset = Produto.objects.all()
     serializer_class = ProdutoSerializer
     

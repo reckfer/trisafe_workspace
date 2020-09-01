@@ -189,7 +189,7 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
         d_cliente = d_dados_app['cliente']        
         m_cliente.cpf = d_cliente['cpf']
 
-        m_cliente.credencial = ClienteViewSet.apropriar_credenciais_http(request)
+        m_cliente.credencial = ClienteViewSet.apropriar_credenciais_iter_http(request)
         
         return m_cliente
 

@@ -36,7 +36,7 @@ class ClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
             v_gerenciador_log.registrar_do_cliente(request)
 
             m_cliente = ClienteViewSet.apropriar_dados_http_chave(request)
-            m_cliente.credencial = ClienteViewSet.apropriar_credenciais_http(request)
+            m_cliente.credencial = ClienteViewSet.apropriar_credenciais_iter_http(request)
 
             retorno_cliente = m_cliente.obter()
             return Response(retorno_cliente.json())
@@ -54,7 +54,7 @@ class ClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
             v_gerenciador_log.registrar_do_cliente(request)
 
             m_cliente = ClienteViewSet.apropriar_dados_http(request)
-            m_cliente.credencial = ClienteViewSet.apropriar_credenciais_http(request)
+            m_cliente.credencial = ClienteViewSet.apropriar_credenciais_iter_http(request)
 
             retorno_cliente = m_cliente.obter_ultimo()
             
@@ -72,7 +72,7 @@ class ClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
             v_gerenciador_log.registrar_do_cliente(request)
             
             m_cliente = ClienteViewSet.apropriar_dados_http(request)
-            m_cliente.credencial = ClienteViewSet.apropriar_credenciais_http(request)
+            m_cliente.credencial = ClienteViewSet.apropriar_credenciais_iter_http(request)
             
             retorno = m_cliente.incluir()
 
@@ -91,7 +91,7 @@ class ClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
             v_gerenciador_log.registrar_do_cliente(request)
             
             m_cliente = ClienteViewSet.apropriar_dados_http(request)
-            m_cliente.credencial = ClienteViewSet.apropriar_credenciais_http(request)
+            m_cliente.credencial = ClienteViewSet.apropriar_credenciais_iter_http(request)
             
             retorno = m_cliente.alterar()
 
@@ -133,7 +133,7 @@ class ClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
         return m_cliente
     
     @classmethod
-    def apropriar_credenciais_http(cls, request):
+    def apropriar_credenciais_iter_http(cls, request):
         chave_iter = ''
         token_iter = ''
         

@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import mixins
 from boletogerencianet.models import BoletoGerenciaNet
 from gerenciadorlog.views import GerenciadorLogViewSet
+from autenticacaotrisafe.views import AutenticacaoTriSafeViewSet
 from rest_framework.renderers import JSONRenderer
 from comum.retorno import Retorno
 from contrato.models import Contrato
@@ -20,7 +21,7 @@ class BoletoSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('charge_id')
 
 # ViewSets define the view behavior.
-class BoletoViewSet(viewsets.ModelViewSet, permissions.BasePermission):
+class BoletoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissions.BasePermission):
     queryset = BoletoGerenciaNet.objects.all()
     serializer_class = BoletoSerializer
     
