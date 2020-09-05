@@ -25,7 +25,7 @@ SECRET_KEY = '4coujo21&xdamy+in7!lwakm%@u*-%jz_ou4qgbqe1)zktrkqz'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["192.168.43.84", "192.168.0.104", "192.168.0.104", "localhost"]
+ALLOWED_HOSTS = ["192.168.43.84", "192.168.1.118", "192.168.1.118", "localhost"]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -90,6 +90,65 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'trisafeserverapp.wsgi.application'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} [pid: {process:d}] [tid: {thread:d}] [{pathname} : {funcName}(): {lineno}]  >  {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{asctime} {message}',
+            'style': '{',
+        },
+    },
+
+    'handlers': {
+        'django_log': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'maxBytes': 1000000,
+            'backupCount': 10,
+            'filename': os.path.join(BASE_DIR, 'django_servidor.log'),
+            'formatter': 'verbose'
+        },
+        'cliente_app_fluxo': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, 'cliente_app_fluxo.log'),
+            'maxBytes': 1000000,
+            'backupCount': 10,
+            'formatter': 'verbose'
+        },
+        'servidor_app_fluxo': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, 'servidor_app_fluxo.log'),
+            'maxBytes': 1000000,
+            'backupCount': 10,
+            'formatter': 'verbose'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['django_log'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'cliente.app.fluxo': {
+            'handlers': ['cliente_app_fluxo'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'servidor.app.fluxo': {
+            'handlers': ['servidor_app_fluxo'],
+            'level': 'DEBUG',
+            'propagate': False,
+        }
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases

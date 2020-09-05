@@ -23,11 +23,12 @@ export default class ComunicacaoHTTP {
 
     getURL(metodo){
         protocol = 'https://';
-        domain = 'trisafeserverherokua.herokuapp.com';
+        // domain = 'trisafeserverherokua.herokuapp.com';
+        domain = 'app.trisafe.com.br';
 
         if (__DEV__) {
             protocol = 'http://';
-            domain = '192.168.0.104:8000';
+            domain = '192.168.1.118:8000';
         }
         return protocol + domain + metodo;
     };
@@ -42,7 +43,8 @@ export default class ComunicacaoHTTP {
         return {
             method: metodo,
             headers: {
-                Authorization: 'Token 23012c910306ed668eed49155e8651f8ec92220a',
+                // Authorization: 'Token 3f7edf70591040bf58437b0cc5d986972ced732e',
+                Authorization: 'Token 4e2293199e1797f16aef2c474e684ab32bd7640d',
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
             },

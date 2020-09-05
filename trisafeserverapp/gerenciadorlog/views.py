@@ -14,12 +14,16 @@ from comum.retorno import Retorno
 import json
 import traceback
 import sys
+import logging
 
 # Create your views here.
 class GerenciadorLogSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = GerenciadorLog
         fields = ()
+
+# Get an instance of a logger
+logger_servidor_app_fluxo = logging.getLogger('servidor.app.fluxo')
 
 # ViewSets define the view behavior.
 class GerenciadorLogViewSet(viewsets.ModelViewSet, permissions.BasePermission):
@@ -29,9 +33,11 @@ class GerenciadorLogViewSet(viewsets.ModelViewSet, permissions.BasePermission):
     @action(detail=False, methods=['post'])
     def registrar_do_cliente(self, request):
         try:
+            logger_servidor_app_fluxo.debug('iniciou')
+
             retorno = Retorno(True)
             if 'registros_log' in request.data:
-                m_gerenciador_log = GerenciadorLog('')
+                m_gerenciador_log = GerenciadorLog()
                 
                 d_registros_log = request.data['registros_log']
             
@@ -43,7 +49,7 @@ class GerenciadorLogViewSet(viewsets.ModelViewSet, permissions.BasePermission):
                     },
                     {
                         'data_hora' : '',
-                        'mensagem_log' : '++++++++  REGISTROS DO CLIENTE +++++++'
+                        'mensagem_log' : '++++++++ REGISTROS DO CLIENTE - INICIO +++++++'
                     },
                     {
                         'data_hora' : '',
@@ -59,7 +65,7 @@ class GerenciadorLogViewSet(viewsets.ModelViewSet, permissions.BasePermission):
                     },
                     {
                         'data_hora' : '',
-                        'mensagem_log' : '++++++++  FIM DOS REGISTROS DO CLIENTE +++++++'
+                        'mensagem_log' : '-------- REGISTROS DO CLIENTE - FIM --------'
                     },
                     {
                         'data_hora' : '',
@@ -67,6 +73,8 @@ class GerenciadorLogViewSet(viewsets.ModelViewSet, permissions.BasePermission):
                     }]
                     retorno = m_gerenciador_log.registrar(d_registro_final)
             
+            logger_servidor_app_fluxo.debug('finalizou')
+
             return Response(retorno.json())
             
         except Exception as e:
