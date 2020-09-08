@@ -1,4 +1,5 @@
 import os, email, smtplib, ssl
+import sys
 import traceback
 from email import encoders
 from email.mime.base import MIMEBase
@@ -13,7 +14,7 @@ class EmailCliente:
         port = 465  # For SSL
         smtp_server = "smtp.gmail.com"
         sender_email = "nandorex@gmail.com"  # Enter your address
-        receiver_email = "fernando.r@outlook.com"  # Enter receiver address
+        receiver_email = ["Fernando Reckziegel <fernando.r@outlook.com>", "Fernando Reckziegel <nandoziegel@yahoo.com.br>", "Fernando Reckziegel <nandorex@gmail.com>"]
         password = "asztgusvpybxlfxm"
         message = """\
         Subject: Bem vindo a TriSafe
@@ -41,13 +42,13 @@ class EmailCliente:
             body = "Veja seus anexos."
             smtp_server = "smtp.gmail.com"
             sender_email = "nandorex@gmail.com"
-            receiver_email = "fernando.r@outlook.com"
+            receiver_email = ["Fernando Reckziegel <fernando.r@outlook.com>", "Fernando Reckziegel <nandoziegel@yahoo.com.br>", "Fernando Reckziegel <nandorex@gmail.com>"]
             password = "asztgusvpybxlfxm"
 
             # Create a multipart message and set headers
             message = MIMEMultipart()
             message["From"] = sender_email
-            message["To"] = receiver_email
+            message["To"] = ', '.join(receiver_email)
             message["Subject"] = subject
             # message["Bcc"] = receiver_email  # Recommended for mass emails
 
@@ -71,8 +72,8 @@ class EmailCliente:
 
             # Add header as key/value pair to attachment part
             part.add_header(
-                "Content-Disposition",
-                f"attachment; filename= {nome_arquivo}",
+                'Content-Disposition',
+                'attachment; filename= %s' % (nome_arquivo),
             )
 
             # Add attachment to message and convert message to string

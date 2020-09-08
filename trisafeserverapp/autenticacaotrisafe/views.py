@@ -18,6 +18,10 @@ from autenticacaotrisafe.models import ExceptionAutenticacaoTriSafe
 import json
 import traceback
 import sys
+import logging
+from django_wsgi import middleware
+
+logger_servidor_app_fluxo = logging.getLogger('servidor.app.fluxo')
 
 # Create your views here.
 class AutenticacaoTriSafeSerializer(serializers.HyperlinkedModelSerializer):
@@ -32,6 +36,7 @@ class AutenticacaoTriSafeViewSet(viewsets.ModelViewSet, permissions.BasePermissi
 
     # Sobrescreve para fazer autenticacao com a Trisafe.
     def initial(self, request, *args, **kwargs):
+        logger_servidor_app_fluxo.warning('Iniciando autenticacao Trisafe')
         init = super().initial(request, *args, **kwargs)
 
         if not (request.stream.path == '/autenticacoestrisafe/autenticar_cliente/'):

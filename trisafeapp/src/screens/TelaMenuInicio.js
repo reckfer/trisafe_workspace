@@ -36,7 +36,11 @@ export default class TelaMenuInicio extends Component {
 
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
+            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
             this.oConfiguracao = new Configuracao(this.oGerenciadorContextoApp, this);
+
+            this.texto_instrucao = 'Bem vindo a Trisafe.';
+            this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
 
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
@@ -64,7 +68,7 @@ export default class TelaMenuInicio extends Component {
     }
 
     irParaMeusVeiculos() {
-        this.oNavegacao.navigate('Veiculo Inicio', this.state);
+        this.oNavegacao.navigate('Veículo Inicio', this.state);
     }
 
     render() {

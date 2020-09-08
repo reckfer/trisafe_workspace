@@ -52,7 +52,7 @@ export default class Configuracao {
 
                 let oDadosParametros = JSON.stringify(oDadosChaves);
 
-                this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.apropriarToken, true, true);
+                this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.apropriarToken, true, false);
             }
         } catch (oExcecao) {
             this.oUtil.tratarExcecao(oExcecao);
@@ -60,7 +60,7 @@ export default class Configuracao {
     }
 
     apropriarToken(oDados, oEstado) {
-        this.oDadosInstrucao.texto_instrucao = 'A autenticação falhou.';
+        this.oDadosInstrucao.texto_instrucao = 'A autenticação com o servidor falhou.';
 
         if(oEstado && oEstado.ok && 
             this.oDadosChaves && 

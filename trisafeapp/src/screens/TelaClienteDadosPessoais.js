@@ -40,7 +40,9 @@ export default class TelaClienteDadosPessoais extends Component {
 
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
-        this.oDadosInstrucao.texto_instrucao = 'Informe seus dados pessoais.';
+        
+        this.texto_instrucao = 'Informe seus dados pessoais.';
+        this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
 
         this.voltar = this.voltar.bind(this);
         this.avancar = this.avancar.bind(this);

@@ -49,7 +49,7 @@ export const DADOS_CONTROLE_APP = {
 };
 
 export const DADOS_INSTRUCAO_USUARIO = {
-    'texto_instrucao': 'Bem vindo a Trisafe.'
+    'texto_instrucao': '',
 };
 
 export const CHAVES = {

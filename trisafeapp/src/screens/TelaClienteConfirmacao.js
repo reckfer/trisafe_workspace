@@ -47,7 +47,9 @@ export default class TelaClienteConfirmacao extends Component {
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
         this.voltar = this.voltar.bind(this);
 
-        this.oDadosInstrucao.texto_instrucao = 'Confirme seus dados.';
+        this.texto_instrucao = 'Confirme seus dados.';
+        this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
+        
         this.oRegistradorLog.registrar('TelaClienteConfirmacao.constructor() => Finalizou.');
     }
 
@@ -68,12 +70,13 @@ export default class TelaClienteConfirmacao extends Component {
     }
 
     tratarDadosRetorno(oDados, oEstado) {
-
+        
         if (oEstado.mensagem && oEstado.mensagem.trim()){
             Alert.alert('Trisafe', oEstado.mensagem);
         }
                 
         if(oEstado.ok) {
+            this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
             this.oDadosControleApp.novo_cadastro = false;
             this.oNavegacao.navigate('Produtos', this.state);
         }

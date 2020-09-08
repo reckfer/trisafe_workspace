@@ -38,6 +38,7 @@ export default class TelaBoletoEmissao extends Component {
             this.oRegistradorLog.registrar('TelaBoletoEmissao.constructor() => Iniciou.');
 
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
+            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
             this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
             this.oUtil = new Util();
@@ -50,6 +51,9 @@ export default class TelaBoletoEmissao extends Component {
         this.finalizar = this.finalizar.bind(this);
         this.tratarRetornoEmail = this.tratarRetornoEmail.bind(this);
         this.voltar = this.voltar.bind(this);
+
+        this.texto_instrucao = 'Contratação finalizada. Obrigado.';
+        this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
 
         this.oRegistradorLog.registrar('TelaBoletoEmissao.constructor() => Finalizou.');
     }
@@ -105,7 +109,7 @@ export default class TelaBoletoEmissao extends Component {
     }
 
     botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;        
-    botaoFinalizar = () => <Button title="Finalizar" onPress={this.finalizar}></Button>;
+    botaoFinalizar = () => <Button title="Finalizar" onPress={this.finalizar} loading={this.oDadosControleApp.processando_requisicao}></Button>;
 
     render() {
 

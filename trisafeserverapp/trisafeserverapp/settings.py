@@ -25,7 +25,7 @@ SECRET_KEY = '4coujo21&xdamy+in7!lwakm%@u*-%jz_ou4qgbqe1)zktrkqz'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["192.168.43.84", "192.168.1.118", "192.168.1.118", "localhost"]
+ALLOWED_HOSTS = ["192.168.43.84", "192.168.0.104", "192.168.0.104", "localhost"]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -114,6 +114,14 @@ LOGGING = {
             'filename': os.path.join(BASE_DIR, 'django_servidor.log'),
             'formatter': 'verbose'
         },
+        'django_request_log': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'maxBytes': 1000000,
+            'backupCount': 10,
+            'filename': os.path.join(BASE_DIR, 'django_request.log'),
+            'formatter': 'verbose'
+        },
         'cliente_app_fluxo': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
@@ -135,7 +143,12 @@ LOGGING = {
         'django': {
             'handlers': ['django_log'],
             'level': 'INFO',
-            'propagate': False,
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['django_request_log'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
         'cliente.app.fluxo': {
             'handlers': ['cliente_app_fluxo'],

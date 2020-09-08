@@ -36,7 +36,7 @@ export default class TelaProdutoEscolha extends Component {
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
             this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
             this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
-            this.oUtil = new Util();
+            this.oUtil = new Util(this.oGerenciadorContextoApp);
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
         
@@ -50,12 +50,17 @@ export default class TelaProdutoEscolha extends Component {
         this.tratarIncluirContrato = this.tratarIncluirContrato.bind(this);
         this.voltar = this.voltar.bind(this);
         
-        this.oDadosInstrucao.texto_instrucao = 'Produtos TriSafe a contratar.';
+        this.texto_instrucao = 'Produtos TriSafe a contratar.';
+        this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
         this.oRegistradorLog.registrar('TelaProdutoEscolha.constructor() => Finalizou.');
     }
 
     componentDidMount() {
         this.listarProdutos();
+    }
+
+    componentDidUpdate() {
+        this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
     }
 
     listarProdutos(){

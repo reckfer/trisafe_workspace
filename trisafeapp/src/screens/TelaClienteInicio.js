@@ -39,14 +39,17 @@ export default class TelaClienteInicio extends Component {
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
             this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
             this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
-            this.oUtil = new Util();
+            this.oUtil = new Util(this.oGerenciadorContextoApp);
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
         
         this.obterCliente = this.obterCliente.bind(this);
         this.tratarDadosCliente = this.tratarDadosCliente.bind(this);
         this.irParaTestesRapidos = this.irParaTestesRapidos.bind(this);
-        this.oDadosInstrucao.texto_instrucao = 'Informe seu CPF ou e-mail para iniciar.';
+
+        this.texto_instrucao = 'Informe seu CPF ou e-mail para iniciar.';
+        this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
+        
         this.oRegistradorLog.registrar('TelaClienteInicio.constructor() => Finalizou.');
     }
 

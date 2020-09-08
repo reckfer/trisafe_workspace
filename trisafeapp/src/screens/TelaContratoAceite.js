@@ -38,6 +38,7 @@ export default class TelaContratoAceite extends Component {
             this.oRegistradorLog.registrar('TelaContratoAceite.constructor() => Iniciou.');
 
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
+            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
             this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
             this.oUtil = new Util();
@@ -51,6 +52,8 @@ export default class TelaContratoAceite extends Component {
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
         this.voltar = this.voltar.bind(this);
 
+        this.texto_instrucao = 'Contrato de serviço de rastreamento.'
+        this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
         this.oRegistradorLog.registrar('TelaContratoAceite.constructor() => Finalizou.');
     }
     
@@ -133,7 +136,6 @@ export class AreaDados extends Component {
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
 
-        this.oDadosInstrucao.texto_instrucao = 'Contrato de serviço de rastreamento.';
         this.excluirArquivoContrato = this.excluirArquivoContrato.bind(this);
     }
 

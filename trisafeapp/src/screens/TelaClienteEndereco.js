@@ -45,7 +45,8 @@ export default class TelaClienteEndereco extends Component {
         this.avancar = this.avancar.bind(this);
         this.voltar = this.voltar.bind(this);
         
-        this.oDadosInstrucao.texto_instrucao = 'Informe seu endereço.';
+        this.texto_instrucao = 'Informe seu endereço.';
+        this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
 
         this.oRegistradorLog.registrar('TelaClienteEndereco.constructor() => Finalizou.');
     }

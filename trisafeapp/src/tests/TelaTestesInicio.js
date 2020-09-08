@@ -32,9 +32,11 @@ export default class TelaTestesInicio extends Component {
             this.oRegistradorLog.registrar('TelaTestesInicio.constructor() => Iniciou.');
 
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
+            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
+            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
             this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
-            this.oUtil = new Util();
+            this.oUtil = new Util(this.oGerenciadorContextoApp);
+
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;            
         }
         
@@ -55,6 +57,9 @@ export default class TelaTestesInicio extends Component {
         this.gerarDadosTestes = this.gerarDadosTestes.bind(this);
         this.voltar = this.voltar.bind(this);
         
+        this.texto_instrucao = 'Selecione a opção de teste.';
+        this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
+
         this.oRegistradorLog.registrar('TelaTestesInicio.constructor() => Finalizou.');
     }
 
@@ -70,6 +75,7 @@ export default class TelaTestesInicio extends Component {
     }
 
     irParaTesteCadastroIter() {
+        this.oNavegacao.popToTop();
         this.oNavegacao.navigate('Cadastro', this.state);
     }
 

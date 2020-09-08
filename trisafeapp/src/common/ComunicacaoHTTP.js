@@ -10,8 +10,10 @@ export default class ComunicacaoHTTP {
 
         if(gerenciadorContexto) {
             this.oGerenciadorContextoApp = gerenciadorContexto;
-            this.oDadosChaves = this.oGerenciadorContextoApp.dadosApp.chaves;
+            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
+            this.oDadosChaves = this.oDadosApp.chaves;
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
+            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
             this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;
             this.oUtil = new Util(this.oGerenciadorContextoApp);
         }
@@ -28,7 +30,7 @@ export default class ComunicacaoHTTP {
 
         if (__DEV__) {
             protocol = 'http://';
-            domain = '192.168.1.118:8000';
+            domain = '192.168.0.104:8000';
         }
         return protocol + domain + metodo;
     };
@@ -43,9 +45,9 @@ export default class ComunicacaoHTTP {
         return {
             method: metodo,
             headers: {
-                // Authorization: 'Token 3f7edf70591040bf58437b0cc5d986972ced732e',
-                Authorization: 'Token 4e2293199e1797f16aef2c474e684ab32bd7640d',
-                Accept: 'application/json',
+                //'Authorization': 'Token 3f7edf70591040bf58437b0cc5d986972ced732e',
+                'Authorization': 'Token 4e2293199e1797f16aef2c474e684ab32bd7640d',
+                'Accept': 'application/json',
                 'Content-Type': 'application/json',
             },
             body: oDados,
@@ -56,6 +58,8 @@ export default class ComunicacaoHTTP {
         this.oDadosControleApp.processando_requisicao = true;
         
         if(this.oComponente) {
+            this.oComponente.texto_instrucao = this.oDadosInstrucao.texto_instrucao;
+            this.oDadosInstrucao.texto_instrucao = 'Processando. Aguarde...';
             this.oGerenciadorContextoApp.atualizarEstadoTela(this.oComponente);
         }
         
@@ -147,6 +151,8 @@ export default class ComunicacaoHTTP {
         this.oDadosControleApp.processando_requisicao = false;
             
         if(this.oComponente) {
+            
+            this.oDadosInstrucao.texto_instrucao = this.oComponente.texto_instrucao;
             this.oGerenciadorContextoApp.atualizarEstadoTela(this.oComponente);
         }
         
