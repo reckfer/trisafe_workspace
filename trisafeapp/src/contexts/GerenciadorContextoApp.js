@@ -1,4 +1,5 @@
-import { DADOS_APP_GERAL } from './DadosAppGeral';
+'use strict';
+import { DADOS_APP_GERAL, clonarObjeto } from './DadosAppGeral';
 import RegistradorLog from './RegistradorLog';
 import { AppState } from 'react-native';
 
@@ -15,7 +16,7 @@ export default class GerenciadorContextoApp {
         this.temDados = this.temDados.bind(this);
         this._atribuirDadosObjeto = this._atribuirDadosObjeto.bind(this);
         this._atribuir = this._atribuir.bind(this);
-        this._clonarObjeto = this._clonarObjeto.bind(this);
+        //this._clonarObjeto = this._clonarObjeto.bind(this);
         this._transportarLogServidor = this._transportarLogServidor.bind(this);
         this.oTelaAtual = null;
         this.oTelaAnterior = null;
@@ -73,6 +74,7 @@ export default class GerenciadorContextoApp {
         }
 
         if(oTela && this.oDadosReferencia) {
+            console.log('Atualizando estado tela.');
             oTela.setState(this.oDadosReferencia);
         }
     };
@@ -142,13 +144,13 @@ export default class GerenciadorContextoApp {
                     oItemArray = oArrayDados[0];
                     oDadosItemModelo = {};
                     oArrayAtribuir = oDadosAtribuir[campo];                        
-                    campoItem = Object.keys(oItemArray)[0];                    
-                    oDadosItemModelo = this._clonarObjeto(oItemArray);
+                    //campoItem = Object.keys(oItemArray)[0];                    
+                    oDadosItemModelo = clonarObjeto(oItemArray);//this._clonarObjeto(oItemArray);
                     oArrayDados.length = 0;
-
+                    
                     for(let i = 0; i < oArrayAtribuir.length; i++) {
                         oDadosItem = {};
-                        for(campoNovo in oDadosItemModelo) {
+                        for(let campoNovo in oDadosItemModelo) {
                             oDadosItem[campoNovo] = '';
                         }
                         
@@ -242,28 +244,17 @@ export default class GerenciadorContextoApp {
     };
 
     _atribuirDadosObjeto(oObjetoReceber, oDadosAtribuir) {        
-        for(campo in oObjetoReceber) {
+        for(let campo in oObjetoReceber) {
             oObjetoReceber[campo] = this._atribuir(campo, oDadosAtribuir);
         }
     };
 
     _atribuir(nomeAtributo, oDadosAtribuir) {
-        for(campo in oDadosAtribuir) {
+        for(let campo in oDadosAtribuir) {
             if(nomeAtributo === campo) {
                 return oDadosAtribuir[nomeAtributo];
             }
         }
-    };
-
-    /*** FUNCOES AUXILIARES ****/
-    _clonarObjeto(objeto) {
-        let novoObjeto = {};
-
-        // Copia o modelo do objeto.
-        for(campoNovo in objeto) {
-            novoObjeto[campoNovo] = '';
-        }
-        return novoObjeto;
     };
 
     _transportarLogServidor() {

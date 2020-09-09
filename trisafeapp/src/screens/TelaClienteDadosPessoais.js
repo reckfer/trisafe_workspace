@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Componente de tela para dados de cliente
  *

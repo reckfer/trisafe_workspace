@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Componente de tela para dados de cliente
  *
@@ -41,7 +42,7 @@ export default class TelaBoletoEmissao extends Component {
             this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
             this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
-            this.oUtil = new Util();
+            this.oUtil = new Util(this.oGerenciadorContextoApp);
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
 

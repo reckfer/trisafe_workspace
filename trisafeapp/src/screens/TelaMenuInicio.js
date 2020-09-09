@@ -1,10 +1,10 @@
+'use strict';
 /**
  * Componente de tela para dados de cliente
  *
  * @format
  * @flow
  */
-
 import React, { Component } from 'react';
 import { Button } from 'react-native-elements';
 import { clonarObjeto } from '../contexts/DadosAppGeral';

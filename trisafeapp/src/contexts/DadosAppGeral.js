@@ -1,3 +1,4 @@
+'use strict';
 export const DADOS_CLIENTE = {
     'id_cliente_iter': '',
     'cpf': '', 
@@ -41,11 +42,19 @@ export const DADOS_BOLETO = {
     'url_html': '',
 };
 
+export const DADOS_FOTOS = {
+    'uri_local_cnh': '',
+    'foto_cnh_base64': '',    
+    'uri_local_doc_veiculo': '',
+    'foto_doc_veiculo': '',
+};
+
 export const DADOS_CONTROLE_APP = {
     'em_producao': false,
     'processando_requisicao': false,
     'novo_cadastro': true,
-    'autenticado': false
+    'autenticado': false,
+    'exibir_foto': true,
 };
 
 export const DADOS_INSTRUCAO_USUARIO = {
@@ -67,6 +76,7 @@ export const DADOS_APP_GERAL = {
         boleto: DADOS_BOLETO,
         controle_app: DADOS_CONTROLE_APP,
         instrucao_usuario: DADOS_INSTRUCAO_USUARIO,
+        fotos: DADOS_FOTOS,
         chaves: CHAVES,
     },
     registros_log: null,

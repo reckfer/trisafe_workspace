@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Componente de tela para dados de cliente
  *
@@ -12,11 +13,11 @@ import {
     View,
     Text,
 } from 'react-native';
-import ComunicacaoHTTP from './../common/ComunicacaoHTTP';
+import ComunicacaoHTTP from '../common/ComunicacaoHTTP';
 import { ThemeProvider, Button, Card, CheckBox, Divider } from 'react-native-elements';
-import Cabecalho from './../common/CabecalhoTela';
-import { styles, theme } from './../common/Estilos';
-import AreaRodape from './../common/AreaRodape';
+import Cabecalho from '../common/CabecalhoTela';
+import { styles, theme } from '../common/Estilos';
+import AreaRodape from '../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Util from '../common/Util';

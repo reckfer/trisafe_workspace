@@ -1,3 +1,4 @@
+'use strict';
 export const CONFIG_LOG = {
     'ativo': true,
     'nivel': 0,

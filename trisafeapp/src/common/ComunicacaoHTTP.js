@@ -1,3 +1,4 @@
+'use strict';
 import {
     Alert,
 } from 'react-native';
@@ -24,9 +25,9 @@ export default class ComunicacaoHTTP {
     };
 
     getURL(metodo){
-        protocol = 'https://';
+        let protocol = 'https://';
         // domain = 'trisafeserverherokua.herokuapp.com';
-        domain = 'app.trisafe.com.br';
+        let domain = 'app.trisafe.com.br';
 
         if (__DEV__) {
             protocol = 'http://';
@@ -73,7 +74,7 @@ export default class ComunicacaoHTTP {
                 this.tratarRetornoServidor(oJsonDados, oFuncaoCallback, suprimirMsgServidor, ignorarCallbackSeErro);
             })
             .catch((oExcecao) => {
-                this.oUtil.tratarExecacao(oExcecao);
+                this.oUtil.tratarExcecao(oExcecao);
             });
     };
 
@@ -92,7 +93,7 @@ export default class ComunicacaoHTTP {
                     }
                 }
             ).catch((oExcecao) => {
-                this.oUtil.tratarExecacao(oExcecao);
+                this.oUtil.tratarExcecao(oExcecao);
             });
     };
 
@@ -115,7 +116,7 @@ export default class ComunicacaoHTTP {
                     oFuncaoCallback();
                 }
             }).catch((oExcecao) => {
-                this.oUtil.tratarExecacao(oExcecao);
+                this.oUtil.tratarExcecao(oExcecao);
             });
     };
     

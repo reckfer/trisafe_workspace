@@ -1,3 +1,4 @@
+'use strict';
 import { DADOS_LOG_GERAL } from './DadosAppLog';
 import ComunicacaoHTTP from '../common/ComunicacaoHTTP';
 import Util from '../common/Util';

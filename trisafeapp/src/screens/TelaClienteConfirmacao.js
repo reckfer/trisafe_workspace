@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Componente de tela para dados de cliente
  *
@@ -76,9 +77,9 @@ export default class TelaClienteConfirmacao extends Component {
         }
                 
         if(oEstado.ok) {
-            this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
+            //this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
             this.oDadosControleApp.novo_cadastro = false;
-            this.oNavegacao.navigate('Produtos', this.state);
+            this.oNavegacao.navigate('Foto CNH', this.state);
         }
     }
      

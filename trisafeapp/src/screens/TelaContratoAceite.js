@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Componente de tela para dados de cliente
  *
@@ -41,7 +42,7 @@ export default class TelaContratoAceite extends Component {
             this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
             this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
-            this.oUtil = new Util();
+            this.oUtil = new Util(this.oGerenciadorContextoApp);
             this.oDadosControleApp.processando_requisicao = false;
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
@@ -132,7 +133,7 @@ export class AreaDados extends Component {
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
             this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp);
-            this.oUtil = new Util();
+            this.oUtil = new Util(this.oGerenciadorContextoApp);
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
 

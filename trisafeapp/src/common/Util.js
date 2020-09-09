@@ -1,3 +1,4 @@
+'use strict';
 import { Alert } from "react-native";
 
 export default class Util {
@@ -18,7 +19,7 @@ export default class Util {
 
     tratarExcecao(oExcecao) {
         
-        this.oRegistradorLog.registrar(`Util.tratarExcecao() ${oExcecao.stack}`);
+        this.oRegistradorLog.registrar(`Util.tratarExcecao() ${oExcecao.message}. Stack: ${oExcecao.stack}`);
 
         Alert.alert('TriSafe', `Algo deu errado. ${oExcecao.message}`);
     }

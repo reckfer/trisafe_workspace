@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Componente de cabecalho padrão de uma tela.
  *

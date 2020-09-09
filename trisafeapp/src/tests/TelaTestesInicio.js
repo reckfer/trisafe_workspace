@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Componente de tela para dados de cliente
  *
@@ -50,9 +51,11 @@ export default class TelaTestesInicio extends Component {
         this.irParaTesteBoletoGerenciaNet = this.irParaTesteBoletoGerenciaNet.bind(this);        
         this.irParaTesteGeraContratoPDF = this.irParaTesteGeraContratoPDF.bind(this);
         this.irParaTesteContratoPDF = this.irParaTesteContratoPDF.bind(this);
+        this.irParaTesteFotoCNH = this.irParaTesteFotoCNH.bind(this);
+        this.irParaTesteFotoDocVeiculo = this.irParaTesteFotoDocVeiculo.bind(this);
         this.obterUltimoCliente = this.obterUltimoCliente.bind(this);        
-        this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
         this.obterContratoPorCliente = this.obterContratoPorCliente.bind(this);
+        this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
         this.tratarDadosRetornoContrato = this.tratarDadosRetornoContrato.bind(this);
         this.gerarDadosTestes = this.gerarDadosTestes.bind(this);
         this.voltar = this.voltar.bind(this);
@@ -89,6 +92,14 @@ export default class TelaTestesInicio extends Component {
 
     irParaTesteContratoPDF() {
         this.oNavegacao.navigate('Contrato', this.state);
+    }
+
+    irParaTesteFotoCNH() {
+        this.oNavegacao.navigate('Foto CNH', this.state);
+    }
+
+    irParaTesteFotoDocVeiculo() {
+        //this.oNavegacao.navigate('Foto CNH', this.state);
     }
 
     obterUltimoCliente() {
@@ -154,10 +165,12 @@ export default class TelaTestesInicio extends Component {
         this.oNavegacao.goBack();
     }
     
-    botaoGerarDados = () => <Button title="Gerar Dados Teste" onPress={this.gerarDadosTestes} ></Button>
     botaoCadastro = () => <Button title="Testar Cadastro" onPress={this.irParaTesteCadastroIter} ></Button>
+    botaoGerarDados = () => <Button title="Gerar Dados Teste" onPress={this.gerarDadosTestes} ></Button>
     botaoContrato = () => <Button title="Testar Contrato" onPress={this.irParaTesteContratoPDF} ></Button>
     botaoBoleto = () => <Button title="Testar Boleto" onPress={this.irParaTesteBoletoGerenciaNet} ></Button>
+    botaoFotoCNH = () => <Button title="Testar Foto CNH" onPress={this.irParaTesteFotoCNH} ></Button>
+    botaoFotoDocVeiculo = () => <Button title="Testar Foto Doc" onPress={this.irParaTesteFotoDocVeiculo} ></Button>
     botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;
     
     render() {
@@ -167,6 +180,9 @@ export default class TelaTestesInicio extends Component {
         let botoesTestes2 = [ 
             { element: this.botaoContrato }, { element: this.botaoBoleto } 
         ];
+        let botoesTestes3 = [ 
+            { element: this.botaoFotoCNH }, { element: this.botaoFotoDocVeiculo } 
+        ];
         let botoesTela = [ 
             { element: this.botaoVoltar }, 
         ];
@@ -174,7 +190,7 @@ export default class TelaTestesInicio extends Component {
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Testes' nomeTela='Início' navigation={this.oNavegacao} />
-                <AreaDados dadosApp={this.oDadosApp} botoesTestes1={botoesTestes1} botoesTestes2={botoesTestes2}/>
+                <AreaDados dadosApp={this.oDadosApp} botoesTestes1={botoesTestes1} botoesTestes2={botoesTestes2} botoesTestes3={botoesTestes3}/>
                 <AreaRodape botoes={botoesTela} mensagem={''}/>
             </View>
         );
@@ -198,7 +214,6 @@ export class AreaDados extends Component {
 
     render() {
         let oDadosCliente = this.props.dadosApp.cliente;
-        //let oFuncoes = this.props.funcoes;
 
         return (
             <View style={styles.areaDadosCliente}>
@@ -208,6 +223,10 @@ export class AreaDados extends Component {
                 />
                 <ButtonGroup
                     buttons={this.props.botoesTestes2}
+                    buttonStyle={ {alignItems: 'stretch'} }
+                />
+                <ButtonGroup
+                    buttons={this.props.botoesTestes3}
                     buttonStyle={ {alignItems: 'stretch'} }
                 />
                 <ScrollView>

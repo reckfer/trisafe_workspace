@@ -1,3 +1,4 @@
+'use strict';
 import React from 'react';
 //import * as React from 'react';
 //import { View, Text } from 'react-native';
@@ -9,7 +10,7 @@ import TelaTestesInicio from '../tests/TelaTestesInicio';
 import TelaClienteDadosPessoais from '../screens/TelaClienteDadosPessoais';
 import TelaClienteEndereco from '../screens/TelaClienteEndereco';
 import TelaClienteConfirmacao from '../screens/TelaClienteConfirmacao';
-import TelaProdutoEscolha from '../screens/TelaProdutoEscolha';
+import TelaFotoCNH from '../screens/TelaFotoCNH';
 import TelaContratoAceite from '../screens/TelaContratoAceite';
 import TelaBoletoEmissao from '../screens/TelaBoletoEmissao';
 import TelaMenuInicio from '../screens/TelaMenuInicio';
@@ -27,7 +28,7 @@ function Cadastro() {
         <Stack.Screen name="Dados pessoais" component={TelaClienteDadosPessoais} />
         <Stack.Screen name="Endereço" component={TelaClienteEndereco} />
         <Stack.Screen name="Confirmação dos dados" component={TelaClienteConfirmacao} />
-        <Stack.Screen name="Produtos" component={TelaProdutoEscolha} />
+        <Stack.Screen name="Foto CNH" component={TelaFotoCNH} />
         <Stack.Screen name="Contrato" component={TelaContratoAceite} />
         <Stack.Screen name="Boleto" component={TelaBoletoEmissao} />
         <Stack.Screen name="Veiculo Inicio" component={TelaVeiculoInicio} />
@@ -43,7 +44,7 @@ function TestesMeuCadastro() {
         <Stack.Screen name="Dados pessoais" component={TelaClienteDadosPessoais} />
         <Stack.Screen name="Endereço" component={TelaClienteEndereco} />
         <Stack.Screen name="Confirmação dos dados" component={TelaClienteConfirmacao} />
-        <Stack.Screen name="Produtos" component={TelaProdutoEscolha} />
+        <Stack.Screen name="Foto CNH" component={TelaFotoCNH} />
         <Stack.Screen name="Contrato" component={TelaContratoAceite} />
         <Stack.Screen name="Boleto" component={TelaBoletoEmissao} />
         <Stack.Screen name="Veiculo Inicio" component={TelaVeiculoInicio} />
@@ -71,25 +72,3 @@ export default function App() {
     </ContextoAppProvider>
   );
 }
-
-// export default function App () {
-    
-//   return (
-//     <ContextoAppProvider>
-//         <NavigationContainer>
-//           <Stack.Navigator headerMode='none'>
-//               <Stack.Screen name="Menu" component={TelaMenuInicio} />
-//               <Stack.Screen name="Cadastro" component={TelaClienteInicio} />
-//               <Stack.Screen name="Testes" component={TelaTestesInicio} />
-//               <Stack.Screen name="Dados pessoais" component={TelaClienteDadosPessoais} />
-//               <Stack.Screen name="Endereço" component={TelaClienteEndereco} />
-//               <Stack.Screen name="Confirmação dos dados" component={TelaClienteConfirmacao} />
-//               <Stack.Screen name="Produtos" component={TelaProdutoEscolha} />
-//               <Stack.Screen name="Contrato" component={TelaContratoAceite} />
-//               <Stack.Screen name="Boleto" component={TelaBoletoEmissao} />
-//               <Stack.Screen name="Veiculo Inicio" component={TelaVeiculoInicio} />
-//           </Stack.Navigator>
-//         </NavigationContainer>
-//     </ContextoAppProvider>
-//   );
-// }
