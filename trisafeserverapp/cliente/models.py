@@ -1,11 +1,14 @@
 import json
 import sys
 import traceback
+import base64
 from django.db import models
 from rest_framework import status
 from clienteiter.models import ClienteIter
+from trisafeserverapp.settings import BASE_DIR
 from comum.retorno import Retorno
 from comum.credencial import Credencial
+import os
 
 class Cliente(models.Model):
     id_cliente_iter = models.IntegerField(primary_key=True)
@@ -169,6 +172,26 @@ class Cliente(models.Model):
             
             retorno = Retorno(True, 'Cadastro atualizado com sucesso.', 200, None, retorno.credencial)
             retorno.dados = m_cliente
+
+            return retorno
+        except Exception as e:
+            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
+                    
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            return retorno
+
+    def salvar_foto_cnh(self, foto_cnh_base64):
+        try:
+            nome_arquivo = "foto_cnh_%s.jpg" % self.cpf
+            caminho_arquivo = os.path.join(BASE_DIR, "data", "contratos", nome_arquivo)
+
+            foto_cnh = base64.b64decode(foto_cnh_base64)
+
+            file = open(caminho_arquivo, 'xb')
+            file.write(foto_cnh)
+            file.close()
+
+            retorno = Retorno(True, 'CNH recebida com sucesso.', 200, None)
 
             return retorno
         except Exception as e:

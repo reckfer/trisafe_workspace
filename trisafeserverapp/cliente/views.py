@@ -103,6 +103,24 @@ class ClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return Response(retorno.json())
 
+    @action(detail=False, methods=['post'])
+    def salvar_foto_cnh(self, request):
+        try:
+            v_gerenciador_log = GerenciadorLogViewSet()
+            v_gerenciador_log.registrar_do_cliente(request)
+
+            m_cliente = ClienteViewSet.apropriar_dados_http_chave(request)
+            foto_cnh_base64 = ClienteViewSet.apropriar_dados_http_foto_cnh(request)
+
+            retorno_cliente = m_cliente.salvar_foto_cnh(foto_cnh_base64)
+            
+            return Response(retorno_cliente.json())
+        except Exception as e:
+            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
+                    
+            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            return Response(retorno.json())
+
     @classmethod
     def apropriar_dados_http_chave(cls, request):
         m_cliente = Cliente()
@@ -147,3 +165,12 @@ class ClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
         credencial.token_iter = token_iter
 
         return credencial
+    
+    @classmethod
+    def apropriar_dados_http_foto_cnh(cls, request):
+        m_cliente = Cliente()
+        
+        d_dados_app = request.data['dados_app']
+        foto_cnh_base64 = d_dados_app['foto_cnh_base64']
+    
+        return foto_cnh_base64
