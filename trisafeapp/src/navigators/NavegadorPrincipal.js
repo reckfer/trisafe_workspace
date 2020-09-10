@@ -39,9 +39,10 @@ function FluxoCadastro() {
 
 function FluxoModais() {
   return (
-    <fluxoModais.Navigator headerMode='none'>
+    <fluxoModais.Navigator headerMode='none' initialRouteName='Testes Cadastro'>
         <fluxoModais.Screen name="Testes Cadastro" component={TelaModalTestesCadastro} />
-        <fluxoModais.Screen name="Visualizar CNH" component={TelaModalVisualizaFotoCNH} />
+        <fluxoModais.Screen name="Visualizacao Foto CNH" component={TelaModalVisualizaFotoCNH} />
+        <fluxoModais.Screen name="Cadastro Cliente" component={FluxoCadastro} />
     </fluxoModais.Navigator>
   );
 }
@@ -56,17 +57,6 @@ function FluxoRaiz() {
     </fluxoRaiz.Navigator>
   );
 }
-
-// const Drawer = createDrawerNavigator();
-
-// function MyDrawer() {
-//   return (
-//     <Drawer.Navigator>
-//       <Drawer.Screen name="Cadastro Cliente" component={Cadastro} />
-//       <Drawer.Screen name="Testes Cadastro Inicio" component={TestesMeuCadastro} />
-//     </Drawer.Navigator>
-//   );
-// }
 
 export default function App() {
   return (

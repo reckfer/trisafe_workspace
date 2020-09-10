@@ -190,7 +190,7 @@ class Cliente(models.Model):
 
             foto_cnh = base64.b64decode(foto_cnh_base64)
 
-            file = open(caminho_arquivo, 'wb')
+            file = open(caminho_arquivo, 'wb+')
             file.write(foto_cnh)
             file.close()
 

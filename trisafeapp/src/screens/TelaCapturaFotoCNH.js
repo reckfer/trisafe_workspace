@@ -18,6 +18,9 @@ import { Button } from 'react-native-elements';
 import { ContextoApp } from '../contexts/ContextoApp';
 import Util from '../common/Util';
 import { RNCamera } from 'react-native-camera';
+import {
+    BarcodeMaskWithOuterLayout
+  } from '@nartc/react-native-barcode-mask';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { clonarObjeto, DADOS_FOTOS } from '../contexts/DadosAppGeral';
@@ -70,7 +73,7 @@ export default class TelaCapturaFotoCNH extends PureComponent {
         if (this.camera) {
             console.log('Tirando foto...');
             
-            const options = { quality: 0.5, base64: true};
+            const options = { quality: 0.5, base64: true, doNotSave: true};
             this.camera.takePictureAsync(options).then((data) => {
                 
                 console.log('Foto tirada: ', data.uri);
@@ -101,6 +104,9 @@ export default class TelaCapturaFotoCNH extends PureComponent {
                     style={styles.preview}
                     type={RNCamera.Constants.Type.back}
                     flashMode={RNCamera.Constants.FlashMode.on}
+                    captureAudio={false}
+                    // rectOfInterest={ {x: .5, y:.5, width:'50%', height:'50%'} }
+                    // cameraViewDimensions={ {width:'50%', height:'50%'} }
                     androidCameraPermissionOptions={{
                         title: 'Permission to use camera',
                         message: 'We need your permission to use your camera',
@@ -116,12 +122,19 @@ export default class TelaCapturaFotoCNH extends PureComponent {
                     onGoogleVisionBarcodesDetected={({ barcodes }) => {
                         console.log(barcodes);
                     }}
-                />
-                <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
-                    <TouchableOpacity onPress={this.capturarFotoCNH} style={styles.capture}>
-                        <Icon name="camera" size={40} color="orange" />
-                    </TouchableOpacity>
-                </View>
+                >
+                    <BarcodeMaskWithOuterLayout
+                        showAnimatedLine={false}
+                        maskOpacity={.7}
+                        width='90%'
+                        height='90%'
+                    />
+                    <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
+                        <TouchableOpacity onPress={this.capturarFotoCNH} style={styles.capture}>
+                            <Icon name="camera" size={40} color="blue" />
+                        </TouchableOpacity>
+                    </View>
+                </RNCamera>
             </View>
         );
     }

@@ -110,13 +110,13 @@ export default class TelaModalVisualizaFotoCNH extends Component {
     
     render() {
         
-        if(this.oDadosApp.fotos.uri_local_cnh) {
+        if(this.oDadosApp.fotos.foto_cnh_base64) {
 
-            console.log('Vai renderizar foto tirada...', this.oDadosApp.fotos.uri_local_cnh);
+            console.log('Vai renderizar foto tirada...');
 
             return(
                 <View style={styles.areaCliente}>
-                    <ImageBackground source={ { uri: this.oDadosApp.fotos.uri_local_cnh }} style={styles.areaCliente} resizeMode='stretch'>
+                    <ImageBackground source={ { uri: `data:image/png;base64,${this.oDadosApp.fotos.foto_cnh_base64}` }} style={styles.areaCliente} resizeMode='stretch'>
                         <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
                             <TouchableOpacity onPress={this.capturarNovamente} >
                                 <Icon name="camera" size={40} color="orange" />

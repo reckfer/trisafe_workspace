@@ -48,8 +48,7 @@ export default class TelaModalTestesCadastro extends Component {
 
         this.inicializarDadosTela = this.inicializarDadosTela.bind(this);
         this.irParaTesteCadastroIter = this.irParaTesteCadastroIter.bind(this);
-        this.irParaTesteBoletoGerenciaNet = this.irParaTesteBoletoGerenciaNet.bind(this);        
-        this.irParaTesteGeraContratoPDF = this.irParaTesteGeraContratoPDF.bind(this);
+        this.irParaTesteBoletoGerenciaNet = this.irParaTesteBoletoGerenciaNet.bind(this); 
         this.irParaTesteContratoPDF = this.irParaTesteContratoPDF.bind(this);
         this.irParaTesteFotoCNH = this.irParaTesteFotoCNH.bind(this);
         this.irParaTesteFotoDocVeiculo = this.irParaTesteFotoDocVeiculo.bind(this);
@@ -78,23 +77,21 @@ export default class TelaModalTestesCadastro extends Component {
     }
 
     irParaTesteCadastroIter() {
-        this.oNavegacao.navigate('Cadastro', this.state);
+        this.oNavegacao.navigate('Cadastro Cliente', { screen: 'Cadastro' });
+
     }
 
     irParaTesteBoletoGerenciaNet() {
-        this.oNavegacao.navigate('Boleto', this.state);
-    }
+        this.oNavegacao.navigate('Cadastro Cliente', { screen: 'Boleto' });
 
-    irParaTesteGeraContratoPDF() {
-        this.oNavegacao.navigate('Produtos', this.state);
     }
 
     irParaTesteContratoPDF() {
-        this.oNavegacao.navigate('Contrato', this.state);
+        this.oNavegacao.navigate('Cadastro Cliente', { screen: 'Contrato' });
     }
 
     irParaTesteFotoCNH() {
-        this.oNavegacao.navigate('Foto CNH', this.state);
+        this.oNavegacao.navigate('Cadastro Cliente', { screen: 'Foto CNH' });
     }
 
     irParaTesteFotoDocVeiculo() {
@@ -174,7 +171,7 @@ export default class TelaModalTestesCadastro extends Component {
     
     render() {
         let botoesTestes1 = [ 
-            { element: this.botaoGerarDados }, { element: this.botaoCadastro } 
+            { element: this.botaoCadastro }, { element: this.botaoGerarDados } 
         ];
         let botoesTestes2 = [ 
             { element: this.botaoContrato }, { element: this.botaoBoleto } 
