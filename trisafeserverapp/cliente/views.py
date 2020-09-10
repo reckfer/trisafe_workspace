@@ -171,6 +171,7 @@ class ClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
         m_cliente = Cliente()
         
         d_dados_app = request.data['dados_app']
-        foto_cnh_base64 = d_dados_app['foto_cnh_base64']
+        d_fotos = d_dados_app['fotos']
+        foto_cnh_base64 = d_fotos['foto_cnh_base64']
     
         return foto_cnh_base64

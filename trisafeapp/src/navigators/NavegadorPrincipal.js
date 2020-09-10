@@ -6,68 +6,73 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import TelaClienteInicio from '../screens/TelaClienteInicio';
-import TelaTestesInicio from '../tests/TelaTestesInicio';
+import TelaModalTestesCadastro from '../tests/TelaModalTestesCadastro';
 import TelaClienteDadosPessoais from '../screens/TelaClienteDadosPessoais';
 import TelaClienteEndereco from '../screens/TelaClienteEndereco';
 import TelaClienteConfirmacao from '../screens/TelaClienteConfirmacao';
-import TelaFotoCNH from '../screens/TelaFotoCNH';
+import TelaCapturaFotoCNH from '../screens/TelaCapturaFotoCNH';
 import TelaContratoAceite from '../screens/TelaContratoAceite';
 import TelaBoletoEmissao from '../screens/TelaBoletoEmissao';
 import TelaMenuInicio from '../screens/TelaMenuInicio';
-import TelaVeiculoInicio from '../screens/TelaVeiculoInicio';
 import { ContextoAppProvider } from '../contexts/ContextoApp';
+import TelaModalVisualizaFotoCNH from '../screens/TelaModalVisualizaFotoCNH';
 
-const Stack = createStackNavigator();
+//const Stack = createStackNavigator();
 
-function Cadastro() {
+const fluxoRaiz = createDrawerNavigator();
+const fluxoModais = createStackNavigator();
+const fluxoCadastro = createStackNavigator();
+
+function FluxoCadastro() {
   return (
-    <Stack.Navigator headerMode='none'>
-        <Stack.Screen name="Menu" component={TelaMenuInicio} />
-        <Stack.Screen name="Cadastro" component={TelaClienteInicio} />
-        <Stack.Screen name="Testes" component={TelaTestesInicio} />
-        <Stack.Screen name="Dados pessoais" component={TelaClienteDadosPessoais} />
-        <Stack.Screen name="Endereço" component={TelaClienteEndereco} />
-        <Stack.Screen name="Confirmação dos dados" component={TelaClienteConfirmacao} />
-        <Stack.Screen name="Foto CNH" component={TelaFotoCNH} />
-        <Stack.Screen name="Contrato" component={TelaContratoAceite} />
-        <Stack.Screen name="Boleto" component={TelaBoletoEmissao} />
-        <Stack.Screen name="Veiculo Inicio" component={TelaVeiculoInicio} />
-    </Stack.Navigator>
+    <fluxoCadastro.Navigator headerMode='none'>
+        <fluxoCadastro.Screen name="Cadastro" component={TelaClienteInicio} />
+        <fluxoCadastro.Screen name="Dados pessoais" component={TelaClienteDadosPessoais} />
+        <fluxoCadastro.Screen name="Endereço" component={TelaClienteEndereco} />
+        <fluxoCadastro.Screen name="Confirmação dos dados" component={TelaClienteConfirmacao} />
+        <fluxoCadastro.Screen name="Foto CNH" component={TelaCapturaFotoCNH} />
+        <fluxoCadastro.Screen name="Contrato" component={TelaContratoAceite} />
+        <fluxoCadastro.Screen name="Boleto" component={TelaBoletoEmissao} />
+    </fluxoCadastro.Navigator>
   );
 }
 
-function TestesMeuCadastro() {
+function FluxoModais() {
   return (
-    <Stack.Navigator headerMode='none'>
-        <Stack.Screen name="Testes" component={TelaTestesInicio} />
-        <Stack.Screen name="Cadastro" component={TelaClienteInicio} />        
-        <Stack.Screen name="Dados pessoais" component={TelaClienteDadosPessoais} />
-        <Stack.Screen name="Endereço" component={TelaClienteEndereco} />
-        <Stack.Screen name="Confirmação dos dados" component={TelaClienteConfirmacao} />
-        <Stack.Screen name="Foto CNH" component={TelaFotoCNH} />
-        <Stack.Screen name="Contrato" component={TelaContratoAceite} />
-        <Stack.Screen name="Boleto" component={TelaBoletoEmissao} />
-        <Stack.Screen name="Veiculo Inicio" component={TelaVeiculoInicio} />
-    </Stack.Navigator>
+    <fluxoModais.Navigator headerMode='none'>
+        <fluxoModais.Screen name="Testes Cadastro" component={TelaModalTestesCadastro} />
+        <fluxoModais.Screen name="Visualizar CNH" component={TelaModalVisualizaFotoCNH} />
+    </fluxoModais.Navigator>
   );
 }
 
-const Drawer = createDrawerNavigator();
-
-function MyDrawer() {
+function FluxoRaiz() {
+  
   return (
-    <Drawer.Navigator>
-      <Drawer.Screen name="Meu Cadastro" component={Cadastro} />
-      <Drawer.Screen name="Testes Inicio" component={TestesMeuCadastro} />
-    </Drawer.Navigator>
+    <fluxoRaiz.Navigator headerMode='none' mode='modal' initialRouteName='Menu'>
+        <fluxoRaiz.Screen name="Menu" component={TelaMenuInicio} />
+        <fluxoRaiz.Screen name="Cadastro Cliente" component={FluxoCadastro} />
+        <fluxoRaiz.Screen name="Testes Cadastro" component={FluxoModais} />
+    </fluxoRaiz.Navigator>
   );
 }
+
+// const Drawer = createDrawerNavigator();
+
+// function MyDrawer() {
+//   return (
+//     <Drawer.Navigator>
+//       <Drawer.Screen name="Cadastro Cliente" component={Cadastro} />
+//       <Drawer.Screen name="Testes Cadastro Inicio" component={TestesMeuCadastro} />
+//     </Drawer.Navigator>
+//   );
+// }
 
 export default function App() {
   return (
     <ContextoAppProvider>
       <NavigationContainer>
-        <MyDrawer />
+        <FluxoRaiz />
       </NavigationContainer>
     </ContextoAppProvider>
   );

@@ -298,7 +298,10 @@ class Contrato(models.Model):
     def excluir_contrato(self):
         try:
             nome_arquivo = "Contrato_%s.pdf" % self.id_contrato
-            os.remove(os.path.join(BASE_DIR, "data", "contratos", nome_arquivo))
+            caminho_arquivo = os.path.join(BASE_DIR, "data", "contratos", nome_arquivo)
+            
+            if(os.path.exists(caminho_arquivo)):
+                os.remove(caminho_arquivo)
 
             retorno = Retorno(True)
             return retorno

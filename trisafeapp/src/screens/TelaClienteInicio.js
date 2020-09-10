@@ -94,11 +94,11 @@ export default class TelaClienteInicio extends Component {
     }
 
     irParaTestesRapidos() {
-        this.oNavegacao.navigate('Testes', this.state);
+        this.oNavegacao.navigate('Testes Cadastro', this.state);
     }
 
     botaoIniciar = () => <Button title="Iniciar" onPress={this.obterCliente} loading={this.oDadosControleApp.processando_requisicao}></Button>;
-    botaoTestesRapidos = () => <Button title="Testes Rápidos" onPress={this.irParaTestesRapidos} ></Button>;
+    botaoTestesRapidos = () => <Button title="Testes Cadastro" onPress={this.irParaTestesRapidos} ></Button>;
 
     render() {
         let botoesTela = [ { element: this.botaoIniciar }, { element: this.botaoTestesRapidos} ];

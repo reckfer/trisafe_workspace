@@ -184,10 +184,13 @@ class Cliente(models.Model):
         try:
             nome_arquivo = "foto_cnh_%s.jpg" % self.cpf
             caminho_arquivo = os.path.join(BASE_DIR, "data", "contratos", nome_arquivo)
+            
+            if(os.path.exists(caminho_arquivo)):
+                os.remove(caminho_arquivo)
 
             foto_cnh = base64.b64decode(foto_cnh_base64)
 
-            file = open(caminho_arquivo, 'xb')
+            file = open(caminho_arquivo, 'wb')
             file.write(foto_cnh)
             file.close()
 

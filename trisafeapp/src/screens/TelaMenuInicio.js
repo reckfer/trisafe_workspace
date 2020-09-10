@@ -9,7 +9,6 @@ import React, { Component } from 'react';
 import { Button } from 'react-native-elements';
 import { clonarObjeto } from '../contexts/DadosAppGeral';
 import {
-    
     View,
 } from 'react-native';
 import Cabecalho from '../common/CabecalhoTela';
@@ -64,7 +63,7 @@ export default class TelaMenuInicio extends Component {
     }
     
     irParaMeusDados() {
-        this.oNavegacao.navigate('Cadastro', this.state);
+        this.oNavegacao.navigate('Cadastro Cliente', this.state);
     }
 
     irParaMeusVeiculos() {

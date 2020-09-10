@@ -21,7 +21,7 @@ import UtilTests from './UtilTests';
 import { ContextoApp } from '../contexts/ContextoApp';
 import Util from '../common/Util';
 
-export default class TelaTestesInicio extends Component {
+export default class TelaModalTestesCadastro extends Component {
 
     constructor(props, value) {
         super(props);
@@ -30,7 +30,7 @@ export default class TelaTestesInicio extends Component {
             // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
             this.oGerenciadorContextoApp = value.gerenciador;
             this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
-            this.oRegistradorLog.registrar('TelaTestesInicio.constructor() => Iniciou.');
+            this.oRegistradorLog.registrar('TelaModalTestesCadastro.constructor() => Iniciou.');
 
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
@@ -63,7 +63,7 @@ export default class TelaTestesInicio extends Component {
         this.texto_instrucao = 'Selecione a opção de teste.';
         this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
 
-        this.oRegistradorLog.registrar('TelaTestesInicio.constructor() => Finalizou.');
+        this.oRegistradorLog.registrar('TelaModalTestesCadastro.constructor() => Finalizou.');
     }
 
     componentDidMount() {
@@ -78,7 +78,6 @@ export default class TelaTestesInicio extends Component {
     }
 
     irParaTesteCadastroIter() {
-        this.oNavegacao.popToTop();
         this.oNavegacao.navigate('Cadastro', this.state);
     }
 
@@ -189,7 +188,7 @@ export default class TelaTestesInicio extends Component {
 
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho titulo='Testes' nomeTela='Início' navigation={this.oNavegacao} />
+                <Cabecalho titulo='Testes Cadastro' nomeTela='Início' navigation={this.oNavegacao} />
                 <AreaDados dadosApp={this.oDadosApp} botoesTestes1={botoesTestes1} botoesTestes2={botoesTestes2} botoesTestes3={botoesTestes3}/>
                 <AreaRodape botoes={botoesTela} mensagem={''}/>
             </View>
@@ -246,4 +245,4 @@ export class AreaDados extends Component {
         );
     }
 }
-TelaTestesInicio.contextType = ContextoApp;
+TelaModalTestesCadastro.contextType = ContextoApp;
