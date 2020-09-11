@@ -73,7 +73,7 @@ export default class TelaCapturaFotoCNH extends PureComponent {
         if (this.camera) {
             console.log('Tirando foto...');
             
-            const options = { quality: 0.5, base64: true, doNotSave: true};
+            const options = { quality: 0.5, base64: true, doNotSave: true, orientation: RNCamera.Constants.Orientation.landscapeRight, pictureSize: '640x480' };
             this.camera.takePictureAsync(options).then((data) => {
                 
                 console.log('Foto tirada: ', data.uri);
@@ -103,10 +103,9 @@ export default class TelaCapturaFotoCNH extends PureComponent {
                     }}
                     style={styles.preview}
                     type={RNCamera.Constants.Type.back}
-                    flashMode={RNCamera.Constants.FlashMode.on}
+                    flashMode={RNCamera.Constants.FlashMode.off}
                     captureAudio={false}
-                    // rectOfInterest={ {x: .5, y:.5, width:'50%', height:'50%'} }
-                    // cameraViewDimensions={ {width:'50%', height:'50%'} }
+                    autoFocusPointOfInterest={{x: 0.7, y: 0.7}}
                     androidCameraPermissionOptions={{
                         title: 'Permission to use camera',
                         message: 'We need your permission to use your camera',
@@ -127,14 +126,19 @@ export default class TelaCapturaFotoCNH extends PureComponent {
                         showAnimatedLine={false}
                         maskOpacity={.7}
                         width='90%'
-                        height='90%'
+                        height='80%'
                     />
-                    <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
-                        <TouchableOpacity onPress={this.capturarFotoCNH} style={styles.capture}>
-                            <Icon name="camera" size={40} color="blue" />
-                        </TouchableOpacity>
-                    </View>
                 </RNCamera>
+                <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
+                    <TouchableOpacity onPress={this.capturarFotoCNH} style={styles.capture}>
+                        <Icon name="camera" size={40} color="blue" style={{transform: [{ rotate: '90deg' }]}} />
+                    </TouchableOpacity>
+                </View>
+                <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
+                    <TouchableOpacity onPress={() => {this.camera.getAvailablePictureSizes().then(valor => {console.log(JSON.stringify(valor));})}} style={styles.capture}>
+                        <Icon name="camera" size={40} color="blue" style={{transform: [{ rotate: '90deg' }]}} />
+                    </TouchableOpacity>
+                </View>
             </View>
         );
     }
@@ -156,10 +160,10 @@ const styles = StyleSheet.create({
       flex: 0,
       backgroundColor: '#fff',
       borderRadius: 5,
-      padding: 3,
-      paddingHorizontal: 10,
+      padding: 2,
+      paddingVertical: 7,
       alignSelf: 'center',
-      margin: 10,
+      margin: 7,
     },
     imgBG: {
         flex: 1,

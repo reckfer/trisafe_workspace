@@ -113,19 +113,40 @@ export default class TelaModalVisualizaFotoCNH extends Component {
         if(this.oDadosApp.fotos.foto_cnh_base64) {
 
             console.log('Vai renderizar foto tirada...');
+            let estiloAreaFoto = clonarObjeto(styles.areaCliente);
+            estiloAreaFoto.flex = .8
+            estiloAreaFoto.justifyContent= 'center';
+            estiloAreaFoto.alignItems = 'center';
+            estiloAreaFoto.margin = 30;
+            estiloAreaFoto.marginTop = 50;
+            estiloAreaFoto.marginRight = 60;
+
+            let estiloFoto = clonarObjeto(styles.areaCliente);
+            estiloFoto.alignSelf= 'center';
+            
+            estiloFoto.width = '90%';
+            estiloFoto.height = '80%';
+            estiloFoto.backgroundColor = 'yellow';
 
             return(
                 <View style={styles.areaCliente}>
-                    <ImageBackground source={ { uri: `data:image/png;base64,${this.oDadosApp.fotos.foto_cnh_base64}` }} style={styles.areaCliente} resizeMode='stretch'>
-                        <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
+                    <View style={estiloAreaFoto}>
+                        <ImageBackground source={ { uri: `data:image/png;base64,${this.oDadosApp.fotos.foto_cnh_base64}` }} style={estiloFoto}>
+                            
+                        </ImageBackground>
+                        
+                    </View>
+                    <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center'}}>
                             <TouchableOpacity onPress={this.capturarNovamente} >
                                 <Icon name="camera" size={40} color="orange" />
                             </TouchableOpacity>
                             <TouchableOpacity onPress={this.enviarFotoCNHServidor} >
                                 <Icon name="camera" size={40} color="orange" />
                             </TouchableOpacity>
-                        </View>
-                    </ImageBackground>
+                            <View style={{backgroundColor: 'blue', transform: [{ rotate: '90deg' }]}}>
+                                <Text>Gostou da foto?</Text>
+                            </View>
+                    </View>
                 </View>
             );
         } else {
