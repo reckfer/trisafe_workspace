@@ -24,6 +24,8 @@ import {
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { clonarObjeto, DADOS_FOTOS } from '../contexts/DadosAppGeral';
+import { StackActions } from '@react-navigation/native';
+import Svg, { Rect } from 'react-native-svg';
 
 export default class TelaCapturaFotoCNH extends PureComponent {
     
@@ -73,7 +75,7 @@ export default class TelaCapturaFotoCNH extends PureComponent {
         if (this.camera) {
             console.log('Tirando foto...');
             
-            const options = { quality: 0.5, base64: true, doNotSave: true, orientation: RNCamera.Constants.Orientation.landscapeRight, pictureSize: '640x480' };
+            const options = { quality: 0.5, base64: true, doNotSave: true,};
             this.camera.takePictureAsync(options).then((data) => {
                 
                 console.log('Foto tirada: ', data.uri);
@@ -83,6 +85,16 @@ export default class TelaCapturaFotoCNH extends PureComponent {
                 dadosFotos.foto_cnh_base64 = data.base64;
                 
                 this.oDadosApp.fotos = dadosFotos;
+
+                const pop = StackActions.pop(1);
+
+                console.log('Removendo tela camera...', JSON.stringify(pop));
+                this.oNavegacao.dispatch(pop);
+
+                // const push = StackActions.push('Cadastro Cliente', { screen: 'Visualizacao Foto CNH' });
+
+                // this.oNavegacao.dispatch(push);
+                
                 this.oNavegacao.navigate('Visualizacao Foto CNH');
             });
 
@@ -94,14 +106,35 @@ export default class TelaCapturaFotoCNH extends PureComponent {
     
     render() {
         console.log('Vai renderizar camera.');
+
+        let estiloAreaFoto =  {
+            flex: 1,
+            flexDirection: 'column',
+            justifyContent: 'flex-start',
+            // flexDirection: 'column',
+            // justifyContent: 'flex-start',
+            //alignItems: 'center',
+            backgroundColor: 'black',
+           // padding: 50,
+        }
+        let estiloFoto =  {
+            flex: .95,
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            // flexDirection: 'column',
+            // justifyContent: 'center',
+            // alignItems: 'center',
+            //backgroundColor: '#f5f5f5',
+           // padding: 50,
+        }
         
         return (
-            <View style={styles.container}>
+            <View style={estiloAreaFoto}>
                 <RNCamera
                     ref={ref => {
                         this.camera = ref;
                     }}
-                    style={styles.preview}
+                    style={estiloFoto}
                     type={RNCamera.Constants.Type.back}
                     flashMode={RNCamera.Constants.FlashMode.off}
                     captureAudio={false}
@@ -122,23 +155,42 @@ export default class TelaCapturaFotoCNH extends PureComponent {
                         console.log(barcodes);
                     }}
                 >
-                    <BarcodeMaskWithOuterLayout
+                    <Svg height="100%" width="100%" >
+                        <Rect
+                            // x="0"
+                            // y="0"
+                            width="100%"
+                            height="100%"
+                            
+                            stroke="grey"
+                            strokeWidth="50"
+                            //origin="10, 10"
+                            // originX="50"
+                            // originY="50"
+                            //fillRule='evenodd'
+                            // strokeDasharray='round'
+                            // strokeLinejoin='round'
+                            opacity='70'
+                            
+                        />
+                    </Svg>
+                    {/* <BarcodeMaskWithOuterLayout
                         showAnimatedLine={false}
                         maskOpacity={.7}
                         width='90%'
                         height='80%'
-                    />
+                    /> */}
                 </RNCamera>
                 <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
-                    <TouchableOpacity onPress={this.capturarFotoCNH} style={styles.capture}>
+                    <TouchableOpacity onPress={this.capturarFotoCNH}>
                         <Icon name="camera" size={40} color="blue" style={{transform: [{ rotate: '90deg' }]}} />
                     </TouchableOpacity>
                 </View>
-                <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
+                {/* <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
                     <TouchableOpacity onPress={() => {this.camera.getAvailablePictureSizes().then(valor => {console.log(JSON.stringify(valor));})}} style={styles.capture}>
                         <Icon name="camera" size={40} color="blue" style={{transform: [{ rotate: '90deg' }]}} />
                     </TouchableOpacity>
-                </View>
+                </View> */}
             </View>
         );
     }

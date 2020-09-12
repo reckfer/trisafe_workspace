@@ -95,6 +95,7 @@ export default class TelaModalTestesCadastro extends Component {
     }
 
     irParaTesteFotoDocVeiculo() {
+        
         //this.oNavegacao.navigate('Foto CNH', this.state);
     }
 

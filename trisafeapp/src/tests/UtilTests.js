@@ -37,6 +37,7 @@ export default class UtilTests {
             d2 = 0;
         }
         
+        let cpf;
         if (comPontos) {
             cpf = ''+n1+n2+n3+'.'+n4+n5+n6+'.'+n7+n8+n9+'-'+d1+d2;
         } else {

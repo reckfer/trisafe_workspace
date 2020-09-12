@@ -28,7 +28,7 @@ function FluxoCadastro() {
     <fluxoCadastro.Navigator headerMode='none'>
         <fluxoCadastro.Screen name="Cadastro" component={TelaClienteInicio} />
         <fluxoCadastro.Screen name="Dados pessoais" component={TelaClienteDadosPessoais} />
-        <fluxoCadastro.Screen name="Endereço" component={TelaClienteEndereco} />
+        <fluxoCadastro.Screen name="Endereco" component={TelaClienteEndereco} />
         <fluxoCadastro.Screen name="Confirmação dos dados" component={TelaClienteConfirmacao} />
         <fluxoCadastro.Screen name="Foto CNH" component={TelaCapturaFotoCNH} />
         <fluxoCadastro.Screen name="Contrato" component={TelaContratoAceite} />

@@ -11,7 +11,9 @@ import {
     Alert,
     View,
     Text,
-    ImageBackground,
+    ImageBackground, 
+    ScrollView,
+    Image
 } from 'react-native';
 import ComunicacaoHTTP from '../common/ComunicacaoHTTP';
 import { Button } from 'react-native-elements';
@@ -21,6 +23,9 @@ import { styles } from '../common/Estilos';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { clonarObjeto, DADOS_FOTOS } from '../contexts/DadosAppGeral';
+import { StackActions } from '@react-navigation/native';
+import Svg, { Circle, Rect } from 'react-native-svg';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default class TelaModalVisualizaFotoCNH extends Component {
     
@@ -102,7 +107,15 @@ export default class TelaModalVisualizaFotoCNH extends Component {
     }
 
     voltar() {
-        this.oNavegacao.goBack();
+        const pop = StackActions.pop(1);
+                
+        console.log('Removendo tela imagem CNH...', JSON.stringify(pop));
+        this.oNavegacao.dispatch(pop);
+
+        const push = StackActions.push('Cadastro Cliente', { screen: 'Foto CNH' });
+
+        this.oNavegacao.dispatch(push);
+        // this.oNavegacao.goBack();
     }
 
     botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;
@@ -113,41 +126,72 @@ export default class TelaModalVisualizaFotoCNH extends Component {
         if(this.oDadosApp.fotos.foto_cnh_base64) {
 
             console.log('Vai renderizar foto tirada...');
-            let estiloAreaFoto = clonarObjeto(styles.areaCliente);
-            estiloAreaFoto.flex = .8
-            estiloAreaFoto.justifyContent= 'center';
-            estiloAreaFoto.alignItems = 'center';
-            estiloAreaFoto.margin = 30;
-            estiloAreaFoto.marginTop = 50;
-            estiloAreaFoto.marginRight = 60;
+            //let estiloAreaFoto = clonarObjeto(styles.areaCliente);
+            // estiloAreaFoto.flex = 1
+            // estiloAreaFoto.justifyContent= 'center';
+            // estiloAreaFoto.alignItems = 'center';
+            // estiloAreaFoto.backgroundColor = 'green';
+            // estiloAreaFoto.margin = 30;
+            // estiloAreaFoto.marginTop = 50;
+            // estiloAreaFoto.marginRight = 60;
 
-            let estiloFoto = clonarObjeto(styles.areaCliente);
-            estiloFoto.alignSelf= 'center';
-            
-            estiloFoto.width = '90%';
-            estiloFoto.height = '80%';
-            estiloFoto.backgroundColor = 'yellow';
+            let estiloAreaFoto =  {
+                flex: 1,
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
+                // flexDirection: 'column',
+                // justifyContent: 'flex-start',
+                //alignItems: 'center',
+                //backgroundColor: '#f5f5f5',
+               // padding: 50,
+            }
+            let estiloFoto =  {
+                flex: .95,
+                //transform: [{ rotate: '90deg' }]
+                // flexDirection: 'column',
+                // justifyContent: 'center',
+                // alignItems: 'center',
+                //backgroundColor: '#f5f5f5',
+               // padding: 50,
+            }
 
             return(
-                <View style={styles.areaCliente}>
+                <SafeAreaView style={styles.areaCliente}>
                     <View style={estiloAreaFoto}>
-                        <ImageBackground source={ { uri: `data:image/png;base64,${this.oDadosApp.fotos.foto_cnh_base64}` }} style={estiloFoto}>
-                            
+                        <ImageBackground source={ { uri: `data:image/png;base64,${this.oDadosApp.fotos.foto_cnh_base64}` }} 
+                            style={estiloFoto}>
+                            <Svg height="100%" width="100%" >
+                                <Rect
+                                    // x="0"
+                                    // y="0"
+                                    width="100%"
+                                    height="100%"
+                                    
+                                    stroke="grey"
+                                    strokeWidth="50"
+                                    //origin="10, 10"
+                                    // originX="50"
+                                    // originY="50"
+                                    //fillRule='evenodd'
+                                    // strokeDasharray='round'
+                                    // strokeLinejoin='round'
+                                    opacity='70'
+                                />
+                            </Svg>
                         </ImageBackground>
-                        
                     </View>
-                    <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center'}}>
+                    <View style={{flexDirection: 'row', justifyContent: 'center'}}>
                             <TouchableOpacity onPress={this.capturarNovamente} >
+                                <Icon name="camera" size={40} color="orange" style={{transform: [{ rotate: '90deg' }]}}/>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={this.enviarFotoCNHServidor} style={{transform: [{ rotate: '90deg' }]}}>
                                 <Icon name="camera" size={40} color="orange" />
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={this.enviarFotoCNHServidor} >
-                                <Icon name="camera" size={40} color="orange" />
-                            </TouchableOpacity>
-                            <View style={{backgroundColor: 'blue', transform: [{ rotate: '90deg' }]}}>
+                            {/* <View style={{backgroundColor: 'blue', transform: [{ rotate: '90deg' }]}}>
                                 <Text>Gostou da foto?</Text>
-                            </View>
+                            </View> */}
                     </View>
-                </View>
+                </SafeAreaView>
             );
         } else {
             return(

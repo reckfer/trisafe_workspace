@@ -51,6 +51,7 @@ export default class TelaMenuInicio extends Component {
     }
 
     componentDidMount() {
+
         this.oRegistradorLog.registrar('TelaMenuInicio.componentDidMount() ++++++++++++ iniciou ++++++++++++');
         
         this.inicializar();
@@ -71,10 +72,11 @@ export default class TelaMenuInicio extends Component {
     }
 
     render() {
+        
         let botoesTela = [ 
             <Button title="Meus dados" key={1} onPress={this.irParaMeusDados} buttonStyle={{margin:10, padding: 10}} icon={<Icon name="user" color="#022F18" size={20} style={{margin:10}} />}></Button>, 
             <Button title="Meus Veículos" key={2} onPress={this.irParaMeusVeiculos} buttonStyle={{margin:10, padding:10}} icon={<Icon name="car" color="#022F18" size={20} style={{margin:10}} />}></Button>
-         ];
+        ];
         
         return (
             <View style={styles.areaCliente}>
