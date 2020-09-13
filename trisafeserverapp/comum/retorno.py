@@ -64,8 +64,19 @@ class EstadoExecucao:
             self.httpStatus = httpStatus
 
         if (self.excecao):
-            logger_servidor_app_fluxo.exception(traceback.format_exception(None, self.excecao, self.excecao.__traceback__))
+            
+            self.httpStatus = 500
+            
+            if(not self.codMensagem or len(self.codMensagem) == 0):
+                self.codMensagem = 'Excecao'
+            
+            if(not self.mensagem or len(self.mensagem) == 0):
+                self.mensagem = 'Falha de comunicação. Em breve será normalizado.'
 
+            logger_servidor_app_fluxo.exception('%s %s' % (self.mensagem, traceback.format_exception(None, self.excecao, self.excecao.__traceback__)))
+            
+            self.mensagem = 'Falha de comunicação. Em breve será normalizado.'
+            
     def json(self):
         return self.__criar_json__()
 

@@ -41,7 +41,7 @@ class BoletoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissio
             
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A geração do boleto falhou.', None, None, e)
             return retorno.gerar_resposta_http()
     
     @action(detail=False, methods=['post'])
@@ -60,7 +60,7 @@ class BoletoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissio
             
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A consulta do boleto falhou.', None, None, e)
             return retorno.gerar_resposta_http()
     
     @classmethod

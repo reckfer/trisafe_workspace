@@ -95,7 +95,7 @@ class AutenticacaoTriSafe():
             self.retorno_autenticacao = retorno
         except Exception as e:
             
-            retorno = Retorno(False, 'Autenticação do aplicativo falhou.', 'ExcecaoAutenticacao', 500, e)
+            retorno = Retorno(False, 'Autenticação do aplicativo falhou.', None, None, e)
             self.retorno_autenticacao = retorno
 
 class ExceptionAutenticacaoTriSafe(Exception):

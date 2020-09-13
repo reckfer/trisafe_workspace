@@ -78,5 +78,5 @@ class GerenciadorLogViewSet(viewsets.ModelViewSet, permissions.BasePermission):
             
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'O registro de log do cliente falhou.', None, None, e)
             return retorno.gerar_resposta_http()

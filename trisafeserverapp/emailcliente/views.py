@@ -42,7 +42,7 @@ class EmailClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, per
             return retorno.gerar_resposta_http()
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, None, None, None, e)
             return retorno.gerar_resposta_http()
 
     @classmethod

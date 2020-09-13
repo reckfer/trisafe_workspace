@@ -40,7 +40,7 @@ class Contrato(models.Model):
                 return retorno_cliente
 
             m_produto = Produto()
-            retorno_produtos = m_produto.listar_especificos(chaves_produtos)
+            retorno_produtos = m_produto.listar()
             
             if not retorno_produtos.estado.ok:
                 return retorno_produtos
@@ -71,7 +71,7 @@ class Contrato(models.Model):
             return retorno
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A inclusão do contrato falhou.', None, None, e)
             return retorno
     
     def alterar(self, chaves_produtos):
@@ -113,7 +113,7 @@ class Contrato(models.Model):
             return retorno
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A atualização do contrato falhou.', None, None, e)
             return retorno
 
     def aceitar(self):
@@ -130,7 +130,7 @@ class Contrato(models.Model):
             return retorno
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'O aceite do contrato falhou.', None, None, e)
             return retorno
     
     def obter(self):
@@ -147,7 +147,7 @@ class Contrato(models.Model):
             return retorno
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A consulta do contrato falhou.', None, None, e)
             return retorno
     
     def obter_por_cliente(self):
@@ -167,7 +167,7 @@ class Contrato(models.Model):
 
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A consulta do contrato falhou.', None, None, e)
             return retorno
 
     def calcular_valor_total(self, m_produtos):
@@ -233,7 +233,7 @@ class Contrato(models.Model):
 
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A geração do contrato falhou.', None, None, e)
             return retorno
     
     def montar_contrato(self):
@@ -285,7 +285,7 @@ class Contrato(models.Model):
             return retorno
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A geração do contrato falhou.', None, None, e)
             return retorno
 
     def excluir_contrato(self):
@@ -296,11 +296,16 @@ class Contrato(models.Model):
             if(os.path.exists(caminho_arquivo)):
                 os.remove(caminho_arquivo)
 
+            caminho_diretorio = os.path.join(BASE_DIR, "data", "contratos")
+            if(not os.path.exists(caminho_diretorio)):
+                os.makedirs(caminho_diretorio)
+
             retorno = Retorno(True)
             return retorno
+
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A exclusão do contrato falhou.', None, None, e)
             return retorno
 
     def atribuir_do_modelo(self, m_contrato):

@@ -71,7 +71,7 @@ class AutenticacaoTriSafeViewSet(viewsets.ModelViewSet, permissions.BasePermissi
             
         except Exception as e:
             
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'Autenticação do aplicativo falhou.', None, None, e)
             return retorno.gerar_resposta_http()
 
     @classmethod

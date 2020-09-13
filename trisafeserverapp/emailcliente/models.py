@@ -91,5 +91,5 @@ class EmailCliente:
             return retorno
         except Exception as e:
                      
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'O envio de e-mail falhou.', None, None, e)
             return retorno

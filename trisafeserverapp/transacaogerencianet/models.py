@@ -29,7 +29,7 @@ class TransacaoGerenciaNet(models.Model):
 
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A inclusão de transação para boleto falhou.', None, None, e)
             return retorno
 
     def converter_de_gerencia_net(self, d_charge):

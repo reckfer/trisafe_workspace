@@ -59,7 +59,7 @@ class Cliente(models.Model):
             return retorno
         except Exception as e:
                      
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A consulta dos dados cadastrais falhou.', None, None, e)
             return retorno
 
     def obter_ultimo(self):
@@ -85,7 +85,7 @@ class Cliente(models.Model):
             return retorno
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A consulta dos dados cadastrais falhou.', None, None, e)
             return retorno
                 
     def incluir(self):
@@ -98,7 +98,7 @@ class Cliente(models.Model):
             # Valida se o cliente já está cadastrado.
             retorno = Cliente.obter(self)
     
-            if retorno.estado.excecao or retorno.estado.codMensagem != 'NaoCadastrado':
+            if retorno.estado.excecao or (len(retorno.estado.codMensagem) > 0 and retorno.estado.codMensagem != 'NaoCadastrado'):
                 return Retorno(False, 
                                 'Erro ao validar cadastro. %s' % (retorno.estado.mensagem), 
                                 retorno.estado.codMensagem, 
@@ -132,13 +132,13 @@ class Cliente(models.Model):
             # salva na base da Trisafe
             self.save()
 
-            retorno = Retorno(True, 'Cadastro realizado com sucesso.', 200, None, retorno.credencial)
+            retorno = Retorno(True, 'Cadastro realizado com sucesso.', '', 200, None, retorno.credencial)
             retorno.dados = self
 
             return retorno
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A inclusão dos dados cadastrais falhou.', None, None, e)
             return retorno
     
     def alterar(self):
@@ -167,26 +167,30 @@ class Cliente(models.Model):
             m_cliente.converter_de_cliente_iter(retorno.json())
             m_cliente.save()
             
-            retorno = Retorno(True, 'Cadastro atualizado com sucesso.', 200, None, retorno.credencial)
+            retorno = Retorno(True, 'Cadastro atualizado com sucesso.', '', 200, None, retorno.credencial)
             retorno.dados = m_cliente
 
             return retorno
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A atualização dos dados cadastrais falhou.', None, None, e)
             return retorno
 
     def salvar_foto_cnh(self, foto_cnh_base64):
         try:
             nome_arquivo = "foto_cnh_%s.jpg" % self.cpf
-            caminho_arquivo = os.path.join(BASE_DIR, "data", "contratos", nome_arquivo)
-            
+
+            caminho_arquivo = os.path.join(BASE_DIR, "data", "fotos_cnh", nome_arquivo)
             if(os.path.exists(caminho_arquivo)):
                 os.remove(caminho_arquivo)
-
+            
+            caminho_diretorio = os.path.join(BASE_DIR, "data", "fotos_cnh")
+            if(not os.path.exists(caminho_diretorio)):
+                os.makedirs(caminho_diretorio)
+            
             foto_cnh = base64.b64decode(foto_cnh_base64)
 
-            file = open(caminho_arquivo, 'wb+')
+            file = open(caminho_arquivo, 'wb')
             file.write(foto_cnh)
             file.close()
 
@@ -195,7 +199,7 @@ class Cliente(models.Model):
             return retorno
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A inclusão da foto da CNH falhou.', None, None, e)
             return retorno
     
     def converter_de_cliente_iter(self, d_cliente_iter):

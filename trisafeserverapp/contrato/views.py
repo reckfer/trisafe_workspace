@@ -52,7 +52,7 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
             return retorno.gerar_resposta_http()
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A inclusão do contrato falhou.', None, None, e)
             return retorno.gerar_resposta_http()
     
     @action(detail=False, methods=['post'])
@@ -87,7 +87,7 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
 
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A aceitação do contrato falhou.', None, None, e)
             return retorno.gerar_resposta_http()
     
     @action(detail=False, methods=['post'])
@@ -103,7 +103,7 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
             return retorno.gerar_resposta_http()
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A consulta do contrato falhou.', None, None, e)
             return retorno.gerar_resposta_http()
 
     @action(detail=False, methods=['post'])
@@ -119,7 +119,7 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
             return retorno.gerar_resposta_http()
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A consulta do contrato falhou.', None, None, e)
             return retorno.gerar_resposta_http()
     
     @action(detail=False, methods=['post'])
@@ -145,7 +145,7 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
             return http_response
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A consulta do arquivo pdf do contrato falhou.', None, None, e)
             return retorno.gerar_resposta_http()
 
     @action(detail=False, methods=['post'])
@@ -161,7 +161,7 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
             return retorno.gerar_resposta_http()
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A exclusão do arquivo pdf do contrato falhou.', None, None, e)
             return retorno.gerar_resposta_http()
 
     @classmethod

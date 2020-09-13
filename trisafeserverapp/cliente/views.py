@@ -43,7 +43,7 @@ class ClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
             
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A consulta dos dados cadastrais falhou.', None, None, e)
             return retorno.gerar_resposta_http()
     
     @action(detail=False, methods=['post'])
@@ -61,7 +61,7 @@ class ClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
 
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A consulta dos dados cadastrais falhou.', None, None, e)
             return retorno.gerar_resposta_http()
 
     @action(detail=False, methods=['post'])
@@ -79,7 +79,7 @@ class ClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
 
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A inclusão dos dados cadastrais falhou.', None, None, e)
             return retorno.gerar_resposta_http()
 
     @action(detail=False, methods=['post'])
@@ -97,7 +97,7 @@ class ClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
 
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A atualização dos dados cadastrais falhou.', None, None, e)
             return retorno.gerar_resposta_http()
 
     @action(detail=False, methods=['post'])
@@ -114,7 +114,7 @@ class ClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
             return retorno_cliente.gerar_resposta_http()
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A inclusão da foto CNH falhou.', None, None, e)
             return retorno.gerar_resposta_http()
 
     @classmethod

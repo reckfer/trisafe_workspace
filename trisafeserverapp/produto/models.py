@@ -41,7 +41,7 @@ class Produto(models.Model):
 
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A consulta a produtos Trisafe falhou.', None, None, e)
             return retorno
     
     def listar(self):
@@ -62,7 +62,7 @@ class Produto(models.Model):
             
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A consulta a produtos Trisafe falhou.', None, None, e)
             return retorno
 
     def listar_especificos(self, chaves_produtos):
@@ -89,7 +89,7 @@ class Produto(models.Model):
             
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A consulta a produtos Trisafe falhou.', None, None, e)
             return retorno
 
     def incluir(self):
@@ -113,7 +113,7 @@ class Produto(models.Model):
             return retorno
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A inclusão de produto Trisafe falhou.', None, None, e)
             return retorno
     
     def validar_dados_obrigatorios_chaves(self):

@@ -36,7 +36,7 @@ class ProdutoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
             return retorno_produtos.gerar_resposta_http()
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A consulta a produtos Trisafe falhou.', None, None, e)
             return retorno.gerar_resposta_http()
     
     @classmethod

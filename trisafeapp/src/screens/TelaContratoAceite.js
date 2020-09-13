@@ -47,9 +47,10 @@ export default class TelaContratoAceite extends Component {
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
         
-        this.inicializarDadosTela = this.inicializarDadosTela.bind(this);
         this.obterArquivoContrato = this.obterArquivoContrato.bind(this);
         this.contratar = this.contratar.bind(this);
+        this.incluirContrato = this.incluirContrato.bind(this);
+        this.tratarIncluirContrato = this.tratarIncluirContrato.bind(this);
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
         this.voltar = this.voltar.bind(this);
 
@@ -59,12 +60,31 @@ export default class TelaContratoAceite extends Component {
     }
     
     componentDidMount() {
-        this.inicializarDadosTela();
+        
+        if(this.oDadosApp.contrato.url_pdf) {
+            this.obterArquivoContrato();
+        } else if(this.oGerenciadorContextoApp.temDados()) {
+            this.incluirContrato();
+        }
     }
 
-    inicializarDadosTela() {
+    incluirContrato() {
+        try {
+            let metodoURI = '/contratos/incluir/';
 
-        if(this.oGerenciadorContextoApp.temDados()) {
+            let oDadosParametros = JSON.stringify(this.state);
+            
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarIncluirContrato);
+        } catch (oExcecao) {
+            this.oUtil.tratarExcecao(oExcecao);
+        }
+    }
+
+    tratarIncluirContrato(oDados, oEstado) {
+        
+        this.oGerenciadorContextoApp.atribuirDados('contrato', oDados);
+
+        if(oEstado.ok) {
             this.obterArquivoContrato();
         }
     }
@@ -158,6 +178,8 @@ export class AreaDados extends Component {
         let oDadosApp = this.props.dadosApp;
         let oDadosContrato = oDadosApp.contrato;
         let areaContrato = <View><Text>Gerando o contrato. Aguarde...</Text></View>
+
+        console.log('oDadosContrato.url_pdf... ', oDadosContrato.url_pdf);
 
         if(oDadosContrato.url_pdf) {
             let oDadosParametros = JSON.stringify({

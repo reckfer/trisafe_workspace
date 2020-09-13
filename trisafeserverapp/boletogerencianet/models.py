@@ -69,7 +69,7 @@ class BoletoGerenciaNet(models.Model):
 
         except Exception as e:
             
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A geração do boleto falhou.', None, None, e)
             return retorno
     
     def obter(self, m_contrato):
@@ -105,7 +105,7 @@ class BoletoGerenciaNet(models.Model):
 
         except Exception as e:
                     
-            retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
+            retorno = Retorno(False, 'A consulta do boleto falhou.', None, None, e)
             return retorno
 
     def tratar_retorno_gerencia_net(self, d_billet):
