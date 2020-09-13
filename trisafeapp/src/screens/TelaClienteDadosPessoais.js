@@ -18,7 +18,6 @@ import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
 import AreaRodape from './../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
-import { StackActions } from '@react-navigation/native';
 
 export default class TelaClienteDadosPessoais extends Component {
 	
@@ -53,7 +52,7 @@ export default class TelaClienteDadosPessoais extends Component {
     }
     
     avancar() {
-                
+
         this.oNavegacao.navigate('Endereco', this.state);
     }
 

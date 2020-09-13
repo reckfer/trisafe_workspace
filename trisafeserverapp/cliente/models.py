@@ -58,8 +58,7 @@ class Cliente(models.Model):
             
             return retorno
         except Exception as e:
-            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
-                    
+                     
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return retorno
 
@@ -85,7 +84,6 @@ class Cliente(models.Model):
             
             return retorno
         except Exception as e:
-            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return retorno
@@ -139,7 +137,6 @@ class Cliente(models.Model):
 
             return retorno
         except Exception as e:
-            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return retorno
@@ -175,7 +172,6 @@ class Cliente(models.Model):
 
             return retorno
         except Exception as e:
-            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return retorno
@@ -198,7 +194,6 @@ class Cliente(models.Model):
 
             return retorno
         except Exception as e:
-            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
             return retorno

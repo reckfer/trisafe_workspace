@@ -5,7 +5,6 @@ from django.forms.models import model_to_dict
 from django.http.response import HttpResponse
 from rest_framework import routers, serializers, viewsets, permissions
 from rest_framework.decorators import action
-from rest_framework.response import Response
 from rest_framework import mixins
 from gerenciadorlog.models import GerenciadorLog
 from contrato.models import Contrato
@@ -75,10 +74,9 @@ class GerenciadorLogViewSet(viewsets.ModelViewSet, permissions.BasePermission):
             
             logger_servidor_app_fluxo.debug('finalizou')
 
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
             
         except Exception as e:
-            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()

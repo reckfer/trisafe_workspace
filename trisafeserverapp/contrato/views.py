@@ -49,12 +49,11 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
             else:    
                 return retorno
 
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
         except Exception as e:
-            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
     
     @action(detail=False, methods=['post'])
     def aceitar(self, request):
@@ -67,7 +66,7 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
             retorno_contrato = m_contrato.obter()
 
             if not retorno_contrato.estado.ok:
-                return Response(retorno_contrato.json())
+                return retorno_contrato.gerar_resposta_http()
             
             m_boleto = BoletoGerenciaNet()
             m_contrato = retorno_contrato.dados
@@ -76,7 +75,7 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
                 retorno = m_contrato.aceitar()
 
                 if not retorno.estado.ok:
-                    return retorno
+                    return retorno.gerar_resposta_http()
 
                 m_contrato = retorno.dados
                 
@@ -84,12 +83,12 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
             else:
                 retorno = m_boleto.obter(m_contrato)
 
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
+
         except Exception as e:
-            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
     
     @action(detail=False, methods=['post'])
     def obter(self, request):
@@ -101,12 +100,11 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
             
             retorno = m_contrato.obter()
             
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
         except Exception as e:
-            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
 
     @action(detail=False, methods=['post'])
     def obter_por_cliente(self, request):
@@ -118,12 +116,11 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
             
             retorno = m_contrato.obter_por_cliente()
             
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
         except Exception as e:
-            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
     
     @action(detail=False, methods=['post'])
     def obter_arquivo_contrato(self, request):
@@ -136,7 +133,7 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
             retorno_contrato = m_contrato.gerar_contrato_pdf()
             
             if not retorno_contrato.estado.ok:
-                return Response(retorno_contrato.json())
+                return retorno_contrato.gerar_resposta_http()
         
             dados_arquivo = retorno_contrato.dados
 
@@ -147,10 +144,9 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
 
             return http_response
         except Exception as e:
-            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
 
     @action(detail=False, methods=['post'])
     def excluir_arquivo_contrato(self, request):
@@ -162,12 +158,11 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
             
             retorno = m_contrato.excluir_contrato()
             
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
         except Exception as e:
-            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
 
     @classmethod
     def apropriar_dados_http(cls, request):

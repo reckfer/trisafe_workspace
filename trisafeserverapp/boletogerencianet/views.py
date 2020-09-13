@@ -37,13 +37,12 @@ class BoletoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissio
             
             retorno_boleto = m_boleto.gerar(m_contrato)
 
-            return Response(retorno_boleto.json())
+            return retorno_boleto.gerar_resposta_http()
             
         except Exception as e:
-            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
     
     @action(detail=False, methods=['post'])
     def obter(self, request):
@@ -57,13 +56,12 @@ class BoletoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissio
             
             retorno_boleto = m_boleto.obter(m_contrato)
 
-            return Response(retorno_boleto.json())
+            return retorno_boleto.gerar_resposta_http()
             
         except Exception as e:
-            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
     
     @classmethod
     def apropriar_dados_http(cls, request):

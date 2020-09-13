@@ -39,13 +39,12 @@ class ClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
             m_cliente.credencial = ClienteViewSet.apropriar_credenciais_iter_http(request)
 
             retorno_cliente = m_cliente.obter()
-            return Response(retorno_cliente.json())
+            return retorno_cliente.gerar_resposta_http()
             
         except Exception as e:
-            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
     
     @action(detail=False, methods=['post'])
     def obter_ultimo(self, request):
@@ -58,12 +57,12 @@ class ClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
 
             retorno_cliente = m_cliente.obter_ultimo()
             
-            return Response(retorno_cliente.json())
+            return retorno_cliente.gerar_resposta_http()
+
         except Exception as e:
-            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
 
     @action(detail=False, methods=['post'])
     def incluir(self, request):
@@ -76,13 +75,12 @@ class ClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
             
             retorno = m_cliente.incluir()
 
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
 
         except Exception as e:
-            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
 
     @action(detail=False, methods=['post'])
     def alterar(self, request):
@@ -95,13 +93,12 @@ class ClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
             
             retorno = m_cliente.alterar()
 
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
 
         except Exception as e:
-            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
 
     @action(detail=False, methods=['post'])
     def salvar_foto_cnh(self, request):
@@ -114,12 +111,11 @@ class ClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
 
             retorno_cliente = m_cliente.salvar_foto_cnh(foto_cnh_base64)
             
-            return Response(retorno_cliente.json())
+            return retorno_cliente.gerar_resposta_http()
         except Exception as e:
-            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
 
     @classmethod
     def apropriar_dados_http_chave(cls, request):

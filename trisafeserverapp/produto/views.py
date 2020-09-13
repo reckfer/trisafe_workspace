@@ -33,12 +33,11 @@ class ProdutoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
             m_produto = Produto()
             
             retorno_produtos = m_produto.listar()
-            return Response(retorno_produtos.json())
+            return retorno_produtos.gerar_resposta_http()
         except Exception as e:
-            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
     
     @classmethod
     def apropriar_dados_http_chave(cls, request):

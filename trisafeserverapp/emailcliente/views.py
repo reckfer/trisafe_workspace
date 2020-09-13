@@ -39,12 +39,11 @@ class EmailClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, per
             
             retorno = m_email_cliente.enviar_com_anexos(m_contrato)
             
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
         except Exception as e:
-            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
                     
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
 
     @classmethod
     def apropriar_dados_http(cls, request):

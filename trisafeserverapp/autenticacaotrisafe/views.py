@@ -7,7 +7,6 @@ from django.db import models
 from rest_framework import routers, serializers, viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.request import Request, HttpRequest
-from rest_framework.response import Response
 from rest_framework import mixins
 from rest_framework.renderers import JSONRenderer
 from contrato.models import Contrato
@@ -57,7 +56,7 @@ class AutenticacaoTriSafeViewSet(viewsets.ModelViewSet, permissions.BasePermissi
 
             retorno = Retorno(False, mensagem, '', 401, exc)
 
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
 
         super().handle_exception(exc)
 
@@ -68,13 +67,12 @@ class AutenticacaoTriSafeViewSet(viewsets.ModelViewSet, permissions.BasePermissi
             credencial_cliente = self.apropriar_credenciais_http(request)
             configuracao = AutenticacaoTriSafe(credencial_cliente)
 
-            return Response(configuracao.retorno_autenticacao.json())
+            return configuracao.retorno_autenticacao.gerar_resposta_http()
             
         except Exception as e:
-            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
-                    
+            
             retorno = Retorno(False, 'Falha de comunicação. Em breve será normalizado.', '', 500, e)
-            return Response(retorno.json())
+            return retorno.gerar_resposta_http()
 
     @classmethod
     def apropriar_credenciais_http(cls, request):

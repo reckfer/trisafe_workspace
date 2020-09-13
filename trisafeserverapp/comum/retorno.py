@@ -1,8 +1,14 @@
 from django.forms.models import model_to_dict
 from django.db.models.query import QuerySet
 from django.db import models
+from rest_framework.response import Response
 from comum.credencial import Credencial
 import json
+import traceback
+import logging
+import sys
+
+logger_servidor_app_fluxo = logging.getLogger('servidor.app.fluxo')
 
 class Retorno:
                         
@@ -12,6 +18,17 @@ class Retorno:
         self.credencial = Credencial()
         if(credencial):
             self.credencial = credencial
+    
+    def gerar_resposta_http(self):
+        if not self.estado.ok:
+            logger_servidor_app_fluxo.error('Resposta: %s' % self.estado.json())
+        else:
+            if logger_servidor_app_fluxo.isEnabledFor(logging.DEBUG):
+                logger_servidor_app_fluxo.debug('Resposta (dados): %s' % self.json())
+            else:
+                logger_servidor_app_fluxo.info('Resposta: %s' % self.estado.json())
+
+        return Response(self.json())
         
     def json(self):
         return self.__criar_json__()
@@ -36,17 +53,19 @@ class Retorno:
 
 class EstadoExecucao:
     def __init__(self, indOK = False, msg = '', codMensagem = '', httpStatus = 500, ex = None):
-        
         self.ok = indOK
         self.mensagem = msg
         self.codMensagem = codMensagem
         self.excecao = ex
-
+        
         if self.ok:            
             self.httpStatus = 200
-        else:            
+        else:
             self.httpStatus = httpStatus
-        
+
+        if (self.excecao):
+            logger_servidor_app_fluxo.exception(traceback.format_exception(None, self.excecao, self.excecao.__traceback__))
+
     def json(self):
         return self.__criar_json__()
 

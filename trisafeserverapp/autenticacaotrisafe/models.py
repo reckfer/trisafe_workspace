@@ -1,8 +1,5 @@
 import json
-import sys
-import traceback
 import os
-import logging
 import base64
 from decouple import config
 from trisafeserverapp.settings import BASE_DIR
@@ -97,10 +94,6 @@ class AutenticacaoTriSafe():
 
             self.retorno_autenticacao = retorno
         except Exception as e:
-            print(traceback.format_exception(None, e, e.__traceback__), file=sys.stderr, flush=True)
-            
-            if e.args and len(e.args) > 0:
-                mensagem = e.args[0]
             
             retorno = Retorno(False, 'Autenticação do aplicativo falhou.', 'ExcecaoAutenticacao', 500, e)
             self.retorno_autenticacao = retorno
