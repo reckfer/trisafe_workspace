@@ -31,7 +31,7 @@ export default class ComunicacaoHTTP {
 
         if (__DEV__) {
             protocol = 'http://';
-            domain = '10.0.0.108:8000';
+            domain = '192.168.0.104:8000';
         }
         return protocol + domain + metodo;
     };

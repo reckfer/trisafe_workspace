@@ -16,7 +16,6 @@ export default class GerenciadorContextoApp {
         this.temDados = this.temDados.bind(this);
         this._atribuirDadosObjeto = this._atribuirDadosObjeto.bind(this);
         this._atribuir = this._atribuir.bind(this);
-        //this._clonarObjeto = this._clonarObjeto.bind(this);
         this._transportarLogServidor = this._transportarLogServidor.bind(this);
         this.oTelaAtual = null;
         this.oTelaAnterior = null;

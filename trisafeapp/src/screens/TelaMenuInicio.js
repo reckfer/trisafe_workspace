@@ -10,6 +10,7 @@ import { Button } from 'react-native-elements';
 import { clonarObjeto } from '../contexts/DadosAppGeral';
 import {
     View,
+    Text
 } from 'react-native';
 import Cabecalho from '../common/CabecalhoTela';
 import { styles } from '../common/Estilos';
@@ -17,6 +18,7 @@ import { ContextoApp } from '../contexts/ContextoApp';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Configuracao from '../common/Configuracao';
 import AreaRodape from '../common/AreaRodape';
+import Orientation from 'react-native-orientation';
 
 export default class TelaMenuInicio extends Component {
     
@@ -42,21 +44,23 @@ export default class TelaMenuInicio extends Component {
             this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
 
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
+            this.oGerenciadorContextoApp.dadosAppGeral.a = 'aaa';
         }
         
         this.irParaMeusDados = this.irParaMeusDados.bind(this);
         this.irParaMeusVeiculos = this.irParaMeusVeiculos.bind(this);
-        
         this.oRegistradorLog.registrar('TelaMenuInicio.constructor() ------------ terminou ------------');
     }
 
     componentDidMount() {
 
+        Orientation.unlockAllOrientations();
+
         this.oRegistradorLog.registrar('TelaMenuInicio.componentDidMount() ++++++++++++ iniciou ++++++++++++');
         
         this.inicializar();
         
-        this.oRegistradorLog.registrar('TelaMenuInicio.componentDidMount() ------------ terminou ------------');
+        this.oRegistradorLog.registrar('TelaMenuInicio.componentDidMount() ------------ terminou ------------');        
     }
     
     inicializar() {
@@ -68,7 +72,9 @@ export default class TelaMenuInicio extends Component {
     }
 
     irParaMeusVeiculos() {
-        this.oNavegacao.navigate('Veículo Inicio', this.state);
+        
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
+        // this.oNavegacao.navigate('Veículo Inicio', this.state);
     }
 
     render() {
@@ -77,7 +83,7 @@ export default class TelaMenuInicio extends Component {
             <Button title="Meus dados" key={1} onPress={this.irParaMeusDados} buttonStyle={{margin:10, padding: 10}} icon={<Icon name="user" color="#022F18" size={20} style={{margin:10}} />}></Button>, 
             <Button title="Meus Veículos" key={2} onPress={this.irParaMeusVeiculos} buttonStyle={{margin:10, padding:10}} icon={<Icon name="car" color="#022F18" size={20} style={{margin:10}} />}></Button>
         ];
-        
+        console.log('renderizando...')
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='' navigation={this.oNavegacao}/>

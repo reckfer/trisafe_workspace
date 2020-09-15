@@ -18,6 +18,7 @@ import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
 import AreaRodape from './../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
+import Orientation from 'react-native-orientation';
 
 export default class TelaClienteEndereco extends Component {
 	
@@ -50,6 +51,11 @@ export default class TelaClienteEndereco extends Component {
         this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
 
         this.oRegistradorLog.registrar('TelaClienteEndereco.constructor() => Finalizou.');
+    }
+
+    componentDidMount() {
+        
+        Orientation.unlockAllOrientations();
     }
 
     avancar() {

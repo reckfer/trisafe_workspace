@@ -21,11 +21,14 @@ import { styles } from '../common/Estilos';
 import AreaRodape from '../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
 import Util from '../common/Util';
+import Orientation from 'react-native-orientation';
 
 export default class TelaContratoAceite extends Component {
 	
     constructor(props, value) {
         super(props);
+        
+        Orientation.unlockAllOrientations();
 
         if(props && props.navigation) {
             this.oNavegacao = props.navigation;
@@ -59,8 +62,8 @@ export default class TelaContratoAceite extends Component {
         this.oRegistradorLog.registrar('TelaContratoAceite.constructor() => Finalizou.');
     }
     
-    componentDidMount() {
-        
+    componentDidMount() {        
+
         if(this.oDadosApp.contrato.url_pdf) {
             this.obterArquivoContrato();
         } else if(this.oGerenciadorContextoApp.temDados()) {
@@ -117,6 +120,7 @@ export default class TelaContratoAceite extends Component {
     }
 
     voltar() {
+
         this.oNavegacao.goBack();
     }
 

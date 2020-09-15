@@ -19,6 +19,7 @@ import { styles, theme } from './../common/Estilos';
 import AreaRodape from './../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
 import Util from '../common/Util';
+import Orientation from 'react-native-orientation';
 
 export default class TelaClienteConfirmacao extends Component {
 	
@@ -54,6 +55,10 @@ export default class TelaClienteConfirmacao extends Component {
         this.oRegistradorLog.registrar('TelaClienteConfirmacao.constructor() => Finalizou.');
     }
 
+    componentDidMount() {
+        
+        Orientation.unlockAllOrientations();
+    }
     salvar() {
         try {
             let metodoURI = '/clientes/incluir/';

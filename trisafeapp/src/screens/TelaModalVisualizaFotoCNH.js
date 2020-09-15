@@ -21,17 +21,19 @@ import { ContextoApp } from '../contexts/ContextoApp';
 import Util from '../common/Util';
 import { styles } from '../common/Estilos';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import { clonarObjeto, DADOS_FOTOS } from '../contexts/DadosAppGeral';
 import { StackActions } from '@react-navigation/native';
-import Svg, { Circle, Rect } from 'react-native-svg';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Orientation from 'react-native-orientation';
 
 export default class TelaModalVisualizaFotoCNH extends Component {
     
     constructor(props, value) {
         super(props);
     
+        Orientation.lockToLandscape();
+
         if(value && value.gerenciador) {
             // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
             this.oGerenciadorContextoApp = value.gerenciador;
@@ -52,6 +54,7 @@ export default class TelaModalVisualizaFotoCNH extends Component {
         this.enviarFotoCNHServidor = this.enviarFotoCNHServidor.bind(this);
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
         this.capturarNovamente = this.capturarNovamente.bind(this);
+        this.registrarEventoFoco = this.registrarEventoFoco.bind(this);
         this.voltar = this.voltar.bind(this);
         
         this.texto_instrucao = 'A foto ficou nítida?';
@@ -60,11 +63,22 @@ export default class TelaModalVisualizaFotoCNH extends Component {
     }
 
     componentDidMount() {
-        console.log('componentDidMount() ...');
+        console.log('componentDidMount() vai chamar o voltar() para abrir a camera...');
+        
+        if(this.oDadosControleApp.abrir_camera) {
+            this.voltar();
+        }
     }
 
-    componentDidUpdate() {
-        console.log('componentDidUpdate() ...');
+    componentWillUnmount() {
+        console.log('componentWillUnmount(), vai registrar Orientation.lockToLandscape(); ao refocar...');
+        this.registrarEventoFoco();
+    }
+
+    registrarEventoFoco() {
+        this.oNavegacao.addListener('focus', () => {
+            Orientation.lockToLandscape();
+        });
     }
 
     enviarFotoCNHServidor() {
@@ -81,7 +95,7 @@ export default class TelaModalVisualizaFotoCNH extends Component {
 
             let oDadosParametros = JSON.stringify(oParametrosFoto);
 
-            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarDadosRetorno, false, true);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarDadosRetorno, false, false);
 
         } catch (oExcecao) {
 
@@ -90,8 +104,9 @@ export default class TelaModalVisualizaFotoCNH extends Component {
     }
 
     tratarDadosRetorno(oDados, oEstado) {
-        
-        if (oEstado.mensagem && oEstado.mensagem.trim()){
+        this.oDadosApp.fotos = clonarObjeto(DADOS_FOTOS);
+
+        if (oEstado.mensagem && oEstado.mensagem.trim()) {
             Alert.alert('Trisafe', oEstado.mensagem);
         }
                 
@@ -102,11 +117,11 @@ export default class TelaModalVisualizaFotoCNH extends Component {
     
     capturarNovamente() {
         
-        this.oDadosApp.fotos = clonarObjeto(DADOS_FOTOS);
         this.voltar();
     }
 
     voltar() {
+        this.oDadosApp.fotos = clonarObjeto(DADOS_FOTOS);
         const pop = StackActions.pop(1);
                 
         console.log('Removendo tela imagem CNH...', JSON.stringify(pop));
@@ -137,7 +152,7 @@ export default class TelaModalVisualizaFotoCNH extends Component {
 
             let estiloAreaFoto =  {
                 flex: 1,
-                flexDirection: 'column',
+                flexDirection: 'row',
                 justifyContent: 'flex-start',
                 // flexDirection: 'column',
                 // justifyContent: 'flex-start',
@@ -146,7 +161,7 @@ export default class TelaModalVisualizaFotoCNH extends Component {
                // padding: 50,
             }
             let estiloFoto =  {
-                flex: .95,
+                flex: 1,
                 //transform: [{ rotate: '90deg' }]
                 // flexDirection: 'column',
                 // justifyContent: 'center',
@@ -160,43 +175,38 @@ export default class TelaModalVisualizaFotoCNH extends Component {
                     <View style={estiloAreaFoto}>
                         <ImageBackground source={ { uri: `data:image/png;base64,${this.oDadosApp.fotos.foto_cnh_base64}` }} 
                             style={estiloFoto}>
-                            <Svg height="100%" width="100%" >
-                                <Rect
-                                    // x="0"
-                                    // y="0"
-                                    width="100%"
-                                    height="100%"
+                            <View style={{flex:1, flexDirection:'column', justifyContent:'space-between'}}>
+                                <View style={{flex:.2, backgroundColor:'black', opacity: .7, flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
+                                    <TouchableOpacity onPress={this.capturarNovamente} style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center'}} >
+                                        <Icon name="arrow-left" size={30} color="white" style={{margin:10}}/>
+                                        <Text style={{color:'white', fontSize:16}}>Tirar outra</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={this.enviarFotoCNHServidor} style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
+                                        <Text style={{color:'white', fontSize:16}}>Está nítida</Text>
+                                        <Icon name="arrow-right" size={30} color="white" style={{margin:10}} />
+                                    </TouchableOpacity> 
+                                </View>
+                                <View style={{flex:1, flexDirection:'row', justifyContent:'space-between'}}>
+                                    <View style={{width:"17%", backgroundColor:'black', opacity: .7}}>
+                                                
+                                    </View>
+                                    <View style={{width:"17%",  backgroundColor:'black', opacity: .7, justifyContent:'center', alignItems:'center'}}>
+                                       
+                                    </View>
+                                </View>
+                                <View style={{flex:.1, flexDirection:'column',  backgroundColor:'black', opacity: .7}}>
                                     
-                                    stroke="grey"
-                                    strokeWidth="50"
-                                    //origin="10, 10"
-                                    // originX="50"
-                                    // originY="50"
-                                    //fillRule='evenodd'
-                                    // strokeDasharray='round'
-                                    // strokeLinejoin='round'
-                                    opacity='70'
-                                />
-                            </Svg>
+                                </View>
+                            </View>
                         </ImageBackground>
-                    </View>
-                    <View style={{flexDirection: 'row', justifyContent: 'center'}}>
-                            <TouchableOpacity onPress={this.capturarNovamente} >
-                                <Icon name="camera" size={40} color="orange" style={{transform: [{ rotate: '90deg' }]}}/>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={this.enviarFotoCNHServidor} style={{transform: [{ rotate: '90deg' }]}}>
-                                <Icon name="camera" size={40} color="orange" />
-                            </TouchableOpacity>
-                            {/* <View style={{backgroundColor: 'blue', transform: [{ rotate: '90deg' }]}}>
-                                <Text>Gostou da foto?</Text>
-                            </View> */}
                     </View>
                 </SafeAreaView>
             );
         } else {
+            this.oDadosControleApp.abrir_camera = true;
             return(
                 <View style={styles.areaCliente}>
-                    <Text>Não há foto para exibir.</Text>
+                    <Text>Abrindo camera...</Text>
                 </View>
             );
         }

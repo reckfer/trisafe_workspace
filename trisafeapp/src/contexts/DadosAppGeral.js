@@ -54,6 +54,7 @@ export const DADOS_CONTROLE_APP = {
     'processando_requisicao': false,
     'novo_cadastro': true,
     'autenticado': false,
+    'abrir_camera': false,
     'exibir_foto': true,
 };
 

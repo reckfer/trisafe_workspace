@@ -18,6 +18,7 @@ import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
 import AreaRodape from './../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
+import Orientation from 'react-native-orientation';
 
 export default class TelaClienteDadosPessoais extends Component {
 	
@@ -49,6 +50,11 @@ export default class TelaClienteDadosPessoais extends Component {
         this.avancar = this.avancar.bind(this);
 
         this.oRegistradorLog.registrar('TelaClienteDadosPessoais.constructor() => Finalizou.');
+    }
+
+    componentDidMount() {
+        
+        Orientation.unlockAllOrientations();
     }
     
     avancar() {

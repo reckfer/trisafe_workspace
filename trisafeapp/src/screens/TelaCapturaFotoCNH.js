@@ -13,14 +13,13 @@ import {
     Text,
     ImageBackground,
 } from 'react-native';
+import { styles } from '../common/Estilos';
 import ComunicacaoHTTP from '../common/ComunicacaoHTTP';
 import { Button } from 'react-native-elements';
 import { ContextoApp } from '../contexts/ContextoApp';
 import Util from '../common/Util';
 import { RNCamera } from 'react-native-camera';
-import {
-    BarcodeMaskWithOuterLayout
-  } from '@nartc/react-native-barcode-mask';
+import Orientation from 'react-native-orientation';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { clonarObjeto, DADOS_FOTOS } from '../contexts/DadosAppGeral';
@@ -31,7 +30,9 @@ export default class TelaCapturaFotoCNH extends PureComponent {
     
     constructor(props, value) {
         super(props);
-    
+        
+        Orientation.lockToLandscape();
+
         if(value && value.gerenciador) {
             // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
             this.oGerenciadorContextoApp = value.gerenciador;
@@ -49,8 +50,8 @@ export default class TelaCapturaFotoCNH extends PureComponent {
         if(props && props.navigation) {
             this.oNavegacao = props.navigation;
         }
-        
         this.capturarFotoCNH = this.capturarFotoCNH.bind(this);
+        this.registrarEventoFoco = this.registrarEventoFoco.bind(this);
         this.voltar = this.voltar.bind(this);
         
         this.texto_instrucao = 'Produtos TriSafe a contratar.';
@@ -60,6 +61,19 @@ export default class TelaCapturaFotoCNH extends PureComponent {
 
     componentDidMount() {
         console.log('componentDidMount() ...');
+        
+        this.oDadosControleApp.abrir_camera = false;
+    }
+    
+    componentWillUnmount() {
+        console.log('componentWillUnmount(), vai registrar Orientation.lockToLandscape(); ao refocar...');
+        this.registrarEventoFoco();
+    }
+
+    registrarEventoFoco() {
+        this.oNavegacao.addListener('focus', () => {
+            Orientation.lockToLandscape();
+        });
     }
 
     componentDidUpdate() {
@@ -105,8 +119,6 @@ export default class TelaCapturaFotoCNH extends PureComponent {
     botaoIncluirContrato = () => <Button title="Avançar" onPress={this.incluirContrato} loading={this.oDadosControleApp.processando_requisicao} ></Button>;
     
     render() {
-        console.log('Vai renderizar camera.');
-
         let estiloAreaFoto =  {
             flex: 1,
             flexDirection: 'column',
@@ -118,16 +130,25 @@ export default class TelaCapturaFotoCNH extends PureComponent {
            // padding: 50,
         }
         let estiloFoto =  {
-            flex: .95,
+            flex: 1,
             justifyContent: 'flex-start',
-            alignItems: 'center',
+            //alignItems: 'center',
             // flexDirection: 'column',
             // justifyContent: 'center',
             // alignItems: 'center',
             //backgroundColor: '#f5f5f5',
            // padding: 50,
         }
-        
+
+        // if(!this.oDadosControleApp.abrir_camera){
+        //     console.log('Tela Abrindo camera...');
+        //     return (
+        //         <View style={styles.areaCliente}>
+        //             <Text>Abrindo camera...</Text>
+        //         </View>
+        //     );
+        // } else {
+        console.log('Abrindo camera...');
         return (
             <View style={estiloAreaFoto}>
                 <RNCamera
@@ -137,89 +158,95 @@ export default class TelaCapturaFotoCNH extends PureComponent {
                     style={estiloFoto}
                     type={RNCamera.Constants.Type.back}
                     flashMode={RNCamera.Constants.FlashMode.off}
+                    onCameraReady={() => {
+                        // this.oGerenciadorContextoApp.dadosAppGeral.a = 1;
+                        // const pop = StackActions.pop(1);
+
+                        // console.log('Removendo tela camera...', JSON.stringify(pop));
+                        // this.oNavegacao.dispatch(pop);
+
+                        // const push = StackActions.push('Cadastro Cliente', { screen: 'Foto CNH' });
+
+                        // this.oNavegacao.dispatch(push);
+                    }}
                     captureAudio={false}
                     autoFocusPointOfInterest={{x: 0.7, y: 0.7}}
-                    androidCameraPermissionOptions={{
-                        title: 'Permission to use camera',
-                        message: 'We need your permission to use your camera',
-                        buttonPositive: 'Ok',
-                        buttonNegative: 'Cancel',
-                    }}
-                    androidRecordAudioPermissionOptions={{
-                        title: 'Permission to use audio recording',
-                        message: 'We need your permission to use your audio',
-                        buttonPositive: 'Ok',
-                        buttonNegative: 'Cancel',
-                    }}
+                    // androidCameraPermissionOptions={{
+                    //     title: 'Permission to use camera',
+                    //     message: 'We need your permission to use your camera',
+                    //     buttonPositive: 'Ok',
+                    //     buttonNegative: 'Cancel',
+                    // }}
+                    // androidRecordAudioPermissionOptions={{
+                    //     title: 'Permission to use audio recording',
+                    //     message: 'We need your permission to use your audio',
+                    //     buttonPositive: 'Ok',
+                    //     buttonNegative: 'Cancel',
+                    // }}
                     onGoogleVisionBarcodesDetected={({ barcodes }) => {
                         console.log(barcodes);
                     }}
                 >
-                    <Svg height="100%" width="100%" >
-                        <Rect
-                            // x="0"
-                            // y="0"
-                            width="100%"
-                            height="100%"
+                    <View style={{flex:1, flexDirection:'column', justifyContent:'space-between'}}>
+                        <View style={{flex:.2, backgroundColor:'black', opacity: .7, justifyContent:'center', alignItems:'center'}}>
+                            <Text style={{color:'white', fontSize:16}}>Posicione sua carteira de motorista nos limites do retangulo em amarelo e tire a foto.</Text>
+                        </View>
+                        <View style={{flex: 1, flexDirection:'row', justifyContent:'space-between'}}>
+                            <View style={{width:"17%", backgroundColor:'black', opacity: .7}}>
+                                        
+                            </View>
+                            <Svg style={{width:"66%", height:"100%"}}>
+                                <Rect
+                                    width="100%"
+                                    height="100%"
+                                    
+                                    stroke="yellow"
+                                    strokeWidth="3"
+                                />
+                            </Svg>
+                            <View style={{width:"17%",  backgroundColor:'black', opacity: .7, justifyContent:'center', alignItems:'center'}}>
+                                <TouchableOpacity onPress={this.capturarFotoCNH}>
+                                    <Icon name="camera" size={40} color="blue" />
+                                </TouchableOpacity>   
+                                <TouchableOpacity onPress={() => {this.oGerenciadorContextoApp.atualizarEstadoTela(this);}}>
+                                    <Icon name="camera" size={40} color="yellow" />
+                                </TouchableOpacity> 
+                            </View>
+                        </View>
+                        <View style={{flex:.1, flexDirection:'column',  backgroundColor:'black', opacity: .7}}>
                             
-                            stroke="grey"
-                            strokeWidth="50"
-                            //origin="10, 10"
-                            // originX="50"
-                            // originY="50"
-                            //fillRule='evenodd'
-                            // strokeDasharray='round'
-                            // strokeLinejoin='round'
-                            opacity='70'
-                            
-                        />
-                    </Svg>
-                    {/* <BarcodeMaskWithOuterLayout
-                        showAnimatedLine={false}
-                        maskOpacity={.7}
-                        width='90%'
-                        height='80%'
-                    /> */}
+                        </View>
+                    </View>
                 </RNCamera>
-                <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
-                    <TouchableOpacity onPress={this.capturarFotoCNH}>
-                        <Icon name="camera" size={40} color="blue" style={{transform: [{ rotate: '90deg' }]}} />
-                    </TouchableOpacity>
-                </View>
-                {/* <View style={{ flex: 0, flexDirection: 'row', justifyContent: 'center' }}>
-                    <TouchableOpacity onPress={() => {this.camera.getAvailablePictureSizes().then(valor => {console.log(JSON.stringify(valor));})}} style={styles.capture}>
-                        <Icon name="camera" size={40} color="blue" style={{transform: [{ rotate: '90deg' }]}} />
-                    </TouchableOpacity>
-                </View> */}
             </View>
         );
     }
 }
 TelaCapturaFotoCNH.contextType = ContextoApp;
 
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      flexDirection: 'column',
-      backgroundColor: 'black',
-    },
-    preview: {
-      flex: 1,
-      justifyContent: 'flex-end',
-      alignItems: 'center',
-    },
-    capture: {
-      flex: 0,
-      backgroundColor: '#fff',
-      borderRadius: 5,
-      padding: 2,
-      paddingVertical: 7,
-      alignSelf: 'center',
-      margin: 7,
-    },
-    imgBG: {
-        flex: 1,
-        alignItems:'center',
-        justifyContent:'space-between'
-    },
-  });
+// const styles = StyleSheet.create({
+//     container: {
+//       flex: 1,
+//       flexDirection: 'column',
+//       backgroundColor: 'black',
+//     },
+//     preview: {
+//       flex: 1,
+//       justifyContent: 'flex-end',
+//       alignItems: 'center',
+//     },
+//     capture: {
+//       flex: 0,
+//       backgroundColor: '#fff',
+//       borderRadius: 5,
+//       padding: 2,
+//       paddingVertical: 7,
+//       alignSelf: 'center',
+//       margin: 7,
+//     },
+//     imgBG: {
+//         flex: 1,
+//         alignItems:'center',
+//         justifyContent:'space-between'
+//     }
+// });

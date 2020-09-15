@@ -19,6 +19,7 @@ import AreaRodape from '../common/AreaRodape';
 import { styles, theme } from '../common/Estilos';
 import { ContextoApp } from '../contexts/ContextoApp';
 import Util from '../common/Util';
+import Orientation from 'react-native-orientation';
 
 export default class TelaClienteInicio extends Component {
     
@@ -52,6 +53,11 @@ export default class TelaClienteInicio extends Component {
         this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
         
         this.oRegistradorLog.registrar('TelaClienteInicio.constructor() => Finalizou.');
+    }
+
+    componentDidMount() {
+        
+        Orientation.unlockAllOrientations();
     }
 
     obterCliente() {

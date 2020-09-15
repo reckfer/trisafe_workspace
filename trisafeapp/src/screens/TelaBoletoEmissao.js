@@ -21,6 +21,7 @@ import { styles, theme } from './../common/Estilos';
 import AreaRodape from './../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
 import Util from '../common/Util';
+import Orientation from 'react-native-orientation';
 
 export default class TelaBoletoEmissao extends Component {
 	
@@ -60,7 +61,8 @@ export default class TelaBoletoEmissao extends Component {
     }
 
     componentDidMount() {
-
+        
+        Orientation.unlockAllOrientations();
         this.inicializarDadosTela();
     }
 

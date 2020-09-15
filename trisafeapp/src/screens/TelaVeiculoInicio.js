@@ -57,29 +57,6 @@ export default class TelaVeiculoInicio extends Component {
         this.oRegistradorLog.registrar('TelaMenuInicio.constructor() => Finalizou.');
     }
     
-
-    // async solicitarPermissoes(){
-    //     try {
-    //         const granted = await PermissionsAndroid.request(
-    //           PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-    //           {
-    //             title: "Storage Permission",
-    //             message: "App needs access to memory to download the file "
-    //           }
-    //         );
-    //         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-    //           Alert.alert("Permission granted","Now you can download anything!");
-    //         } else {
-    //           Alert.alert(
-    //             "Permission Denied!",
-    //             "You need to give storage permission to download the file"
-    //           );
-    //         }
-    //       } catch (err) {
-    //         console.warn(err);
-    //       }
-    // }
-
     irParaMeusDados() {
         // this.oGerenciadorContextoApp.setTelaAnterior(this);
         this.oNavegacao.navigate('Cadastro', this.state);
