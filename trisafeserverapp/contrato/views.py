@@ -7,6 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import mixins
 from contrato.models import Contrato
+from comum.credencial import Credencial
 from produto.models import Produto
 from cliente.models import Cliente
 from rest_framework.renderers import JSONRenderer
@@ -37,17 +38,17 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
             v_gerenciador_log.registrar_do_cliente(request)
 
             m_contrato = ContratoViewSet.apropriar_dados_http(request)
-            lista_produtos = ContratoViewSet.extrair_produtos_dados_http(request)
+            m_contrato.credencial = ContratoViewSet.apropriar_credenciais_clicksign_http(request)
             
-            retorno = m_contrato.obter_por_cliente()
+            # retorno = m_contrato.obter_por_cliente()
 
-            if retorno.estado.codMensagem == 'NaoCadastrado':
-                retorno = m_contrato.incluir(lista_produtos)
-            elif retorno.estado.ok:
-                m_contrato = retorno.dados
-                retorno = m_contrato.alterar(lista_produtos)
-            else:    
-                return retorno
+            # if retorno.estado.codMensagem == 'NaoCadastrado':
+            retorno = m_contrato.incluir()
+            # elif retorno.estado.ok:
+            #     m_contrato = retorno.dados
+            #     retorno = m_contrato.alterar(lista_produtos)
+            # else:    
+            #     return retorno
 
             return retorno.gerar_resposta_http()
         except Exception as e:
@@ -174,6 +175,22 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
         m_contrato.id_contrato = d_contrato['id_contrato']
 
         return m_contrato
+    
+    @classmethod
+    def apropriar_credenciais_clicksign_http(cls, request):
+        chave_clicksign = ''
+        token_clicksign = ''
+        
+        d_dados_app = request.data['dados_app']
+        if 'chaves' in d_dados_app:
+            d_chaves = d_dados_app['chaves']
+            chave_clicksign = d_chaves['chave_clicksign']
+            token_clicksign = d_chaves['token_clicksign']
+
+        credencial = Credencial(chave_clicksign, '')
+        credencial.token_clicksign = token_clicksign
+
+        return credencial
 
     @classmethod
     def extrair_cliente_dados_http(cls, request):

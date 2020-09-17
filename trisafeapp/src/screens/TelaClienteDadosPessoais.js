@@ -19,6 +19,7 @@ import { styles, theme } from './../common/Estilos';
 import AreaRodape from './../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
 import Orientation from 'react-native-orientation';
+import { StackActions } from '@react-navigation/native';
 
 export default class TelaClienteDadosPessoais extends Component {
 	
@@ -55,6 +56,34 @@ export default class TelaClienteDadosPessoais extends Component {
     componentDidMount() {
         
         Orientation.unlockAllOrientations();
+
+        console.log('Adicionando listener beforeRemove()...')
+        
+        // this.oNavegacao.addListener('beforeRemove', (e) => {
+        //     // if (!hasUnsavedChanges) {
+        //     //   // If we don't have unsaved changes, then we don't need to do anything
+        //     //   return;
+        //     // }
+        //     console.log('Impedindo a volta ...');
+        //     // Prevent default behavior of leaving the screen
+        //     e.preventDefault();
+    
+        //     // Prompt the user before leaving the screen
+        //         Alert.alert(
+        //             'Certo, você pode sair agora, se quiser, mas lembre-se que poderá continuar a partir daqui a qualquer momento.',
+        //             'Deseja realmente sair o processo?',
+        //             [
+        //                 { text: "Don't leave", style: 'cancel', onPress: () => {} },
+        //                 {
+        //                     text: 'Discard',
+        //                     style: 'destructive',
+        //                     // If the user confirmed, then we dispatch the action we blocked earlier
+        //                     // This will continue the action that had triggered the removal of the screen
+        //                     onPress: () => this.oNavegacao.dispatch(e.data.action),
+        //                 },
+        //             ]
+        //         );
+        //     })
     }
     
     avancar() {

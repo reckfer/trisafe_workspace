@@ -1,7 +1,7 @@
 'use strict';
 import { DADOS_APP_GERAL, clonarObjeto } from './DadosAppGeral';
 import RegistradorLog from './RegistradorLog';
-import { AppState } from 'react-native';
+import { AppState, BackHandler } from 'react-native';
 
 export default class GerenciadorContextoApp {
     
@@ -21,6 +21,7 @@ export default class GerenciadorContextoApp {
         this.oTelaAnterior = null;
 
         AppState.addEventListener('change', this._transportarLogServidor);
+        
     };
 
     get dadosApp() {

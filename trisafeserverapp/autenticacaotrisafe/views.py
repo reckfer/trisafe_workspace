@@ -49,16 +49,16 @@ class AutenticacaoTriSafeViewSet(viewsets.ModelViewSet, permissions.BasePermissi
 
     # Sobrescreve para capturar erros de autenticacao com a Trisafe.
     def handle_exception(self, exc):
-        if (exc and isinstance(exc, ExceptionAutenticacaoTriSafe)):
-            mensagem = ''
-            if exc and len(exc.args) > 0:
-                mensagem = exc.args[0]
+        #if (exc and isinstance(exc, ExceptionAutenticacaoTriSafe)):
+        mensagem = ''
+        if exc and len(exc.args) > 0:
+            mensagem = exc.args[0]
+        
+        response = super().handle_exception(exc)
 
-            retorno = Retorno(False, mensagem, '', 401, exc)
+        retorno = Retorno(False, mensagem, '', response.status_code, exc)
 
-            return retorno.gerar_resposta_http()
-
-        super().handle_exception(exc)
+        return retorno.gerar_resposta_http()
 
     @action(detail=False, methods=['post'])
     def autenticar_cliente(self, request):

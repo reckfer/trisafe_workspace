@@ -12,6 +12,7 @@ import {
     View,
     Text,
     ImageBackground,
+    BackHandler
 } from 'react-native';
 import { styles } from '../common/Estilos';
 import ComunicacaoHTTP from '../common/ComunicacaoHTTP';
@@ -31,7 +32,7 @@ export default class TelaCapturaFotoCNH extends PureComponent {
     constructor(props, value) {
         super(props);
         
-        Orientation.lockToLandscape();
+        Orientation.lockToLandscapeLeft();
 
         if(value && value.gerenciador) {
             // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
@@ -52,11 +53,13 @@ export default class TelaCapturaFotoCNH extends PureComponent {
         }
         this.capturarFotoCNH = this.capturarFotoCNH.bind(this);
         this.registrarEventoFoco = this.registrarEventoFoco.bind(this);
+        this._tratarVoltarPeloDispositivo = this._tratarVoltarPeloDispositivo.bind(this);
         this.voltar = this.voltar.bind(this);
         
         this.texto_instrucao = 'Produtos TriSafe a contratar.';
         this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
         this.oRegistradorLog.registrar('TelaCapturaFotoCNH.constructor() => Finalizou.');
+        BackHandler.addEventListener('hardwareBackPress', this._tratarVoltarPeloDispositivo);
     }
 
     componentDidMount() {
@@ -66,13 +69,13 @@ export default class TelaCapturaFotoCNH extends PureComponent {
     }
     
     componentWillUnmount() {
-        console.log('componentWillUnmount(), vai registrar Orientation.lockToLandscape(); ao refocar...');
+        console.log('componentWillUnmount(), vai registrar Orientation.lockToLandscapeLeft(); ao refocar...');
         this.registrarEventoFoco();
     }
 
     registrarEventoFoco() {
         this.oNavegacao.addListener('focus', () => {
-            Orientation.lockToLandscape();
+            Orientation.lockToLandscapeLeft();
         });
     }
 
@@ -84,12 +87,22 @@ export default class TelaCapturaFotoCNH extends PureComponent {
         this.oNavegacao.goBack();
     }
 
+    _tratarVoltarPeloDispositivo() {
+        console.log('Desbloqueando orientacao horizontal...');
+        Orientation.unlockAllOrientations;
+        
+        const pop = StackActions.pop(1);
+
+        console.log('Removendo tela camera...', JSON.stringify(pop));
+        this.oNavegacao.dispatch(pop);
+    }
+
     capturarFotoCNH() {
         
         if (this.camera) {
             console.log('Tirando foto...');
             
-            const options = { quality: 0.5, base64: true, doNotSave: true,};
+            const options = { quality: 0.5, base64: true, doNotSave: true, orientation: 'landscapeLeft'};
             this.camera.takePictureAsync(options).then((data) => {
                 
                 console.log('Foto tirada: ', data.uri);

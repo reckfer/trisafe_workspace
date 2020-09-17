@@ -47,6 +47,7 @@ export default class TelaClienteConfirmacao extends Component {
         
         this.salvar = this.salvar.bind(this);
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
+        this.avancar = this.avancar.bind(this);
         this.voltar = this.voltar.bind(this);
 
         this.texto_instrucao = 'Confirme seus dados.';
@@ -69,23 +70,28 @@ export default class TelaClienteConfirmacao extends Component {
             
             let oDadosParametros = JSON.stringify(this.state);
 
-            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarDadosRetorno, true, true);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarDadosRetorno, true, false);
         } catch (oExcecao) {
             this.oUtil.tratarExcecao(oExcecao);
         }
     }
 
     tratarDadosRetorno(oDados, oEstado) {
+        let oFuncaoMensagem = () => {};
         
-        if (oEstado.mensagem && oEstado.mensagem.trim()){
-            Alert.alert('Trisafe', oEstado.mensagem);
-        }
-                
         if(oEstado.ok) {
-            //this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
-            this.oDadosControleApp.novo_cadastro = false;
-            this.oNavegacao.navigate('Foto CNH', this.state);
+            oFuncaoMensagem = this.avancar;
         }
+
+        this.oUtil.exibirMensagemUsuario(oEstado.mensagem, oFuncaoMensagem);
+    }
+
+    avancar() {
+        Orientation.lockToLandscapeLeft();
+        
+        this.oDadosControleApp.novo_cadastro = false;
+
+        this.oNavegacao.navigate('Foto CNH', this.state);
     }
      
     voltar() {

@@ -25,7 +25,7 @@ SECRET_KEY = '4coujo21&xdamy+in7!lwakm%@u*-%jz_ou4qgbqe1)zktrkqz'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["192.168.43.84", "10.0.0.108", "10.0.0.108", "localhost"]
+ALLOWED_HOSTS = ["192.168.43.84", "192.168.0.104", "192.168.0.104", "localhost"]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'clienteiter',
     'produto',
     'contrato',
+    'contratoclicksign',
     'transacaogerencianet',
     'boletogerencianet',
     'autenticacaotrisafe'

@@ -1,4 +1,7 @@
 'use strict';
+
+import { cond } from "react-native-reanimated";
+
 export const DADOS_CLIENTE = {
     'id_cliente_iter': '',
     'cpf': '', 
@@ -65,9 +68,18 @@ export const DADOS_INSTRUCAO_USUARIO = {
 export const CHAVES = {
     'chave_trisafe': 'jNFjYQWDbUZk1V9Y',    
     'token_trisafe': '',
-    'chave_iter': 'bUZk1V9YjNFjYQWD',    
-    'token_iter': ''
+    'chave_iter': 'bUZk1V9YjNFjYQWD',
+    'token_iter': '',
+    'chave_clicksign': '1V9YjbYQWDkUZNFj',    
+    'token_clicksign': ''
 };
+
+export const ESTADO = {
+    ok: false,
+    mensagem: 'Falha de comunicação. Nenhum dado foi recebido.',
+    cod_mensagem: '0',
+    http_status: '0'
+}
 
 export const DADOS_APP_GERAL = {
     dados_app: {

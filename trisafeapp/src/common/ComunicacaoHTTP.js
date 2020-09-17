@@ -2,6 +2,7 @@
 import {
     Alert,
 } from 'react-native';
+import { clonarObjeto, ESTADO } from '../contexts/DadosAppGeral';
 import Util from './Util';
 
 export default class ComunicacaoHTTP {
@@ -47,7 +48,8 @@ export default class ComunicacaoHTTP {
             method: metodo,
             headers: {
                 //'Authorization': 'Token 3f7edf70591040bf58437b0cc5d986972ced732e',
-                'Authorization': 'Token 4e2293199e1797f16aef2c474e684ab32bd7640d',
+                // Antigo desnvolvimenti --- 'Authorization': 'Token 4e2293199e1797f16aef2c474e684ab32bd7640d',
+                'Authorization': 'Token ec97e2e166fb92b84e39a0317a334dea5e93469e',
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             },
@@ -135,12 +137,10 @@ export default class ComunicacaoHTTP {
                 if(!ignorarErro) {
                     if(oRespostaHTTP.status && oRespostaHTTP.url) {
                         
-                        Alert.alert('Trisafe', "Erro HTTP status: " + oRespostaHTTP.status + 
-                        ". URL: " + oRespostaHTTP.url);
+                        this.oRegistradorLog.registrar(`ComunicacaoHTTP.obterJsonResposta() Erro HTTP status: ${oRespostaHTTP.status}. URL chamada:  ${oRespostaHTTP.url}`);
                     } else if (oRespostaHTTP instanceof Error) {
                         
-                        this.oRegistradorLog.registrar(oRespostaHTTP.message);
-                        Alert.alert('Trisafe', oRespostaHTTP.message);
+                        this.oUtil.tratarExcecao(oRespostaHTTP);
                     }
                 }
             }
@@ -149,6 +149,9 @@ export default class ComunicacaoHTTP {
     }
 
     tratarRetornoServidor(oJsonRetorno, oFuncaoCallback, suprimirMsgServidor, ignorarCallbackSeErro) {
+        let oEstado = clonarObjeto(ESTADO);
+        let oDados = {};
+
         this.oDadosControleApp.processando_requisicao = false;
             
         if(this.oComponente) {
@@ -157,43 +160,40 @@ export default class ComunicacaoHTTP {
             this.oGerenciadorContextoApp.atualizarEstadoTela(this.oComponente);
         }
         
-        this.oRegistradorLog.registrar('ComunicacaoHTTP.tratarRetornoServidor() => Iniciou.');
-
         if(oJsonRetorno) {
-            this.oRegistradorLog.registrar('ComunicacaoHTTP.tratarRetornoServidor() => Recebeu: ' + JSON.stringify(oJsonRetorno));
-    
-            let oEstado = oJsonRetorno.estado;
-            let oDados = oJsonRetorno.dados;
             
+            oEstado = oJsonRetorno.estado;
+            oDados = oJsonRetorno.dados;
+
             if(oJsonRetorno.credencial.token_iter) {
                 this.oDadosChaves.token_iter = oJsonRetorno.credencial.token_iter;
             }
             if(oJsonRetorno.credencial.token_trisafe) {
                 this.oDadosChaves.token_trisafe = oJsonRetorno.credencial.token_trisafe;
             }
-            
-            if (!suprimirMsgServidor && oEstado.mensagem && oEstado.mensagem.trim()) {
-                Alert.alert('Trisafe', oEstado.mensagem);
-            }
-            
-            if(oDados && typeof(oDados) === 'string' && oDados.trim()) {
-                oDados = oDados.trim();
-            }
+        } else {
+            this.oRegistradorLog.registrar(`ComunicacaoHTTP.tratarRetornoServidor() O servidor não retornou dados.`);
+        }
 
-            if(oFuncaoCallback) {
+        if (!suprimirMsgServidor && oEstado.mensagem && oEstado.mensagem.trim()) {
+            Alert.alert('Trisafe', oEstado.mensagem);
+        }
+        
+        if(oDados && typeof(oDados) === 'string' && oDados.trim()) {
+            oDados = oDados.trim();
+        }
+        
+        this.oRegistradorLog.registrar(`ComunicacaoHTTP.tratarRetornoServidor() Estado da resposta do servidor = ${JSON.stringify(oEstado)}`);
+
+        if(oFuncaoCallback) {
              
-                if(ignorarCallbackSeErro) {
-                    if(oEstado.ok === true) {
-                        oFuncaoCallback(oDados, oEstado);
-                    }
-                } else {
+            if(ignorarCallbackSeErro) {
+                if(oEstado.ok === true) {
                     oFuncaoCallback(oDados, oEstado);
                 }
+            } else {
+                oFuncaoCallback(oDados, oEstado);
             }
-        } else {
-            this.oRegistradorLog.registrar('ComunicacaoHTTP.tratarRetornoServidor() => oJsonRetorno estava vazio.');
-            
-            Alert.alert('Trisafe', "O retorno do servidor foi vazio.");
         }
     }
 }

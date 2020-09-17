@@ -6,64 +6,76 @@ from trisafeserverapp.settings import BASE_DIR
 from django.db import models
 from rest_framework import status
 from comum.retorno import Retorno
+from comum.credencial import Credencial
 from cliente.models import Cliente
 from produto.models import Produto
 from emailcliente.models import EmailCliente
-from transacaogerencianet.models import TransacaoGerenciaNet
+from contratoclicksign.models import ContratoClicksign
 from fpdf import FPDF
 
 class Contrato(models.Model):
-    id_contrato = models.CharField(primary_key=True, max_length=16)
+    id_contrato = models.CharField(primary_key=True, max_length=30)
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, blank=False, null=False)
     produtos_contratados = models.ManyToManyField(Produto)
     valor_total = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
-    charge_id = models.CharField(max_length=10, blank=False, null=True)
+    aceito = models.BooleanField(default=False)
     dt_hr_inclusao = models.DateTimeField(blank=False, null=False, auto_now_add=True)
     ult_atualizacao = models.DateTimeField(blank=False, null=False, auto_now=True)
-    aceito = models.BooleanField(default=False)
-    url_pdf = models.CharField(max_length=200, blank=True, null=True)
+    chave_contrato_ext = models.CharField(max_length=100, blank=False, null=True)
+    chave_boleto_ext = models.CharField(max_length=100, blank=False, null=True)
+    credencial = Credencial()
 
-    # Tipos de produtos
-    FISICO = 'F'
-    SERVICO = 'S'
-    TIPOS_PRODUTO = [
-        (FISICO, 'Contrato Físico'),
-        (SERVICO, 'Serviço'),
-    ]
-
-    def incluir(self, chaves_produtos):
+    def incluir(self):
 
         try:
             retorno_cliente = self.cliente.obter()
 
-            if not retorno_cliente.estado.ok:
+            if (not retorno_cliente.estado.ok):
                 return retorno_cliente
-
-            m_produto = Produto()
-            retorno_produtos = m_produto.listar()
             
-            if not retorno_produtos.estado.ok:
-                return retorno_produtos
+            chave_doc = ''
+            m_contrato_clicksign = ContratoClicksign(self.credencial)
+            # Tenta obter o contrato da base, pelo CPF
+            retorno = self.obter_por_cliente()
 
-            d_dados_pedido = self.gerar_dados_pedido_transacao_gerencia_net(retorno_produtos.dados)
+            if (retorno.estado.ok):
 
-            m_transacao_gerencia_net = TransacaoGerenciaNet()
+                m_contrato = retorno.dados
+                chave_doc = m_contrato.chave_contrato_ext
 
-            retorno_transacao = m_transacao_gerencia_net.incluir(d_dados_pedido)
+            else:
+                if retorno.estado.codMensagem != 'NaoCadastrado':
+                    return retorno
+                else:
+                    retorno = m_contrato_clicksign.incluir(retorno_cliente.dados)
 
-            if not retorno_transacao.estado.ok:
-                return retorno_transacao
+                    if not retorno.estado.ok:
+                        return retorno
             
-            self.charge_id = m_transacao_gerencia_net.id            
-            self.cliente = retorno_cliente.dados
-            self.id_contrato = str(self.cliente.id_cliente_iter).rjust(6, '0') + str(self.charge_id).rjust(10, '0')
-            self.calcular_valor_total(retorno_produtos.dados)
+                    d_dados_doc = retorno.dados
 
-            # Inclui na base
-            self.save()
+                    if 'document' in d_dados_doc:
+                        d_documento = d_dados_doc['document']
+                        if 'key' in d_documento:
+                            chave_doc = d_documento['key']
+                        
+                        self.cliente = retorno_cliente.dados
+                        # Sobram 4, caso necessario mais de um contrato por cliente.
+                        self.id_contrato = str(self.cliente.id_cliente_iter).rjust(6, '0') + str(self.cliente.cpf).rjust(6, '0')
+                        self.chave_contrato_ext = d_documento['key']
+                        self.valor_total = 0.0
 
-            # Atualiza com os produtos
-            self.produtos_contratados.add(*retorno_produtos.dados)
+                        # Inclui/atualiza na base
+                        self.save()
+
+            retorno = m_contrato_clicksign.obter(chave_doc)
+            
+            if not retorno.estado.ok:
+                return retorno
+
+            d_documento = retorno.dados
+            
+            retorno = m_contrato_clicksign.fazer_download(d_documento)
 
             retorno = Retorno(True, 'Contrato gerado com sucesso. Selecione "Contratar" para aceitá-lo.')
             retorno.dados = self
@@ -73,6 +85,48 @@ class Contrato(models.Model):
                     
             retorno = Retorno(False, 'A inclusão do contrato falhou.', None, None, e)
             return retorno
+    # def incluir(self, chaves_produtos):
+
+    #     try:
+    #         retorno_cliente = self.cliente.obter()
+
+    #         if not retorno_cliente.estado.ok:
+    #             return retorno_cliente
+
+    #         m_produto = Produto()
+    #         retorno_produtos = m_produto.listar()
+            
+    #         if not retorno_produtos.estado.ok:
+    #             return retorno_produtos
+
+    #         d_dados_pedido = self.gerar_dados_pedido_transacao_gerencia_net(retorno_produtos.dados)
+
+    #         m_transacao_gerencia_net = TransacaoGerenciaNet()
+
+    #         retorno_transacao = m_transacao_gerencia_net.incluir(d_dados_pedido)
+
+    #         if not retorno_transacao.estado.ok:
+    #             return retorno_transacao
+            
+    #         self.charge_id = m_transacao_gerencia_net.id            
+    #         self.cliente = retorno_cliente.dados
+    #         self.id_contrato = str(self.cliente.id_cliente_iter).rjust(6, '0') + str(self.charge_id).rjust(10, '0')
+    #         self.calcular_valor_total(retorno_produtos.dados)
+
+    #         # Inclui na base
+    #         self.save()
+
+    #         # Atualiza com os produtos
+    #         self.produtos_contratados.add(*retorno_produtos.dados)
+
+    #         retorno = Retorno(True, 'Contrato gerado com sucesso. Selecione "Contratar" para aceitá-lo.')
+    #         retorno.dados = self
+
+    #         return retorno
+    #     except Exception as e:
+                    
+    #         retorno = Retorno(False, 'A inclusão do contrato falhou.', None, None, e)
+    #         return retorno
     
     def alterar(self, chaves_produtos):
 

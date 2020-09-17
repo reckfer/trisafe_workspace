@@ -32,7 +32,7 @@ export default class TelaModalVisualizaFotoCNH extends Component {
     constructor(props, value) {
         super(props);
     
-        Orientation.lockToLandscape();
+        Orientation.lockToLandscapeLeft();
 
         if(value && value.gerenciador) {
             // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
@@ -55,6 +55,7 @@ export default class TelaModalVisualizaFotoCNH extends Component {
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
         this.capturarNovamente = this.capturarNovamente.bind(this);
         this.registrarEventoFoco = this.registrarEventoFoco.bind(this);
+        this.avancar = this.avancar.bind(this);
         this.voltar = this.voltar.bind(this);
         
         this.texto_instrucao = 'A foto ficou nítida?';
@@ -63,21 +64,21 @@ export default class TelaModalVisualizaFotoCNH extends Component {
     }
 
     componentDidMount() {
-        console.log('componentDidMount() vai chamar o voltar() para abrir a camera...');
         
         if(this.oDadosControleApp.abrir_camera) {
+            console.log('componentDidMount() vai chamar o voltar() para abrir a camera...');
             this.voltar();
         }
     }
 
     componentWillUnmount() {
-        console.log('componentWillUnmount(), vai registrar Orientation.lockToLandscape(); ao refocar...');
+        console.log('componentWillUnmount(), vai registrar Orientation.lockToLandscapeLeft(); ao refocar...');
         this.registrarEventoFoco();
     }
 
     registrarEventoFoco() {
         this.oNavegacao.addListener('focus', () => {
-            Orientation.lockToLandscape();
+            Orientation.lockToLandscapeLeft();
         });
     }
 
@@ -106,13 +107,19 @@ export default class TelaModalVisualizaFotoCNH extends Component {
     tratarDadosRetorno(oDados, oEstado) {
         this.oDadosApp.fotos = clonarObjeto(DADOS_FOTOS);
 
-        if (oEstado.mensagem && oEstado.mensagem.trim()) {
-            Alert.alert('Trisafe', oEstado.mensagem);
-        }
-                
+        let oFuncaoMensagem = () => {};
+        
         if(oEstado.ok) {
-            this.oNavegacao.navigate('Contrato', this.state);
+            oFuncaoMensagem = this.avancar;
         }
+
+        this.oUtil.exibirMensagemUsuario(oEstado.mensagem, oFuncaoMensagem);
+    }
+
+    avancar() {
+        Orientation.unlockAllOrientations();
+
+        this.oNavegacao.navigate('Contrato');
     }
     
     capturarNovamente() {

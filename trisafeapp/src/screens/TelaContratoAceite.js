@@ -87,9 +87,9 @@ export default class TelaContratoAceite extends Component {
         
         this.oGerenciadorContextoApp.atribuirDados('contrato', oDados);
 
-        if(oEstado.ok) {
-            this.obterArquivoContrato();
-        }
+        // if(oEstado.ok) {
+        //     this.obterArquivoContrato();
+        // }
     }
 
     obterArquivoContrato() {

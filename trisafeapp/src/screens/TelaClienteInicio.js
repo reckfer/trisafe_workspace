@@ -48,16 +48,29 @@ export default class TelaClienteInicio extends Component {
         this.obterCliente = this.obterCliente.bind(this);
         this.tratarDadosCliente = this.tratarDadosCliente.bind(this);
         this.irParaTestesRapidos = this.irParaTestesRapidos.bind(this);
+        this.registrarEventoFoco = this.registrarEventoFoco.bind(this);
 
         this.texto_instrucao = 'Informe seu CPF ou e-mail para iniciar.';
         this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
         
         this.oRegistradorLog.registrar('TelaClienteInicio.constructor() => Finalizou.');
     }
-
+    
     componentDidMount() {
         
         Orientation.unlockAllOrientations();
+    }
+
+    componentWillUnmount() {
+        console.log('componentWillUnmount(), vai registrar Orientation.lockToLandscapeLeft(); ao refocar...');
+        
+        this.registrarEventoFoco();
+    }
+
+    registrarEventoFoco() {
+        this.oNavegacao.addListener('focus', () => {
+            Orientation.unlockAllOrientations();
+        });
     }
 
     obterCliente() {

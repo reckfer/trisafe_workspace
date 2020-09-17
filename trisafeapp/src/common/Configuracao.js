@@ -53,7 +53,7 @@ export default class Configuracao {
 
                 let oDadosParametros = JSON.stringify(oDadosChaves);
 
-                this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.apropriarToken, true, false);
+                this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.apropriarToken, false, false);
             }
         } catch (oExcecao) {
             this.oUtil.tratarExcecao(oExcecao);
