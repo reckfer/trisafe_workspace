@@ -18,9 +18,11 @@ Os seguintes pacotes devem estar instalados na estação de trabalho.
 ## Baixar todas as dependencias de pacotes React-Native utilizados:
 
 Acessar a pasta do projeto do aplicativo:
+
 	cd trisafe_workspace\trisafeapp
 
 Instalar as dependências:
+
 	npm install
 	
 # Python:
@@ -30,16 +32,14 @@ Acessar a raiz da workspace.
 	cd trisafe_workspace
 
 ## Criar o Virtual Environment do Python
- - No terminal cmd Windows:
-	
-	python.exe -m venv .venv
+No terminal cmd Windows:
 
+	python.exe -m venv .venv
 	.venv\Scripts\Activate.bat
 
- - No shell Linux/Mac:
+No shell Linux/Mac:
 
-	python.exe -m venv .venv
-	
+	python.exe -m venv .venv	
 	source .venv/bin/activate
 
 ## Instalar as dependências
