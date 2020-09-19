@@ -6,8 +6,8 @@ Guia para o desenvolvedor configurar a workspace na estação de trabalho, apena
 
 Os seguintes pacotes devem estar instalados na estação de trabalho.
 
-- Python 3.5.1 ou superior
-- React-Native
+- Python 3.5.1 ou superior (ver instruções de instalação no site)
+- React-Native: seguir instruções de instalação no site do React Native, https://reactnative.dev/docs/environment-setup, aba "React Native CLI Quickstart"
 - Emulador Android
 - Android Studio
 - Visual Studio Code
@@ -15,75 +15,31 @@ Os seguintes pacotes devem estar instalados na estação de trabalho.
 
 # React-Native
 
-## Baixar as dependencias para navegação entre telas:
+## Baixar todas as dependencias de pacotes React-Native utilizados:
 
-	npm install @react-navigation/native --save
-	
-	npm install react-native-reanimated react-native-gesture-handler react-native-screens react-native-safe-area-context @react-native-community/masked-view
-	
-	npm install @react-navigation/stack --save
-	
-	npm install @react-navigation/drawer --save
+Acessar a pasta do projeto do aplicativo:
 
-## Baixar as dependencias para elementos de construção de telas:
+	cd trisafe_workspace\trisafeapp
 
-	npm install react-native-elements --save
-	
-## Baixar as dependencias para ícones:
+Instalar as dependências:
 
-	npm install react-native-vector-icons --save
-	
-		Obs.: apenas a primeira vez, foi necessário adicionar o seguinte, ao arquivo C:\Users\ferna\trisafe_workspace\trisafeapp\android\app\build.gradle:
-		
-			// Adiciona as fontes de icones.
-			apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
-
-## Baixar as dependencias para cartões de escolhas:
-
-	npm install react-native-cards --save
-
-## Baixar as visualizador de PDF:	
-
-	npm install react-native-pdf rn-fetch-blob --save
-	
-	npm install @react-native-community/progress-bar-android --save
-	
-		Obs.: apenas a primeira vez, foi necessário adicionar o seguinte, ao arquivo C:\Users\ferna\trisafe_workspace\trisafeapp\android\app\build.gradle:
-		
-			pickFirst "lib/x86_64/libjsc.so"
-			
-			pickFirst "lib/arm64-v8a/libjsc.so"
-	
-## Baixar as dependencias para rotina de armazenamento local:
-
-	npm install @react-native-community/async-storage --save
-	
-## Baixar as dependencias para notificações:
-	
-	npm install react-native-push-notification --save
-
-## Baixar as dependencias para logger:
-
-	npm install react-native-logs --save
-	
+	npm install
 	
 # Python:
 
+## Criar o Virtual Environment do Python
 Acessar a raiz da workspace.
 
 	cd trisafe_workspace
 
-## Criar o Virtual Environment do Python
- - No terminal cmd Windows:
-	
-	python.exe -m venv .venv
+No terminal cmd Windows:
 
+	python.exe -m venv .venv
 	.venv\Scripts\Activate.bat
 
- - No shell Linux/Mac:
+No shell Linux/Mac:
 
-	python.exe -m venv .venv
-	
+	python.exe -m venv .venv	
 	source .venv/bin/activate
 
 ## Instalar as dependências
