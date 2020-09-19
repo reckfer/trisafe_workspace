@@ -18,7 +18,7 @@ import sys
 class BoletoSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = BoletoGerenciaNet
-        fields = ('charge_id')
+        fields = ('chave_boleto_ext')
 
 # ViewSets define the view behavior.
 class BoletoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissions.BasePermission):

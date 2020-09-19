@@ -108,9 +108,9 @@ class Contrato(models.Model):
     #         if not retorno_transacao.estado.ok:
     #             return retorno_transacao
             
-    #         self.charge_id = m_transacao_gerencia_net.id            
+    #         self.chave_boleto_ext = m_transacao_gerencia_net.id            
     #         self.cliente = retorno_cliente.dados
-    #         self.id_contrato = str(self.cliente.id_cliente_iter).rjust(6, '0') + str(self.charge_id).rjust(10, '0')
+    #         self.id_contrato = str(self.cliente.id_cliente_iter).rjust(6, '0') + str(self.chave_boleto_ext).rjust(10, '0')
     #         self.calcular_valor_total(retorno_produtos.dados)
 
     #         # Inclui na base
@@ -151,7 +151,7 @@ class Contrato(models.Model):
             if not retorno_transacao.estado.ok:
                 return retorno_transacao
             
-            self.charge_id = m_transacao_gerencia_net.id
+            self.chave_boleto_ext = m_transacao_gerencia_net.id
             self.cliente = retorno_cliente.dados
             self.calcular_valor_total(retorno_produtos.dados)
             self.aceito = False
@@ -322,7 +322,7 @@ class Contrato(models.Model):
                 pdf.cell(200, 10, txt= "%s = %s" % (m_produto.nome, m_produto.valor), ln=1, align="C")
             
             pdf.cell(200, 10, txt= "Valor Total = %s" % self.valor_total, ln=1, align="C")
-            pdf.cell(200, 10, txt= "Charge Id Boleto = %s" % self.charge_id, ln=1, align="C")
+            pdf.cell(200, 10, txt= "Charge Id Boleto = %s" % self.chave_boleto_ext, ln=1, align="C")
             
             nome_arquivo = "Contrato_%s.pdf" % self.id_contrato
             caminho_arquivo = os.path.join(BASE_DIR, "data", "contratos", nome_arquivo)
@@ -368,7 +368,7 @@ class Contrato(models.Model):
             self.cliente = m_contrato.cliente
             self.produtos_contratados.set(m_contrato.produtos_contratados.all())
             self.valor_total = m_contrato.valor_total
-            self.charge_id = m_contrato.charge_id
+            self.chave_boleto_ext = m_contrato.chave_boleto_ext
             self.dt_hr_inclusao = m_contrato.dt_hr_inclusao
             self.ult_atualizacao = m_contrato.ult_atualizacao
             self.aceito = m_contrato.aceito
@@ -384,8 +384,9 @@ class Contrato(models.Model):
             'cliente': self.cliente.json(),
             'produtos_contratados': self.produtos_contratados.values(),
             'valor_total': self.valor_total,
-            'charge_id' : self.charge_id,
-            'url_pdf' : self.url_pdf,
+            'chave_contrato_ext': self.chave_contrato_ext,
+            'chave_boleto_ext' : self.chave_boleto_ext,
+            'aceito' : self.aceito,
             'dt_hr_inclusao' : self.dt_hr_inclusao,
             'ult_atualizacao' : self.ult_atualizacao,
         }

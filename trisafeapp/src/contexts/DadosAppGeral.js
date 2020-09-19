@@ -34,7 +34,7 @@ export const DADOS_CONTRATO = {
     'cliente': DADOS_CLIENTE,
     'produtos_contratados': DADOS_PRODUTOS_CONTRATADOS,
     'valor_total': 0.0,
-    'charge_id' : '',
+    'chave_boleto_ext' : '',
     'url_pdf': '',
     'dt_hr_inclusao' : '',
     'ult_atualizacao' : '',

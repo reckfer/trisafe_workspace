@@ -49,7 +49,7 @@ export default class ComunicacaoHTTP {
             headers: {
                 //'Authorization': 'Token 3f7edf70591040bf58437b0cc5d986972ced732e',
                 // Antigo desnvolvimenti --- 'Authorization': 'Token 4e2293199e1797f16aef2c474e684ab32bd7640d',
-                'Authorization': 'Token ec97e2e166fb92b84e39a0317a334dea5e93469e',
+                'Authorization': 'Token 7dd815215f55d8a01d66cbdb0a1bb895aba598c5',
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             },

@@ -50,6 +50,8 @@ export default class TelaModalTestesCadastro extends Component {
         this.irParaTesteCadastroIter = this.irParaTesteCadastroIter.bind(this);
         this.irParaTesteBoletoGerenciaNet = this.irParaTesteBoletoGerenciaNet.bind(this); 
         this.irParaTesteContratoPDF = this.irParaTesteContratoPDF.bind(this);
+        this.irParaTesteDownloadContrato = this.irParaTesteDownloadContrato.bind(this);
+        this.irParaTesteDownloadBoleto = this.irParaTesteDownloadBoleto.bind(this);
         this.irParaTesteFotoCNH = this.irParaTesteFotoCNH.bind(this);
         this.irParaTesteFotoDocVeiculo = this.irParaTesteFotoDocVeiculo.bind(this);
         this.obterUltimoCliente = this.obterUltimoCliente.bind(this);        
@@ -160,6 +162,14 @@ export default class TelaModalTestesCadastro extends Component {
         this.oGerenciadorContextoApp.atualizarEstadoTela(this);
     }
 
+    irParaTesteDownloadContrato() {
+
+    }
+
+    irParaTesteDownloadBoleto(){
+
+    }
+
     voltar() {
         this.oNavegacao.goBack();
     }
@@ -168,6 +178,8 @@ export default class TelaModalTestesCadastro extends Component {
     botaoGerarDados = () => <Button title="Gerar Dados Teste" onPress={this.gerarDadosTestes} ></Button>
     botaoContrato = () => <Button title="Testar Contrato" onPress={this.irParaTesteContratoPDF} ></Button>
     botaoBoleto = () => <Button title="Testar Boleto" onPress={this.irParaTesteBoletoGerenciaNet} ></Button>
+    botaoDownloadContrato = () => <Button title="Download Contrato" onPress={this.irParaTesteDownloadContrato} ></Button>
+    botaoDownloadBoleto = () => <Button title="Download Boleto" onPress={this.irParaTesteDownloadBoleto} ></Button>
     botaoFotoCNH = () => <Button title="Testar Foto CNH" onPress={this.irParaTesteFotoCNH} ></Button>
     botaoFotoDocVeiculo = () => <Button title="Testar Foto Doc" onPress={this.irParaTesteFotoDocVeiculo} ></Button>
     botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;

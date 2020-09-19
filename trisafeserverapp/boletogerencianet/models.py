@@ -42,7 +42,7 @@ class BoletoGerenciaNet(models.Model):
             data_vencimento = today.strftime("%Y-%m-%d")
  
             params = {
-                'id': m_contrato_cadastro.charge_id
+                'id': m_contrato_cadastro.chave_boleto_ext
             }
             
             body = {
@@ -92,7 +92,7 @@ class BoletoGerenciaNet(models.Model):
             m_contrato_cadastro = retorno_contrato.dados
  
             params = {
-                'id': m_contrato_cadastro.charge_id
+                'id': m_contrato_cadastro.chave_boleto_ext
             }
 
             m_gerencia_net = Gerencianet(credentials)

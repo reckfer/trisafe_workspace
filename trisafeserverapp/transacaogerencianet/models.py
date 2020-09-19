@@ -35,7 +35,7 @@ class TransacaoGerenciaNet(models.Model):
     def converter_de_gerencia_net(self, d_charge):
         if d_charge:
             d_dados_charge = d_charge['data']
-            self.id = d_dados_charge['charge_id']
+            self.id = d_dados_charge['chave_boleto_ext']
             self.data_criacao = d_dados_charge['created_at']
             self.estado = d_dados_charge['status']
             self.total = d_dados_charge['total']
