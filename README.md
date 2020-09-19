@@ -27,11 +27,11 @@ Instalar as dependências:
 	
 # Python:
 
+## Criar o Virtual Environment do Python
 Acessar a raiz da workspace.
 
 	cd trisafe_workspace
 
-## Criar o Virtual Environment do Python
 No terminal cmd Windows:
 
 	python.exe -m venv .venv
