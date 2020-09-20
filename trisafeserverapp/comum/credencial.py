@@ -103,7 +103,7 @@ class Credencial:
 
             return token
 
-        return self.token_click
+        return self.token_clicksign
 
     def json(self):
         return self.__criar_json__()

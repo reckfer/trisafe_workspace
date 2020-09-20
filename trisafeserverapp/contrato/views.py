@@ -124,6 +124,23 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
             return retorno.gerar_resposta_http()
     
     @action(detail=False, methods=['post'])
+    def obter_url_contrato_docx(self, request):
+        try:
+            v_gerenciador_log = GerenciadorLogViewSet()
+            v_gerenciador_log.registrar_do_cliente(request)
+            
+            m_contrato = ContratoViewSet.apropriar_dados_http(request)
+            m_contrato.credencial = ContratoViewSet.apropriar_credenciais_clicksign_http(request)
+            
+            retorno = m_contrato.obter_url_contrato_docx()
+            
+            return retorno.gerar_resposta_http()
+        except Exception as e:
+                    
+            retorno = Retorno(False, 'A consulta do contrato falhou.', None, None, e)
+            return retorno.gerar_resposta_http()
+    
+    @action(detail=False, methods=['post'])
     def obter_arquivo_contrato(self, request):
         try:
             v_gerenciador_log = GerenciadorLogViewSet()

@@ -11,7 +11,7 @@ import { ThemeProvider, Input, Button, Card, ButtonGroup} from 'react-native-ele
 import {
     ScrollView,
     Alert,
-    View
+    View, PermissionsAndroid
 } from 'react-native';
 import ComunicacaoHTTP from '../common/ComunicacaoHTTP';
 import Cabecalho from '../common/CabecalhoTela';
@@ -20,6 +20,7 @@ import { styles, theme } from '../common/Estilos';
 import UtilTests from './UtilTests';
 import { ContextoApp } from '../contexts/ContextoApp';
 import Util from '../common/Util';
+import RNFetchBlob from 'rn-fetch-blob';
 
 export default class TelaModalTestesCadastro extends Component {
 
@@ -56,9 +57,12 @@ export default class TelaModalTestesCadastro extends Component {
         this.irParaTesteFotoDocVeiculo = this.irParaTesteFotoDocVeiculo.bind(this);
         this.obterUltimoCliente = this.obterUltimoCliente.bind(this);        
         this.obterContratoPorCliente = this.obterContratoPorCliente.bind(this);
+        this.obterURLContrato = this.obterURLContrato.bind(this);
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
         this.tratarDadosRetornoContrato = this.tratarDadosRetornoContrato.bind(this);
+        this.tratarObterURLContrato = this.tratarObterURLContrato.bind(this);
         this.gerarDadosTestes = this.gerarDadosTestes.bind(this);
+        this.requestCameraPermission = this.requestCameraPermission.bind(this);
         this.voltar = this.voltar.bind(this);
         
         this.texto_instrucao = 'Selecione a opção de teste.';
@@ -163,7 +167,102 @@ export default class TelaModalTestesCadastro extends Component {
     }
 
     irParaTesteDownloadContrato() {
+        this.requestCameraPermission();
+    }
 
+    obterURLContrato() {
+
+        try {
+            let metodoURI = '/contratos/obter_url_contrato_docx/';
+            
+            let oDadosParametros = JSON.stringify(this.state);
+
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarObterURLContrato);
+
+        } catch (oExcecao) {
+            this.oUtil.tratarExcecao(oExcecao);
+        }
+    }
+
+    tratarObterURLContrato(oDados, oEstado) {
+        
+        if(oEstado.ok && oDados) {
+            RNFetchBlob
+            .config({
+                fileCache : true,
+                //path: RNFetchBlob.fs.dirs.DownloadDir + '/a.docx',
+                // appendExt: 'docx',
+                // addAndroidDownloads : {
+                //     useDownloadManager : true, // <-- this is the only thing required
+                //     // Optional, override notification setting (default to true)
+                //     notification : true,
+                //     // Optional, but recommended since android DownloadManager will fail when
+                //     // the url does not contains a file extension, by default the mime type will be text/plain
+                //     // mime : 'application/msword',
+                //     //description : 'File downloaded by download manager.',
+                //     // mediaScannable : true,
+                // },
+                
+            //   // add this option that makes response data to be stored as a file,
+            //   // this is much more performant.
+            //   fileCache : true,
+            //   appendExt: 'docx'
+            })
+            .fetch('GET', oDados)
+            .then((res) => {
+              // the temp file path
+              console.log('The file saved to ', res.path());
+              console.log('Caminho downloads:', RNFetchBlob.fs.dirs.DownloadDir);
+
+              let nomeArquivo = `Contrato_Trisafe_${this.oDadosApp.contrato.id_contrato}.docx`;
+              let caminhoArquivoDestino = `${RNFetchBlob.fs.dirs.DownloadDir}/${nomeArquivo}`;
+              
+              RNFetchBlob.fs.mv(res.path(), caminhoArquivoDestino).then((resultado) => {
+                  console.log('Arquivo movido: ', resultado);
+                  Alert.alert('TriSafe', `Seu contrato salvo. Verifique na pasta Downloads o arquivo ${nomeArquivo}.`);
+              });
+            //   RNFetchBlob.android.addCompleteDownload({
+            //     title : 'test file of RNFB',
+            //     description : 'desc',
+            //     mime : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',//'application/msword',//'application/octet-stream',
+            //     path : res.path(),
+            //     showNotification : true
+            //   })
+            //   .then((valor) => {console.log('Download resultante: ', valor)})
+            //   .catch((e) => {
+            //     this.oUtil.tratarExcecao(e);
+            //   });
+            }).catch((e) =>{
+                this.oUtil.tratarExcecao(e);
+            })
+        }
+    }
+
+    requestCameraPermission() {
+        try {
+          PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+            {
+              title: "Cool Photo App Camera Permission",
+              message:
+                "Cool Photo App needs access to your camera " +
+                "so you can take awesome pictures.",
+              buttonNeutral: "Ask Me Later",
+              buttonNegative: "Cancel",
+              buttonPositive: "OK"
+            }
+          )
+          .then((granted) => {
+                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                    console.log("You can use the camera");
+                    this.obterURLContrato();
+                } else {
+                    console.log("Camera permission denied");
+                }
+            });
+        } catch (err) {
+          console.warn(err);
+        }
     }
 
     irParaTesteDownloadBoleto(){
@@ -192,6 +291,9 @@ export default class TelaModalTestesCadastro extends Component {
             { element: this.botaoContrato }, { element: this.botaoBoleto } 
         ];
         let botoesTestes3 = [ 
+            { element: this.botaoDownloadContrato }, { element: this.botaoDownloadBoleto } 
+        ];
+        let botoesTestes4 = [ 
             { element: this.botaoFotoCNH }, { element: this.botaoFotoDocVeiculo } 
         ];
         let botoesTela = [ 
@@ -201,7 +303,12 @@ export default class TelaModalTestesCadastro extends Component {
         return (
             <View style={styles.areaCliente}>
                 <Cabecalho titulo='Testes Cadastro' nomeTela='Início' navigation={this.oNavegacao} />
-                <AreaDados dadosApp={this.oDadosApp} botoesTestes1={botoesTestes1} botoesTestes2={botoesTestes2} botoesTestes3={botoesTestes3}/>
+                <AreaDados dadosApp={this.oDadosApp} 
+                    botoesTestes1={botoesTestes1} 
+                    botoesTestes2={botoesTestes2} 
+                    botoesTestes3={botoesTestes3}
+                    botoesTestes4={botoesTestes4}
+                />
                 <AreaRodape botoes={botoesTela} mensagem={''}/>
             </View>
         );
@@ -238,6 +345,10 @@ export class AreaDados extends Component {
                 />
                 <ButtonGroup
                     buttons={this.props.botoesTestes3}
+                    buttonStyle={ {alignItems: 'stretch'} }
+                />
+                <ButtonGroup
+                    buttons={this.props.botoesTestes4}
                     buttonStyle={ {alignItems: 'stretch'} }
                 />
                 <ScrollView>

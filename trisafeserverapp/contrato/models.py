@@ -204,6 +204,26 @@ class Contrato(models.Model):
             retorno = Retorno(False, 'A consulta do contrato falhou.', None, None, e)
             return retorno
     
+    def obter_url_contrato_docx(self):
+        try:
+            retorno = Retorno(False, 'Contrato não localizado.', 'NaoCadastrado')
+            
+            m_contratos = Contrato.objects.filter(cliente__cpf=self.cliente.cpf)
+            
+            if m_contratos:
+                m_contrato = m_contratos[0]
+                if m_contrato:
+                    
+                    m_contrato_clicksign = ContratoClicksign(self.credencial)
+                    retorno = m_contrato_clicksign.obter_url_contrato_docx(m_contrato.chave_contrato_ext)
+
+            return retorno
+
+        except Exception as e:
+                    
+            retorno = Retorno(False, 'A consulta do contrato falhou.', None, None, e)
+            return retorno
+    
     def obter_por_cliente(self):
         try:
             retorno = Retorno(False, 'Contrato não localizado.', 'NaoCadastrado')
