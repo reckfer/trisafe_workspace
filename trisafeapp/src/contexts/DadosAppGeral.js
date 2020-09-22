@@ -1,7 +1,5 @@
 'use strict';
 
-import { cond } from "react-native-reanimated";
-
 export const DADOS_CLIENTE = {
     'id_cliente_iter': '',
     'cpf': '', 
@@ -18,6 +16,7 @@ export const DADOS_CLIENTE = {
     'bairro': '',
     'cep': '',
     'uf': '',
+    'id_signatario_contrato': ''
 };
 
 export const DADOS_PRODUTO = {
@@ -42,6 +41,7 @@ export const DADOS_CONTRATO = {
 
 export const DADOS_BOLETO = {
     'url_pdf': '',
+    'url_doc':'',
     'url_html': '',
 };
 

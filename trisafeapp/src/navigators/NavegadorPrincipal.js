@@ -11,11 +11,11 @@ import TelaClienteDadosPessoais from '../screens/TelaClienteDadosPessoais';
 import TelaClienteEndereco from '../screens/TelaClienteEndereco';
 import TelaClienteConfirmacao from '../screens/TelaClienteConfirmacao';
 import TelaCapturaFotoCNH from '../screens/TelaCapturaFotoCNH';
-import TelaContratoAceite from '../screens/TelaContratoAceite';
 import TelaBoletoEmissao from '../screens/TelaBoletoEmissao';
 import TelaMenuInicio from '../screens/TelaMenuInicio';
 import { ContextoAppProvider } from '../contexts/ContextoApp';
 import TelaModalVisualizaFotoCNH from '../screens/TelaModalVisualizaFotoCNH';
+import TelaModalContratoAceite from '../screens/TelaContratoClicksign';
 
 //const Stack = createStackNavigator();
 
@@ -31,7 +31,7 @@ function FluxoCadastro() {
         <fluxoCadastro.Screen name="Endereco" component={TelaClienteEndereco} />
         <fluxoCadastro.Screen name="Confirmação dos dados" component={TelaClienteConfirmacao} />
         <fluxoCadastro.Screen name="Foto CNH" component={TelaCapturaFotoCNH} />
-        <fluxoCadastro.Screen name="Contrato" component={TelaContratoAceite} />
+        <fluxoCadastro.Screen name="Contrato" component={TelaModalContratoAceite} />
         <fluxoCadastro.Screen name="Boleto" component={TelaBoletoEmissao} />
     </fluxoCadastro.Navigator>
   );

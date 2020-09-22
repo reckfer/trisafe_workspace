@@ -8,8 +8,9 @@
 import ComunicacaoHTTP from './ComunicacaoHTTP';
 import { clonarObjeto } from '../contexts/DadosAppGeral';
 import {
-    Alert
+    Alert, PermissionsAndroid
 } from 'react-native';
+import DeviceInfo from 'react-native-device-info';
 import Util from './Util';
 
 export default class Configuracao {
@@ -30,6 +31,8 @@ export default class Configuracao {
 
         this.autenticarCliente = this.autenticarCliente.bind(this);
         this.apropriarToken = this.apropriarToken.bind(this);
+        this.solicitarPermissaoArmazenamento = this.solicitarPermissaoArmazenamento.bind(this);
+        this.solicitarPermissaoNumeroTelefone = this.solicitarPermissaoNumeroTelefone.bind(this);
         this.texto_instrucao = '';
     }
 
@@ -73,5 +76,60 @@ export default class Configuracao {
         }
 
         this.oGerenciadorContextoApp.atualizarEstadoTela(this.oInstanciaComponente);
+    }
+
+    solicitarPermissaoArmazenamento(callback) {
+        try {
+          PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+            {
+              title: 'Salvar arquivos no dispositivo.',
+              message: 'O aplicativo da Trisafe necessita salvar o contrato no seu dispositivo após baixá-lo.\nVocê autoriza?',
+              buttonNegative: "Não",
+              buttonPositive: "Sim"
+            }
+          )
+          .then((granted) => {
+                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                    console.log("Acesso ao armazenamento autorizado.");
+                    
+                    if(callback) {
+                        callback();
+                    }
+                } else {
+                    console.log("Acesso ao armazenamento negado.");
+                }
+            });
+        } catch (err) {
+          console.warn(err);
+        }
+    }
+
+    solicitarPermissaoNumeroTelefone() {
+        try {
+          PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.READ_PHONE_STATE,
+            {
+              title: 'Acesso ao número do telefone.',
+              message: 'O aplicativo da Trisafe necessita obter o número do seu telefone.\nVocê autoriza?',
+              buttonNegative: "Não",
+              buttonPositive: "Sim"
+            }
+          )
+          .then((granted) => {
+                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                    console.log("Acesso ao número do telefone autorizado.");
+                    DeviceInfo.getPhoneNumber()
+                    .then((numTelefone) => {
+                        this.oDadosApp.cliente.telefone = numTelefone;
+                        console.log('Num. telefone: ' + this.oDadosApp.cliente.telefone);
+                    });
+                } else {
+                    console.log("Acesso ao número do telefone negado.");
+                }
+            });
+        } catch (err) {
+          console.warn(err);
+        }
     }
 }

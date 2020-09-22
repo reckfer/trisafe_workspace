@@ -28,6 +28,7 @@ class Cliente(models.Model):
     senha = models.CharField(max_length=20, blank=False, null=True)
     dt_hr_inclusao = models.DateTimeField(blank=False, null=False, auto_now_add=True)
     ult_atualizacao = models.DateTimeField(blank=False, null=False, auto_now=True)
+    id_signatario_contrato = models.CharField(max_length=100, null=True)
     credencial = Credencial()
     
     def obter(self):
@@ -42,17 +43,23 @@ class Cliente(models.Model):
             # Valida se o cliente já está cadastrado.
             lista_clientes = Cliente.objects.filter(cpf=self.cpf)
             if lista_clientes:
+
                 m_cliente = lista_clientes[0]
+
                 if m_cliente:
-                    m_cliente_iter = ClienteIter(self.credencial)
-                    # Obtem o cadastro na Iter.
-                    retorno = m_cliente_iter.obter(m_cliente)
                     
-                    if not retorno.estado.ok:
-                        return retorno
+                    retorno = Retorno(True)
                     
-                    m_cliente.converter_de_cliente_iter(retorno.json())
-                    m_cliente.nome_usuario = m_cliente.nome_usuario
+                    if(self.credencial.chave_iter_cli and len(self.credencial.chave_iter_cli) > 0):
+                        m_cliente_iter = ClienteIter(self.credencial)
+                        # Obtem o cadastro na Iter.
+                        retorno = m_cliente_iter.obter(m_cliente)
+                        
+                        if not retorno.estado.ok:
+                            return retorno
+                    
+                        m_cliente.converter_de_cliente_iter(retorno.json())
+                        m_cliente.nome_usuario = m_cliente.nome_usuario
                     
                     retorno.dados = m_cliente
             
@@ -155,16 +162,20 @@ class Cliente(models.Model):
                 return retorno
             
             m_cliente = retorno.dados
-            self.id_cliente_iter = m_cliente.id_cliente_iter
-
-            # Alteracao na Iter.
-            m_cliente_iter = ClienteIter(self.credencial)
-            retorno = m_cliente_iter.alterar(self)
             
-            if not retorno.estado.ok:
-                return retorno
+            if(self.credencial.chave_iter_cli and len(self.credencial.chave_iter_cli) > 0):
+                self.id_cliente_iter = m_cliente.id_cliente_iter
 
-            m_cliente.converter_de_cliente_iter(retorno.json())
+                # Alteracao na Iter.
+                m_cliente_iter = ClienteIter(self.credencial)
+                retorno = m_cliente_iter.alterar(self)
+                
+                if not retorno.estado.ok:
+                    return retorno
+
+                m_cliente.converter_de_cliente_iter(retorno.json())
+            
+            m_cliente.id_signatario_contrato = self.id_signatario_contrato
             m_cliente.save()
             
             retorno = Retorno(True, 'Cadastro atualizado com sucesso.', '', 200, None, retorno.credencial)
@@ -256,6 +267,7 @@ class Cliente(models.Model):
             "uf": self.uf,
             "telefone": self.telefone,
             "email": self.email,
+            'id_signatario_contrato': self.id_signatario_contrato
             }
         return ret
 

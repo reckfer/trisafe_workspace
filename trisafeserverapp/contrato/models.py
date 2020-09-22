@@ -34,19 +34,19 @@ class Contrato(models.Model):
                 return retorno_cliente
             
             chave_doc = ''
-            m_contrato_clicksign = ContratoClicksign(self.credencial)
+            
             # Tenta obter o contrato da base, pelo CPF
             retorno = self.obter_por_cliente()
 
             if (retorno.estado.ok):
-
-                m_contrato = retorno.dados
-                chave_doc = m_contrato.chave_contrato_ext
-
+                
+                return retorno
             else:
                 if retorno.estado.codMensagem != 'NaoCadastrado':
                     return retorno
                 else:
+                    m_contrato_clicksign = ContratoClicksign(self.credencial)
+
                     retorno = m_contrato_clicksign.incluir(retorno_cliente.dados)
 
                     if not retorno.estado.ok:
@@ -68,15 +68,6 @@ class Contrato(models.Model):
                         # Inclui/atualiza na base
                         self.save()
 
-            retorno = m_contrato_clicksign.obter(chave_doc)
-            
-            if not retorno.estado.ok:
-                return retorno
-
-            d_documento = retorno.dados
-            
-            retorno = m_contrato_clicksign.fazer_download(d_documento)
-
             retorno = Retorno(True, 'Contrato gerado com sucesso. Selecione "Contratar" para aceitá-lo.')
             retorno.dados = self
 
@@ -84,6 +75,131 @@ class Contrato(models.Model):
         except Exception as e:
                     
             retorno = Retorno(False, 'A inclusão do contrato falhou.', None, None, e)
+            return retorno
+    
+    def incluir_com_signatario(self):
+
+        try:
+            retorno_contrato = self.incluir()
+            if not retorno_contrato:
+                return retorno_contrato
+            
+            m_contrato = retorno_contrato.dados
+            m_contrato.credencial = self.credencial
+
+            retorno_contrato = m_contrato.incluir_signatario_contrato()
+
+            return retorno_contrato
+        except Exception as e:
+                    
+            retorno = Retorno(False, 'A inclusão do contrato falhou.', None, None, e)
+            return retorno
+    
+    def incluir_signatario(self):
+        try:
+            retorno = self.obter_signatario()
+
+            if retorno.estado.ok:
+                return retorno
+            elif retorno.estado.codMensagem != 'SignatarioNaoCadastrado':
+                return retorno
+
+            m_contrato_clicksign = ContratoClicksign(self.credencial)
+
+            retorno_chave_signatario = m_contrato_clicksign.incluir_signatario(self.cliente)
+
+            if not retorno_chave_signatario.estado.ok:
+                return retorno_chave_signatario
+            
+            retorno_cliente = self.cliente.obter()
+            
+            if not retorno_cliente.estado.ok:
+                return retorno_cliente
+
+            m_cliente = retorno_cliente.dados
+            m_cliente.id_signatario_contrato = retorno_chave_signatario.dados
+
+            retorno_cliente = m_cliente.alterar()
+
+            if not retorno_cliente.estado.ok:
+                return retorno_cliente
+
+            retorno = self.obter()
+
+            return retorno
+
+        except Exception as e:
+                    
+            retorno = Retorno(False, 'A atualização do signatário do contrato falhou.', None, None, e)
+            return retorno
+    
+    def incluir_signatario_contrato (self):
+        try:
+            
+            m_contrato_clicksign = ContratoClicksign(self.credencial)
+
+            retorno_signatario = self.incluir_signatario()
+
+            if not retorno_signatario.estado.ok:
+                return retorno_signatario
+            
+            m_cliente = retorno_signatario.dados.cliente
+            ids_assinaturas_clicksign = m_cliente.id_signatario_contrato.split(sep="|-|")
+
+            if isinstance(ids_assinaturas_clicksign, list) and len(ids_assinaturas_clicksign) > 1:
+                m_contrato_clicksign.solicitar_assinatura(retorno_signatario.dados)
+                return retorno_signatario
+
+            m_contrato = retorno_signatario.dados
+            retorno_chave_signatario = m_contrato_clicksign.incluir_signatario_contrato(m_contrato)
+
+            if not retorno_chave_signatario.estado.ok:
+                return retorno_chave_signatario
+            
+            retorno_cliente = self.cliente.obter()
+            
+            if not retorno_cliente.estado.ok:
+                return retorno_cliente
+
+            m_cliente = retorno_cliente.dados
+            m_cliente.id_signatario_contrato = '%s|-|%s' % (m_cliente.id_signatario_contrato, retorno_chave_signatario.dados)
+
+            retorno = m_cliente.alterar()
+            
+            if not  retorno.estado.ok:
+                retorno.dados = self
+            
+            retorno = self.obter()
+
+            if(retorno.estado.ok):
+                m_contrato_clicksign.solicitar_assinatura(retorno.dados)
+
+            return retorno
+        except Exception as e:
+                    
+            retorno = Retorno(False, 'A atualização do signatário do contrato falhou.', None, None, e)
+            return retorno
+
+    def obter_signatario(self):
+        try:
+            retorno = self.obter_por_cliente()
+
+            if not retorno.estado.ok:
+                return retorno
+            
+            m_cliente = retorno.dados.cliente
+
+            if(not (m_cliente.id_signatario_contrato and len(str(m_cliente.id_signatario_contrato).strip()) > 0)):
+                return Retorno(False, 'Signatario não cadastrado', 'SignatarioNaoCadastrado', 404)
+
+            # m_contrato_clicksign = ContratoClicksign(self.credencial)
+
+            # retorno_chave_signatario = m_contrato_clicksign.obter_signatario(m_cliente)
+
+            return retorno
+        except Exception as e:
+                    
+            retorno = Retorno(False, 'A atualização do signatário do contrato falhou.', None, None, e)
             return retorno
     # def incluir(self, chaves_produtos):
 

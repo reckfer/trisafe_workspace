@@ -11,7 +11,7 @@ import { ThemeProvider, Input, Button, Card, ButtonGroup} from 'react-native-ele
 import {
     ScrollView,
     Alert,
-    View, PermissionsAndroid
+    View
 } from 'react-native';
 import ComunicacaoHTTP from '../common/ComunicacaoHTTP';
 import Cabecalho from '../common/CabecalhoTela';
@@ -21,6 +21,7 @@ import UtilTests from './UtilTests';
 import { ContextoApp } from '../contexts/ContextoApp';
 import Util from '../common/Util';
 import RNFetchBlob from 'rn-fetch-blob';
+import Configuracao from '../common/Configuracao';
 
 export default class TelaModalTestesCadastro extends Component {
 
@@ -37,6 +38,7 @@ export default class TelaModalTestesCadastro extends Component {
             this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
             this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
             this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
+            this.oConfiguracao = new Configuracao(this.oGerenciadorContextoApp, this);
             this.oUtil = new Util(this.oGerenciadorContextoApp);
 
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;            
@@ -53,6 +55,8 @@ export default class TelaModalTestesCadastro extends Component {
         this.irParaTesteContratoPDF = this.irParaTesteContratoPDF.bind(this);
         this.irParaTesteDownloadContrato = this.irParaTesteDownloadContrato.bind(this);
         this.irParaTesteDownloadBoleto = this.irParaTesteDownloadBoleto.bind(this);
+        this.irParaTesteIncluirSignatario = this.irParaTesteIncluirSignatario.bind(this);
+        this.irParaTesteAssinarContrato = this.irParaTesteAssinarContrato.bind(this);
         this.irParaTesteFotoCNH = this.irParaTesteFotoCNH.bind(this);
         this.irParaTesteFotoDocVeiculo = this.irParaTesteFotoDocVeiculo.bind(this);
         this.obterUltimoCliente = this.obterUltimoCliente.bind(this);        
@@ -62,7 +66,7 @@ export default class TelaModalTestesCadastro extends Component {
         this.tratarDadosRetornoContrato = this.tratarDadosRetornoContrato.bind(this);
         this.tratarObterURLContrato = this.tratarObterURLContrato.bind(this);
         this.gerarDadosTestes = this.gerarDadosTestes.bind(this);
-        this.requestCameraPermission = this.requestCameraPermission.bind(this);
+        this.incluirSignatario = this.incluirSignatario.bind(this);
         this.voltar = this.voltar.bind(this);
         
         this.texto_instrucao = 'Selecione a opção de teste.';
@@ -142,6 +146,7 @@ export default class TelaModalTestesCadastro extends Component {
     
     tratarDadosRetornoContrato(oDados) {
         this.oGerenciadorContextoApp.atribuirDados('contrato', oDados, this);
+        this.oConfiguracao.solicitarPermissaoNumeroTelefone();
     }
 
     gerarDadosTestes() {
@@ -167,7 +172,7 @@ export default class TelaModalTestesCadastro extends Component {
     }
 
     irParaTesteDownloadContrato() {
-        this.requestCameraPermission();
+        this.oConfiguracao.solicitarPermissaoArmazenamento(this.obterURLContrato);
     }
 
     obterURLContrato() {
@@ -191,7 +196,7 @@ export default class TelaModalTestesCadastro extends Component {
             .config({
                 fileCache : true,
                 //path: RNFetchBlob.fs.dirs.DownloadDir + '/a.docx',
-                // appendExt: 'docx',
+                appendExt: 'docx',
                 // addAndroidDownloads : {
                 //     useDownloadManager : true, // <-- this is the only thing required
                 //     // Optional, override notification setting (default to true)
@@ -210,59 +215,53 @@ export default class TelaModalTestesCadastro extends Component {
             })
             .fetch('GET', oDados)
             .then((res) => {
-              // the temp file path
-              console.log('The file saved to ', res.path());
-              console.log('Caminho downloads:', RNFetchBlob.fs.dirs.DownloadDir);
+                // the temp file path
+                console.log('The file saved to ', res.path());
+                console.log('Caminho downloads:', RNFetchBlob.fs.dirs.DownloadDir);
 
-              let nomeArquivo = `Contrato_Trisafe_${this.oDadosApp.contrato.id_contrato}.docx`;
-              let caminhoArquivoDestino = `${RNFetchBlob.fs.dirs.DownloadDir}/${nomeArquivo}`;
-              
-              RNFetchBlob.fs.mv(res.path(), caminhoArquivoDestino).then((resultado) => {
-                  console.log('Arquivo movido: ', resultado);
-                  Alert.alert('TriSafe', `Seu contrato salvo. Verifique na pasta Downloads o arquivo ${nomeArquivo}.`);
-              });
-            //   RNFetchBlob.android.addCompleteDownload({
-            //     title : 'test file of RNFB',
-            //     description : 'desc',
-            //     mime : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',//'application/msword',//'application/octet-stream',
-            //     path : res.path(),
-            //     showNotification : true
-            //   })
-            //   .then((valor) => {console.log('Download resultante: ', valor)})
-            //   .catch((e) => {
-            //     this.oUtil.tratarExcecao(e);
-            //   });
+                let nomeArquivo = `Contrato_Trisafe_${this.oDadosApp.contrato.id_contrato}.docx`;
+                let caminhoArquivoDestino = `${RNFetchBlob.fs.dirs.DownloadDir}/${nomeArquivo}`;
+                
+                RNFetchBlob.android.actionViewIntent(res.path(), 'application/msword')
+                .then((valor) => {
+                    console.log(valor);
+                }).catch((e) => {
+                    this.oUtil.tratarExcecao(e);    
+                });
+
+                RNFetchBlob.fs.cp(res.path(), caminhoArquivoDestino).then((resultado) => {
+                    console.log('Arquivo movido: ', resultado);
+                    Alert.alert('TriSafe', `Seu contrato salvo. Verifique na pasta Downloads o arquivo ${nomeArquivo}.`);
+                });
             }).catch((e) =>{
                 this.oUtil.tratarExcecao(e);
             })
         }
     }
 
-    requestCameraPermission() {
+    irParaTesteIncluirSignatario() {
+        this.incluirSignatario();
+    }
+
+    incluirSignatario() {
         try {
-          PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-            {
-              title: "Cool Photo App Camera Permission",
-              message:
-                "Cool Photo App needs access to your camera " +
-                "so you can take awesome pictures.",
-              buttonNeutral: "Ask Me Later",
-              buttonNegative: "Cancel",
-              buttonPositive: "OK"
-            }
-          )
-          .then((granted) => {
-                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                    console.log("You can use the camera");
-                    this.obterURLContrato();
-                } else {
-                    console.log("Camera permission denied");
-                }
-            });
-        } catch (err) {
-          console.warn(err);
+            let metodoURI = '/contratos/incluir_signatario_contrato/';
+            
+            let oDadosParametros = JSON.stringify(this.state);
+
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarIncluirSignatario);
+
+        } catch (oExcecao) {
+            this.oUtil.tratarExcecao(oExcecao);
         }
+    }
+
+    tratarIncluirSignatario(oDados, oEstado) {
+        
+    }
+
+    irParaTesteAssinarContrato() {
+
     }
 
     irParaTesteDownloadBoleto(){
@@ -279,6 +278,8 @@ export default class TelaModalTestesCadastro extends Component {
     botaoBoleto = () => <Button title="Testar Boleto" onPress={this.irParaTesteBoletoGerenciaNet} ></Button>
     botaoDownloadContrato = () => <Button title="Download Contrato" onPress={this.irParaTesteDownloadContrato} ></Button>
     botaoDownloadBoleto = () => <Button title="Download Boleto" onPress={this.irParaTesteDownloadBoleto} ></Button>
+    botaoIncluirSignatario = () => <Button title="Testar Incluir Signatario" onPress={this.irParaTesteIncluirSignatario} ></Button>
+    botaoAssinarContrato = () => <Button title="Testar Assinar Contrato" onPress={this.irParaTesteAssinarContrato} ></Button>
     botaoFotoCNH = () => <Button title="Testar Foto CNH" onPress={this.irParaTesteFotoCNH} ></Button>
     botaoFotoDocVeiculo = () => <Button title="Testar Foto Doc" onPress={this.irParaTesteFotoDocVeiculo} ></Button>
     botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;
@@ -294,6 +295,9 @@ export default class TelaModalTestesCadastro extends Component {
             { element: this.botaoDownloadContrato }, { element: this.botaoDownloadBoleto } 
         ];
         let botoesTestes4 = [ 
+            { element: this.botaoIncluirSignatario }, { element: this.botaoAssinarContrato } 
+        ];
+        let botoesTestes5 = [ 
             { element: this.botaoFotoCNH }, { element: this.botaoFotoDocVeiculo } 
         ];
         let botoesTela = [ 
@@ -308,6 +312,7 @@ export default class TelaModalTestesCadastro extends Component {
                     botoesTestes2={botoesTestes2} 
                     botoesTestes3={botoesTestes3}
                     botoesTestes4={botoesTestes4}
+                    botoesTestes5={botoesTestes5}
                 />
                 <AreaRodape botoes={botoesTela} mensagem={''}/>
             </View>
@@ -349,6 +354,10 @@ export class AreaDados extends Component {
                 />
                 <ButtonGroup
                     buttons={this.props.botoesTestes4}
+                    buttonStyle={ {alignItems: 'stretch'} }
+                />
+                <ButtonGroup
+                    buttons={this.props.botoesTestes5}
                     buttonStyle={ {alignItems: 'stretch'} }
                 />
                 <ScrollView>

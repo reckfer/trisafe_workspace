@@ -31,8 +31,33 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
     queryset = Contrato.objects.all()
     serializer_class = ContratoSerializer
     
+    # @action(detail=False, methods=['post'])
+    # def incluir(self, request):
+    #     try:
+    #         v_gerenciador_log = GerenciadorLogViewSet()
+    #         v_gerenciador_log.registrar_do_cliente(request)
+
+    #         m_contrato = ContratoViewSet.apropriar_dados_http(request)
+    #         m_contrato.credencial = ContratoViewSet.apropriar_credenciais_clicksign_http(request)
+            
+    #         # retorno = m_contrato.obter_por_cliente()
+
+    #         # if retorno.estado.codMensagem == 'NaoCadastrado':
+    #         retorno = m_contrato.incluir()
+    #         # elif retorno.estado.ok:
+    #         #     m_contrato = retorno.dados
+    #         #     retorno = m_contrato.alterar(lista_produtos)
+    #         # else:    
+    #         #     return retorno
+
+    #         return retorno.gerar_resposta_http()
+    #     except Exception as e:
+                    
+    #         retorno = Retorno(False, 'A inclusão do contrato falhou.', None, None, e)
+    #         return retorno.gerar_resposta_http()
+
     @action(detail=False, methods=['post'])
-    def incluir(self, request):
+    def incluir_com_signatario(self, request):
         try:
             v_gerenciador_log = GerenciadorLogViewSet()
             v_gerenciador_log.registrar_do_cliente(request)
@@ -40,56 +65,92 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
             m_contrato = ContratoViewSet.apropriar_dados_http(request)
             m_contrato.credencial = ContratoViewSet.apropriar_credenciais_clicksign_http(request)
             
-            # retorno = m_contrato.obter_por_cliente()
+            retorno_contrato = m_contrato.incluir_com_signatario()
+            
+            if not retorno_contrato:
+                return retorno_contrato
 
-            # if retorno.estado.codMensagem == 'NaoCadastrado':
-            retorno = m_contrato.incluir()
-            # elif retorno.estado.ok:
-            #     m_contrato = retorno.dados
-            #     retorno = m_contrato.alterar(lista_produtos)
-            # else:    
-            #     return retorno
-
-            return retorno.gerar_resposta_http()
+            return retorno_contrato.gerar_resposta_http()
         except Exception as e:
                     
             retorno = Retorno(False, 'A inclusão do contrato falhou.', None, None, e)
             return retorno.gerar_resposta_http()
     
-    @action(detail=False, methods=['post'])
-    def aceitar(self, request):
-        try:
-            v_gerenciador_log = GerenciadorLogViewSet()
-            v_gerenciador_log.registrar_do_cliente(request)
+    # @action(detail=False, methods=['post'])
+    # def incluir_signatario(self, request):
+    #     try:
+    #         v_gerenciador_log = GerenciadorLogViewSet()
+    #         v_gerenciador_log.registrar_do_cliente(request)
 
-            m_contrato = ContratoViewSet.apropriar_dados_http(request)
+    #         m_contrato = ContratoViewSet.apropriar_dados_http(request)
+    #         m_contrato.credencial = ContratoViewSet.apropriar_credenciais_clicksign_http(request)
             
-            retorno_contrato = m_contrato.obter()
-
-            if not retorno_contrato.estado.ok:
-                return retorno_contrato.gerar_resposta_http()
+    #         retorno = m_contrato.incluir_signatario(m_contrato.cliente)
             
-            m_boleto = BoletoGerenciaNet()
-            m_contrato = retorno_contrato.dados
-
-            if not m_contrato.aceito:
-                retorno = m_contrato.aceitar()
-
-                if not retorno.estado.ok:
-                    return retorno.gerar_resposta_http()
-
-                m_contrato = retorno.dados
-                
-                retorno = m_boleto.gerar(m_contrato)
-            else:
-                retorno = m_boleto.obter(m_contrato)
-
-            return retorno.gerar_resposta_http()
-
-        except Exception as e:
+    #         return retorno.gerar_resposta_http()
+    #     except Exception as e:
                     
-            retorno = Retorno(False, 'A aceitação do contrato falhou.', None, None, e)
-            return retorno.gerar_resposta_http()
+    #         retorno = Retorno(False, 'A inclusão do contrato falhou.', None, None, e)
+    #         return retorno.gerar_resposta_http()
+    
+    # @action(detail=False, methods=['post'])
+    # def incluir_signatario_contrato(self, request):
+    #     try:
+    #         v_gerenciador_log = GerenciadorLogViewSet()
+    #         v_gerenciador_log.registrar_do_cliente(request)
+
+    #         m_contrato = ContratoViewSet.apropriar_dados_http(request)
+            
+    #         retorno = m_contrato.obter_por_cliente()
+
+    #         if not retorno.estado.ok:
+    #             return retorno.gerar_resposta_http()
+            
+    #         m_contrato = retorno.dados
+    #         m_contrato.credencial = ContratoViewSet.apropriar_credenciais_clicksign_http(request)
+            
+    #         retorno = m_contrato.incluir_signatario_contrato(m_contrato)
+            
+    #         return retorno.gerar_resposta_http()
+    #     except Exception as e:
+                    
+    #         retorno = Retorno(False, 'A inclusão do contrato falhou.', None, None, e)
+    #         return retorno.gerar_resposta_http()
+
+    # @action(detail=False, methods=['post'])
+    # def aceitar(self, request):
+    #     try:
+    #         v_gerenciador_log = GerenciadorLogViewSet()
+    #         v_gerenciador_log.registrar_do_cliente(request)
+
+    #         m_contrato = ContratoViewSet.apropriar_dados_http(request)
+            
+    #         retorno_contrato = m_contrato.obter()
+
+    #         if not retorno_contrato.estado.ok:
+    #             return retorno_contrato.gerar_resposta_http()
+            
+    #         m_boleto = BoletoGerenciaNet()
+    #         m_contrato = retorno_contrato.dados
+
+    #         if not m_contrato.aceito:
+    #             retorno = m_contrato.aceitar()
+
+    #             if not retorno.estado.ok:
+    #                 return retorno.gerar_resposta_http()
+
+    #             m_contrato = retorno.dados
+                
+    #             retorno = m_boleto.gerar(m_contrato)
+    #         else:
+    #             retorno = m_boleto.obter(m_contrato)
+
+    #         return retorno.gerar_resposta_http()
+
+    #     except Exception as e:
+                    
+    #         retorno = Retorno(False, 'A aceitação do contrato falhou.', None, None, e)
+    #         return retorno.gerar_resposta_http()
     
     @action(detail=False, methods=['post'])
     def obter(self, request):
@@ -216,7 +277,10 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
         d_dados_app = request.data['dados_app']
 
         d_cliente = d_dados_app['cliente']        
+        m_cliente.nome = d_cliente['nome']
         m_cliente.cpf = d_cliente['cpf']
+        m_cliente.email = d_cliente['email']
+        m_cliente.telefone = d_cliente['telefone']
 
         m_cliente.credencial = ClienteViewSet.apropriar_credenciais_iter_http(request)
         

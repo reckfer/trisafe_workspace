@@ -64,7 +64,7 @@ class EstadoExecucao:
             self.httpStatus = httpStatus
 
         if (self.excecao):
-            if httpStatus >= 200 and httpStatus < 400:
+            if httpStatus and (httpStatus >= 200 and httpStatus < 400):
                 self.httpStatus = 500
             
             if(not self.codMensagem or len(self.codMensagem) == 0):

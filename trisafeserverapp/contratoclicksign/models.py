@@ -101,22 +101,160 @@ class ContratoClicksign(models.Model):
         retorno = self.__tratarRespostaHTTP(r)
         
         return retorno
+
+    def incluir_signatario(self, m_cliente):
+        url = "https://sandbox.clicksign.com/api/v1/signers%s" % (self.querystring_access_token)
+
+        d_signatario_clicksign = self.__montar_dic_signatario(m_cliente)
+        
+        if(not self.headers_clicksign):
+            return self.retorno_autenticacao
+
+        r = requests.post(url, headers=self.headers_clicksign, data=d_signatario_clicksign)
+        
+        retorno = self.__tratarRespostaHTTP(r)
+        
+        if not retorno.estado.ok:
+            return retorno
+
+        d_dados_signatario = retorno.dados
+        tem_chave = False
+        chave_signatario = ''
+
+        if(d_dados_signatario):
+            if 'signer' in d_dados_signatario:
+                d_signatario = d_dados_signatario['signer']
+                if 'key' in d_signatario:
+                    
+                    chave_signatario = d_signatario['key']
+
+                    if(chave_signatario and len(str(chave_signatario).strip()) > 0):
+                        tem_chave = True
+
+        if tem_chave:
+            retorno = Retorno(True)
+            retorno.dados = chave_signatario
+        else:
+            retorno = Retorno(False, 'Não foi possível obter o documento do contrato. Os dados retornaram vazios', '', 404)
+
+        return retorno
     
-    def fazer_download(self, d_documento):
-        url = ''
+    def incluir_signatario_contrato(self, m_contrato):
+        url = "https://sandbox.clicksign.com/api/v1/lists%s" % (self.querystring_access_token)
+
+        d_signatario_clicksign = self.__montar_dic_signatario_contrato(m_contrato)
         
-        if(d_documento):
-            if 'downloads' in d_documento:
-                d_downloads = d_documento['downloads']
-                if 'original_file_url' in d_downloads:
-                    url = d_downloads['original_file_url']
+        if(not self.headers_clicksign):
+            return self.retorno_autenticacao
+
+        r = requests.post(url, headers=self.headers_clicksign, data=d_signatario_clicksign)
         
-        r = requests.get(url, allow_redirects=True)
+        retorno = self.__tratarRespostaHTTP(r)
         
-        # retorno = self.__tratarRespostaHTTP(r)
+        if not retorno.estado.ok:
+            return retorno
+
+        d_dados_signatario = retorno.dados
+        tem_chave = False
+        chave_signatario = ''
+
+        if(d_dados_signatario):
+            if 'list' in d_dados_signatario:
+                d_signatario = d_dados_signatario['list']
+                if 'request_signature_key' in d_signatario:
+                    
+                    chave_requisicao_assinatura = d_signatario['request_signature_key']
+
+                    if(chave_requisicao_assinatura and len(str(chave_requisicao_assinatura).strip()) > 0):
+                        tem_chave = True
+
+        if tem_chave:
+            retorno = Retorno(True, '', 'SignatarioCadastrado')
+            retorno.dados = chave_requisicao_assinatura
+        else:
+            retorno = Retorno(False, 'Não foi possível obter o documento do contrato. Os dados retornaram vazios', '', 404)
+
+        return retorno
+    
+    def solicitar_assinatura(self, m_contrato):
+        url = "https://sandbox.clicksign.com/api/v1/notifications%s" % (self.querystring_access_token)
+
+        d_signatario_clicksign = self.__montar_dic_solicitacao_assinatura(m_contrato)
+        
+        if(not self.headers_clicksign):
+            return self.retorno_autenticacao
+
+        r = requests.post(url, headers=self.headers_clicksign, data=d_signatario_clicksign)
+        
+        retorno = self.__tratarRespostaHTTP(r)
         
         # if not retorno.estado.ok:
         #     return retorno
+
+        # d_dados_signatario = retorno.dados
+        # tem_chave = False
+        # chave_signatario = ''
+
+        # if(d_dados_signatario):
+        #     if 'list' in d_dados_signatario:
+        #         d_signatario = d_dados_signatario['list']
+        #         if 'request_signature_key' in d_signatario:
+                    
+        #             chave_requisicao_assinatura = d_signatario['request_signature_key']
+
+        #             if(chave_requisicao_assinatura and len(str(chave_requisicao_assinatura).strip()) > 0):
+        #                 tem_chave = True
+
+        # if tem_chave:
+        #     retorno = Retorno(True)
+        #     retorno.dados = chave_requisicao_assinatura
+        # else:
+        #     retorno = Retorno(False, 'Não foi possível obter o documento do contrato. Os dados retornaram vazios', '', 404)
+
+        return retorno
+    
+    def obter_signatario(self, m_cliente):
+        url = "https://sandbox.clicksign.com/api/v1/signers/%s%s" % (m_cliente.id_signatario_contrato, self.querystring_access_token)
+
+        r = requests.get(url, headers=self.headers_clicksign)
+        
+        retorno = self.__tratarRespostaHTTP(r)
+        
+        if not retorno.estado.ok:
+            return retorno
+
+        d_dados_signatario = retorno.dados
+        tem_chave = False
+        chave_signatario = ''
+
+        if(d_dados_signatario):
+            if 'signer' in d_dados_signatario:
+                d_signatario = d_dados_signatario['signer']
+                if 'key' in d_signatario:
+                    
+                    chave_signatario = d_signatario['key']
+
+                    if(chave_signatario and len(str(chave_signatario).strip()) > 0):
+                        tem_chave = True
+
+        if tem_chave:
+            retorno = Retorno(True)
+            retorno.dados = chave_signatario
+        else:
+            retorno = Retorno(False, 'Não foi possível obter o documento do contrato. Os dados retornaram vazios', '', 404)
+
+        return retorno
+    
+    def fazer_download(self, url):
+        # url = ''
+        
+        # if(d_documento):
+        #     if 'downloads' in d_documento:
+        #         d_downloads = d_documento['downloads']
+        #         if 'original_file_url' in d_downloads:
+        #             url = d_downloads['original_file_url']
+        
+        r = requests.get(url, allow_redirects=True)
         
         # Salva o documento
         file = open('a.docx', 'wb')
@@ -142,7 +280,7 @@ class ContratoClicksign(models.Model):
 
     def __montar_dic_cliente(self, m_cliente):
         data_atual = date.today()
-        path = "/Contrato_Rastreamento_%s.pdf" % m_cliente.cpf
+        path = "/Contrato_Rastreamento_%s.docx" % m_cliente.cpf
 
         jsonCliente = json.dumps({
             "document": {
@@ -167,6 +305,52 @@ class ContratoClicksign(models.Model):
 
         return jsonCliente
     
+    def __montar_dic_signatario(self, m_cliente):
+        
+        jsonCliente = json.dumps({
+            "signer": {
+                "name": "Fernando Reckziegel", #m_cliente.nome,
+                "email": 'nandorex@gmail.com',
+                "phone_number": m_cliente.telefone,
+                "auths": ["email"],
+                "documentation": m_cliente.cpf,
+                "delivery": ["email"]
+            }
+        })
+
+        return jsonCliente
+    
+    def __montar_dic_signatario_contrato(self, m_contrato):
+        m_cliente = m_contrato.cliente
+
+        jsonCliente = json.dumps({
+            "list": {
+                "document_key": m_contrato.chave_contrato_ext,
+                "signer_key": m_cliente.id_signatario_contrato,
+                "sign_as": 'sign',
+                "message": 'Por gentileza, assine o contrato identificado pelo link neste e-mail.',
+            }
+        })
+
+        return jsonCliente
+    
+    def __montar_dic_solicitacao_assinatura(self, m_contrato):
+        jsonCliente = ''
+        m_cliente = m_contrato.cliente
+
+        ids_assinaturas_clicksign = m_cliente.id_signatario_contrato.split(sep="|-|")
+
+        if isinstance(ids_assinaturas_clicksign, list) and len(ids_assinaturas_clicksign) > 1:
+            
+            id_requisicao_assinatura = ids_assinaturas_clicksign[1]
+            
+            jsonCliente = json.dumps({
+                    "request_signature_key": id_requisicao_assinatura,
+                    "message": 'Por gentileza, assine o contrato identificado pelo link neste e-mail.'
+            })
+
+        return jsonCliente
+    
     def __tratarRespostaHTTP(self, respostaHTTP):
         
         json_dados = self.__obterJsonBodyHTTP(respostaHTTP.text)
@@ -175,14 +359,17 @@ class ContratoClicksign(models.Model):
             
             logger_servidor_app_fluxo.error('RespostaHTTP Clicksign Erro: %s' % respostaHTTP.text)
 
-            mensagem_erro = json_dados['errors'][0]['message']
+            mensagem_erro = self.__extrairMensagemErro(json_dados)
 
             retorno = Retorno(False, 'Erro de comunicação com a Clicksign. %s' % mensagem_erro, 'ErroComunicacaoClicksign', respostaHTTP.status_code)
         else:
-            logger_servidor_app_fluxo.info('RespostaHTTP Clicksign Sucesso: %s' % respostaHTTP.text)
+            dadosRetorno = respostaHTTP.text
+            logger_servidor_app_fluxo.info('RespostaHTTP Clicksign Sucesso: %s' % dadosRetorno)
 
             retorno = Retorno(True)
-            dadosRetorno = respostaHTTP.json()
+            
+            if(dadosRetorno):
+                dadosRetorno = respostaHTTP.json()
             
             if dadosRetorno:                
                 retorno.dados = dadosRetorno
@@ -191,6 +378,24 @@ class ContratoClicksign(models.Model):
                 retorno = Retorno(False, respostaHTTP.text, '', 404)
 
         return retorno
+
+    def __extrairMensagemErro(self, d_dados_retorno):
+        texto_erro = ''
+
+        if('errors' in d_dados_retorno):            
+            d_erros = d_dados_retorno['errors']
+            
+            if isinstance(d_erros, list):
+                if len(d_erros) > 0:
+                    
+                    d_mensagem = d_erros[0]
+
+                    if('message' in d_mensagem):
+                        texto_erro = d_mensagem['message']
+                    else:
+                        texto_erro = d_mensagem
+
+        return texto_erro
 
     def __obterJsonBodyHTTP(self, texto):
         json_texto = texto
@@ -202,7 +407,7 @@ class ContratoClicksign(models.Model):
             except Exception:
                 pass
 
-        return json_texto        
+        return json_texto
 
     def __autenticar_clicksign(self, credencial_cliente):
         self.headers_clicksign = None
