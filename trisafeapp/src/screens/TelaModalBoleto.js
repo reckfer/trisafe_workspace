@@ -15,15 +15,14 @@ import {
 import ComunicacaoHTTP from '../common/ComunicacaoHTTP';
 import { ThemeProvider, Button } from 'react-native-elements';
 import Pdf from 'react-native-pdf';
-// import { WebView } from 'react-native-webview';
-import Cabecalho from './../common/CabecalhoTela';
-import { styles, theme } from './../common/Estilos';
-import AreaRodape from './../common/AreaRodape';
+import Cabecalho from '../common/CabecalhoTela';
+import { styles, theme } from '../common/Estilos';
+import AreaRodape from '../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
 import Util from '../common/Util';
 import Orientation from 'react-native-orientation';
 
-export default class TelaBoletoEmissao extends Component {
+export default class TelaModalBoleto extends Component {
 	
     constructor(props, value) {
         super(props);
@@ -37,7 +36,7 @@ export default class TelaBoletoEmissao extends Component {
             this.oGerenciadorContextoApp = value.gerenciador;
             
             this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
-            this.oRegistradorLog.registrar('TelaBoletoEmissao.constructor() => Iniciou.');
+            this.oRegistradorLog.registrar('TelaModalBoleto.constructor() => Iniciou.');
 
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
@@ -57,7 +56,7 @@ export default class TelaBoletoEmissao extends Component {
         this.texto_instrucao = 'Contratação finalizada. Obrigado.';
         this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
 
-        this.oRegistradorLog.registrar('TelaBoletoEmissao.constructor() => Finalizou.');
+        this.oRegistradorLog.registrar('TelaModalBoleto.constructor() => Finalizou.');
     }
 
     componentDidMount() {
@@ -128,7 +127,7 @@ export default class TelaBoletoEmissao extends Component {
     }
 }
 
-TelaBoletoEmissao.contextType = ContextoApp;
+TelaModalBoleto.contextType = ContextoApp;
 
 export class AreaDados extends Component {
 

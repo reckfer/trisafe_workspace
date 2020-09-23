@@ -8,14 +8,12 @@
 
 import React, { Component } from 'react';
 import {
-    Dimensions,
     Alert,
     View,
-    Text
+    Text, Dimensions
 } from 'react-native';
 import ComunicacaoHTTP from '../common/ComunicacaoHTTP';
 import { Button } from 'react-native-elements';
-import Pdf from 'react-native-pdf';
 import Cabecalho from '../common/CabecalhoTela';
 import { styles } from '../common/Estilos';
 import AreaRodape from '../common/AreaRodape';
@@ -23,8 +21,9 @@ import { ContextoApp } from '../contexts/ContextoApp';
 import Util from '../common/Util';
 import Orientation from 'react-native-orientation';
 import WebView from 'react-native-webview';
+import Pdf from 'react-native-pdf';
 
-export default class TelaModalContratoAceite extends Component {
+export default class TelaModalContratoClicksign extends Component {
 	
     constructor(props, value) {
         super(props);
@@ -40,7 +39,7 @@ export default class TelaModalContratoAceite extends Component {
             this.oGerenciadorContextoApp = value.gerenciador;
             
             this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
-            this.oRegistradorLog.registrar('TelaContratoAceite.constructor() => Iniciou.');
+            this.oRegistradorLog.registrar('TelaModalContratoClicksign.constructor() => Iniciou.');
 
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
@@ -53,18 +52,20 @@ export default class TelaModalContratoAceite extends Component {
         
         this.incluirContrato = this.incluirContrato.bind(this);
         this.tratarIncluirContrato = this.tratarIncluirContrato.bind(this);
+        this.contratado = this.contratado.bind(this);
+        this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
         this.voltar = this.voltar.bind(this);
 
         this.texto_instrucao = 'Contrato de serviço de rastreamento.'
         this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
-        this.oRegistradorLog.registrar('TelaContratoAceite.constructor() => Finalizou.');
+        this.oRegistradorLog.registrar('TelaModalContratoClicksign.constructor() => Finalizou.');
     }
     
     componentDidMount() {        
 
-        if(!this.oDadosApp.contrato.url_doc && this.oGerenciadorContextoApp.temDados()) {
-            this.incluirContrato();
-        }
+        // if(!this.oDadosApp.contrato.url_pdf && this.oGerenciadorContextoApp.temDados()) {
+        //     this.incluirContrato();
+        // }
     }
 
     incluirContrato() {
@@ -132,27 +133,27 @@ export default class TelaModalContratoAceite extends Component {
     //     }
     // }
 
-    // contratar() {
-    //     try {
-    //         let metodoURI = '/contratos/aceitar/';
+    contratado() {
+        try {
+            let metodoURI = '/contratos/aceitar/';
             
-    //         let oDadosParametros = JSON.stringify(this.state);
+            let oDadosParametros = JSON.stringify(this.state);
 
-    //         this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarDadosRetorno);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarDadosRetorno);
 
-    //     } catch (oExcecao) {
-    //         this.oUtil.tratarExcecao(oExcecao);
-    //     }
-    // }
+        } catch (oExcecao) {
+            this.oUtil.tratarExcecao(oExcecao);
+        }
+    }
 
-    // tratarDadosRetorno(oDados, oEstado) {
-    //     this.oGerenciadorContextoApp.atribuirDados('contrato', oDados);
-    //     this.oGerenciadorContextoApp.atribuirDados('boleto', oDados);
+    tratarDadosRetorno(oDados, oEstado) {
+        this.oGerenciadorContextoApp.atribuirDados('contrato', oDados);
+        this.oGerenciadorContextoApp.atribuirDados('boleto', oDados);
 
-    //     if(oEstado.ok) {
-    //         this.oNavegacao.navigate('Boleto', this.state);
-    //     }
-    // }
+        if(oEstado.ok) {
+            this.oNavegacao.navigate('Boleto', this.state);
+        }
+    }
 
     voltar() {
 
@@ -160,22 +161,22 @@ export default class TelaModalContratoAceite extends Component {
     }
 
     botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;        
-    botaoContratar = () => <Button title="Contratar" onPress={this.contratar} loading={this.oDadosControleApp.processando_requisicao}></Button>;
+    botaoPronto = () => <Button title="Pronto" onPress={this.contratado} loading={this.oDadosControleApp.processando_requisicao}></Button>;
 
     render() {
 
-        let botoesTela = [ { element: this.botaoVoltar }, { element: this.botaoContratar } ];
+        let botoesTela = [ { element: this.botaoVoltar }, { element: this.botaoPronto } ];
         
         return (
             <View style={styles.areaCliente}>
-                <Cabecalho titulo='Contrato' navigation={this.oNavegacao} />
+                <Cabecalho titulo='Contratacao' navigation={this.oNavegacao} />
                 <AreaDados dadosApp={this.oDadosApp}/>
                 <AreaRodape botoes={botoesTela} mensagem={''}/>
             </View>
         );
     }
 }
-TelaModalContratoAceite.contextType = ContextoApp;
+TelaModalContratoClicksign.contextType = ContextoApp;
 
 export class AreaDados extends Component {
 
@@ -187,7 +188,7 @@ export class AreaDados extends Component {
             this.oGerenciadorContextoApp = value.gerenciador;
             
             this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
-            this.oRegistradorLog.registrar('TelaContratoAceite.constructor() => Iniciou.');
+            this.oRegistradorLog.registrar('TelaModalContratoClicksign.constructor() => Iniciou.');
 
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
@@ -202,17 +203,9 @@ export class AreaDados extends Component {
         let oDadosContrato = oDadosApp.contrato;
         let areaContrato = <View><Text>Gerando o contrato. Aguarde...</Text></View>
 
-        
         console.log('oDadosContrato.url_doc... ', oDadosContrato.url_doc);
-        
+        console.log('oDadosContrato.url_pdf... ', oDadosContrato.url_pdf);
         if(oDadosContrato.url_doc) {
-            // let oDadosParametros = JSON.stringify({
-            //         'dados_app' : oDadosApp,
-            //     });
-
-            // let parametrosHTTPS = this.oComunicacaoHTTP.getParametrosHTTPS(oDadosParametros);
-            // parametrosHTTPS.uri = oDadosContrato.url_pdf;
-            // const source = parametrosHTTPS;
         
             areaContrato = <WebView source={{ uri: `${oDadosContrato.url_doc}` }}></WebView>
 
@@ -257,6 +250,34 @@ export class AreaDados extends Component {
             //     </script>
             //   </body>
             // </html>` }}></WebView>
+        } else {
+            
+            const source = { 'uri': '' };
+
+            if(oDadosContrato.url_pdf) {
+                source.uri = oDadosContrato.url_pdf;
+            }
+            areaContrato = <View style={styles.areaDadosCliente}>
+                <Pdf
+                    source={source}
+                    onLoadComplete={(numberOfPages,filePath)=>{
+                    }}
+                    onPageChanged={(page,numberOfPages)=>{
+                    }}
+                    onError={(error)=>{
+                        if(source.uri) {
+                            this.oComunicacaoHTTP.obterJsonResposta(error);
+                        }
+                    }}
+                    onPressLink={(uri)=>{
+                    }}
+                    style={{
+                        flex:1,
+                        width:Dimensions.get('window').width,
+                        height:Dimensions.get('window').height,
+                    }}
+                />
+            </View>
         }
         return (
             <View style={styles.areaDadosCliente}>

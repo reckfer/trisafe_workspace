@@ -47,20 +47,10 @@ class ContratoClicksign(models.Model):
 
         return retorno
     
-    def obter_url_contrato_docx(self, chave_doc_clicksign):
+    def obter_url_contrato_pdf(self, chave_doc_clicksign):
 
         if(not self.headers_clicksign):
             return self.retorno_autenticacao
-
-        # url = ''
-
-        # if(chave_doc_clicksign and len(chave_doc_clicksign) > 0):
-        #     url = "https://sandbox.clicksign.com/api/v1/documents/{0}{1}".format(chave_doc_clicksign, self.querystring_access_token)
-
-        # r = requests.get(url, headers=self.headers_clicksign)
-
-        # # tenta obter por id_clicksign.
-        # retorno = self.__tratarRespostaHTTP(r)
         
         retorno = self.obter(chave_doc_clicksign)
     
@@ -73,9 +63,9 @@ class ContratoClicksign(models.Model):
         if(d_dados_doc):
             if 'downloads' in d_dados_doc:
                 d_downloads = d_dados_doc['downloads']
-                if 'original_file_url' in d_downloads:
+                if 'signed_file_url' in d_downloads:
                     
-                    url = d_downloads['original_file_url']
+                    url = d_downloads['signed_file_url']
 
                     if(url and len(str(url).strip()) > 0):
                         tem_url = True
@@ -87,6 +77,37 @@ class ContratoClicksign(models.Model):
             retorno = Retorno(False, 'Não foi possível obter o documento do contrato. Os dados retornaram vazios', '', 404)
 
         return retorno
+
+    # def obter_url_contrato_docx(self, chave_doc_clicksign):
+
+    #     if(not self.headers_clicksign):
+    #         return self.retorno_autenticacao
+        
+    #     retorno = self.obter(chave_doc_clicksign)
+    
+    #     if not retorno.estado.ok:
+    #         return retorno
+
+    #     d_dados_doc = retorno.dados
+    #     tem_url = False
+        
+    #     if(d_dados_doc):
+    #         if 'downloads' in d_dados_doc:
+    #             d_downloads = d_dados_doc['downloads']
+    #             if 'original_file_url' in d_downloads:
+                    
+    #                 url = d_downloads['original_file_url']
+
+    #                 if(url and len(str(url).strip()) > 0):
+    #                     tem_url = True
+
+    #     if tem_url:
+    #         retorno = Retorno(True)
+    #         retorno.dados = url
+    #     else:
+    #         retorno = Retorno(False, 'Não foi possível obter o documento do contrato. Os dados retornaram vazios', '', 404)
+
+    #     return retorno
 
     def incluir(self, m_cliente):
         url = "https://sandbox.clicksign.com/api/v1/templates/%s/documents%s" % (self.chave_template_contrato, self.querystring_access_token)

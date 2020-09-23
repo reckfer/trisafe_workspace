@@ -119,7 +119,7 @@ export default class TelaModalVisualizaFotoCNH extends Component {
     avancar() {
         Orientation.unlockAllOrientations();
 
-        this.oNavegacao.navigate('Contrato');
+        this.oNavegacao.navigate('Contratacao');
     }
     
     capturarNovamente() {
@@ -134,7 +134,7 @@ export default class TelaModalVisualizaFotoCNH extends Component {
         console.log('Removendo tela imagem CNH...', JSON.stringify(pop));
         this.oNavegacao.dispatch(pop);
 
-        const push = StackActions.push('Cadastro Cliente', { screen: 'Foto CNH' });
+        const push = StackActions.push('Fluxo Cadastro Cliente', { screen: 'Foto CNH' });
 
         this.oNavegacao.dispatch(push);
         // this.oNavegacao.goBack();

@@ -33,10 +33,12 @@ export const DADOS_CONTRATO = {
     'cliente': DADOS_CLIENTE,
     'produtos_contratados': DADOS_PRODUTOS_CONTRATADOS,
     'valor_total': 0.0,
+    'aceito': false,
     'chave_boleto_ext' : '',
-    'url_pdf': '',
     'dt_hr_inclusao' : '',
     'ult_atualizacao' : '',
+    'url_pdf': '',
+    'url_doc': '',
 };
 
 export const DADOS_BOLETO = {

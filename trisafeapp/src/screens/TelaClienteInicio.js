@@ -113,7 +113,7 @@ export default class TelaClienteInicio extends Component {
     }
 
     irParaTestesRapidos() {
-        this.oNavegacao.navigate('Testes Cadastro', this.state);
+        this.oNavegacao.navigate('Fluxo Modais', { screen: 'Testes Cadastro' });
     }
 
     botaoIniciar = () => <Button title="Iniciar" onPress={this.obterCliente} loading={this.oDadosControleApp.processando_requisicao}></Button>;

@@ -117,40 +117,41 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
     #         retorno = Retorno(False, 'A inclusão do contrato falhou.', None, None, e)
     #         return retorno.gerar_resposta_http()
 
-    # @action(detail=False, methods=['post'])
-    # def aceitar(self, request):
-    #     try:
-    #         v_gerenciador_log = GerenciadorLogViewSet()
-    #         v_gerenciador_log.registrar_do_cliente(request)
+    @action(detail=False, methods=['post'])
+    def aceitar(self, request):
+        try:
+            v_gerenciador_log = GerenciadorLogViewSet()
+            v_gerenciador_log.registrar_do_cliente(request)
 
-    #         m_contrato = ContratoViewSet.apropriar_dados_http(request)
+            m_contrato = ContratoViewSet.apropriar_dados_http(request)
             
-    #         retorno_contrato = m_contrato.obter()
+            retorno_contrato = m_contrato.obter()
 
-    #         if not retorno_contrato.estado.ok:
-    #             return retorno_contrato.gerar_resposta_http()
+            if not retorno_contrato.estado.ok:
+                return retorno_contrato.gerar_resposta_http()
             
-    #         m_boleto = BoletoGerenciaNet()
-    #         m_contrato = retorno_contrato.dados
+            m_boleto = BoletoGerenciaNet()
+            m_contrato = retorno_contrato.dados
+            m_contrato.credencial = ContratoViewSet.apropriar_credenciais_clicksign_http(request)
 
-    #         if not m_contrato.aceito:
-    #             retorno = m_contrato.aceitar()
+            if not m_contrato.aceito:
+                retorno = m_contrato.aceitar()
 
-    #             if not retorno.estado.ok:
-    #                 return retorno.gerar_resposta_http()
+                if not retorno.estado.ok:
+                    return retorno.gerar_resposta_http()
 
-    #             m_contrato = retorno.dados
+                m_contrato = retorno.dados
                 
-    #             retorno = m_boleto.gerar(m_contrato)
-    #         else:
-    #             retorno = m_boleto.obter(m_contrato)
+                retorno = m_boleto.gerar(m_contrato)
+            else:
+                retorno = m_boleto.obter(m_contrato)
 
-    #         return retorno.gerar_resposta_http()
+            return retorno.gerar_resposta_http()
 
-    #     except Exception as e:
+        except Exception as e:
                     
-    #         retorno = Retorno(False, 'A aceitação do contrato falhou.', None, None, e)
-    #         return retorno.gerar_resposta_http()
+            retorno = Retorno(False, 'A aceitação do contrato falhou.', None, None, e)
+            return retorno.gerar_resposta_http()
     
     @action(detail=False, methods=['post'])
     def obter(self, request):
@@ -184,22 +185,22 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
             retorno = Retorno(False, 'A consulta do contrato falhou.', None, None, e)
             return retorno.gerar_resposta_http()
     
-    @action(detail=False, methods=['post'])
-    def obter_url_contrato_docx(self, request):
-        try:
-            v_gerenciador_log = GerenciadorLogViewSet()
-            v_gerenciador_log.registrar_do_cliente(request)
+    # @action(detail=False, methods=['post'])
+    # def obter_url_contrato_docx(self, request):
+    #     try:
+    #         v_gerenciador_log = GerenciadorLogViewSet()
+    #         v_gerenciador_log.registrar_do_cliente(request)
             
-            m_contrato = ContratoViewSet.apropriar_dados_http(request)
-            m_contrato.credencial = ContratoViewSet.apropriar_credenciais_clicksign_http(request)
+    #         m_contrato = ContratoViewSet.apropriar_dados_http(request)
+    #         m_contrato.credencial = ContratoViewSet.apropriar_credenciais_clicksign_http(request)
             
-            retorno = m_contrato.obter_url_contrato_docx()
+    #         retorno = m_contrato.obter_url_contrato_docx()
             
-            return retorno.gerar_resposta_http()
-        except Exception as e:
+    #         return retorno.gerar_resposta_http()
+    #     except Exception as e:
                     
-            retorno = Retorno(False, 'A consulta do contrato falhou.', None, None, e)
-            return retorno.gerar_resposta_http()
+    #         retorno = Retorno(False, 'A consulta do contrato falhou.', None, None, e)
+    #         return retorno.gerar_resposta_http()
     
     @action(detail=False, methods=['post'])
     def obter_arquivo_contrato(self, request):

@@ -25,24 +25,24 @@ class BoletoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissio
     queryset = BoletoGerenciaNet.objects.all()
     serializer_class = BoletoSerializer
     
-    @action(detail=False, methods=['post'])
-    def gerar(self, request):
-        try:
-            v_gerenciador_log = GerenciadorLogViewSet()
-            v_gerenciador_log.registrar_do_cliente(request)
+    # @action(detail=False, methods=['post'])
+    # def gerar(self, request):
+    #     try:
+    #         v_gerenciador_log = GerenciadorLogViewSet()
+    #         v_gerenciador_log.registrar_do_cliente(request)
 
-            m_boleto = BoletoGerenciaNet()
+    #         m_boleto = BoletoGerenciaNet()
             
-            m_contrato = self.apropriar_dados_http(request)
+    #         m_contrato = self.apropriar_dados_http(request)
             
-            retorno_boleto = m_boleto.gerar(m_contrato)
+    #         retorno_boleto = m_boleto.gerar(m_contrato)
 
-            return retorno_boleto.gerar_resposta_http()
+    #         return retorno_boleto.gerar_resposta_http()
             
-        except Exception as e:
+    #     except Exception as e:
                     
-            retorno = Retorno(False, 'A geração do boleto falhou.', None, None, e)
-            return retorno.gerar_resposta_http()
+    #         retorno = Retorno(False, 'A geração do boleto falhou.', None, None, e)
+    #         return retorno.gerar_resposta_http()
     
     @action(detail=False, methods=['post'])
     def obter(self, request):

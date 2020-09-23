@@ -87,21 +87,21 @@ export default class TelaModalTestesCadastro extends Component {
     }
 
     irParaTesteCadastroIter() {
-        this.oNavegacao.navigate('Cadastro Cliente', { screen: 'Cadastro' });
+        this.oNavegacao.navigate('Fluxo Cadastro Cliente', { screen: 'Cadastro' });
 
     }
 
     irParaTesteBoletoGerenciaNet() {
-        this.oNavegacao.navigate('Cadastro Cliente', { screen: 'Boleto' });
+        this.oNavegacao.navigate('Fluxo Cadastro Cliente', { screen: 'Boleto' });
 
     }
 
     irParaTesteContratoPDF() {
-        this.oNavegacao.navigate('Cadastro Cliente', { screen: 'Contrato' });
+        this.oNavegacao.navigate('Fluxo Cadastro Cliente', { screen: 'Contratacao' });
     }
 
     irParaTesteFotoCNH() {
-        // this.oNavegacao.navigate('Cadastro Cliente', { screen: 'Foto CNH' });
+        // this.oNavegacao.navigate('Fluxo Cadastro Cliente', { screen: 'Foto CNH' });
         this.oNavegacao.navigate('Visualizacao Foto CNH');
         
     }

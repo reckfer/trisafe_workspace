@@ -70,7 +70,7 @@ export default class TelaMenuInicio extends Component {
     }
     
     irParaMeusDados() {
-        this.oNavegacao.navigate('Cadastro Cliente', this.state);
+        this.oNavegacao.navigate('Fluxo Cadastro Cliente', this.state);
     }
 
     irParaMeusVeiculos() {
