@@ -42,6 +42,7 @@ function FluxoModais() {
     <fluxoModais.Navigator headerMode='none' initialRouteName='Testes Cadastro'>
         <fluxoModais.Screen name="Visualizacao Foto CNH" component={TelaModalVisualizaFotoCNH} />
         <fluxoModais.Screen name="Contrato Clicksign" component={TelaModalContratoClicksign} />
+        <fluxoModais.Screen name="Boleto Gerencianet" component={TelaModalBoleto} />
         <fluxoModais.Screen name="Fluxo Cadastro Cliente" component={FluxoCadastro} />
         <fluxoModais.Screen name="Testes Cadastro" component={TelaModalTestesCadastro} />
     </fluxoModais.Navigator>

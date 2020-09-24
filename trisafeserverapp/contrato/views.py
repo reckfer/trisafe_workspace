@@ -137,12 +137,7 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
             if not m_contrato.aceito:
                 retorno = m_contrato.aceitar()
 
-                if not retorno.estado.ok:
-                    return retorno.gerar_resposta_http()
-
-                m_contrato = retorno.dados
                 
-                retorno = m_boleto.gerar(m_contrato)
             else:
                 retorno = m_boleto.obter(m_contrato)
 

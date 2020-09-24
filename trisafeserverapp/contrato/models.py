@@ -12,6 +12,7 @@ from produto.models import Produto
 from emailcliente.models import EmailCliente
 from contratoclicksign.models import ContratoClicksign
 from transacaogerencianet.models import TransacaoGerenciaNet
+from boletogerencianet.models import BoletoGerenciaNet
 from fpdf import FPDF
 
 class Contrato(models.Model):
@@ -26,6 +27,7 @@ class Contrato(models.Model):
     chave_boleto_ext = models.CharField(max_length=100, blank=False, null=True)
     credencial = Credencial()
     url_pdf = None
+    boleto = BoletoGerenciaNet()
 
     def incluir(self):
 
@@ -105,6 +107,12 @@ class Contrato(models.Model):
                     return retorno_url
                 
                 m_contrato.url_pdf = retorno_url.dados
+
+                m_boleto = BoletoGerenciaNet()
+                retorno_boleto = m_boleto.obter(m_contrato)
+                
+                if(retorno_boleto.estado.ok):
+                    m_contrato.boleto = retorno_boleto.dados
 
                 # O contrato foi aceito e assinado, então apenas retorna seus dados.
                 return retorno_contrato
@@ -346,6 +354,14 @@ class Contrato(models.Model):
 
             # Atualiza na base
             m_contrato.save()
+            
+            m_boleto = BoletoGerenciaNet()
+            retorno_boleto = m_boleto.gerar(m_contrato)
+
+            if not retorno_boleto.estado.ok:
+                return retorno_boleto
+
+            m_contrato.boleto = retorno_boleto.dados
 
             return retorno
         except Exception as e:
@@ -595,6 +611,7 @@ class Contrato(models.Model):
             'dt_hr_inclusao' : self.dt_hr_inclusao,
             'ult_atualizacao' : self.ult_atualizacao,
             'url_pdf' : self.url_pdf,
+            'boleto' : self.boleto.json()
         }
         return ret
 

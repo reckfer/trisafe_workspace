@@ -67,7 +67,7 @@ export default class TelaModalBoleto extends Component {
 
     inicializarDadosTela() {
 
-        if(this.oGerenciadorContextoApp.temDados()) {
+        if(this.oGerenciadorContextoApp.temDados() && this.oDadosApp.url_pdf) {
             this.obterBoleto();
         }
     }

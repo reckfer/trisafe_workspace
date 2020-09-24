@@ -22,6 +22,7 @@ import Util from '../common/Util';
 import Orientation from 'react-native-orientation';
 import WebView from 'react-native-webview';
 import Pdf from 'react-native-pdf';
+import { StackActions } from '@react-navigation/native';
 
 export default class TelaModalContratoClicksign extends Component {
 	
@@ -147,11 +148,21 @@ export default class TelaModalContratoClicksign extends Component {
     }
 
     tratarDadosRetorno(oDados, oEstado) {
-        this.oGerenciadorContextoApp.atribuirDados('contrato', oDados);
-        this.oGerenciadorContextoApp.atribuirDados('boleto', oDados);
+        if(oDados) {
+            this.oGerenciadorContextoApp.atribuirDados('contrato', oDados);
+            this.oGerenciadorContextoApp.atribuirDados('cliente', oDados.cliente);
+            this.oGerenciadorContextoApp.atribuirDados('boleto', oDados.boleto);
+        }
 
         if(oEstado.ok) {
-            this.oNavegacao.navigate('Boleto', this.state);
+            const pop = StackActions.pop(1);
+                
+            console.log('Removendo tela contrato clicksign...', JSON.stringify(pop));
+            this.oNavegacao.dispatch(pop);
+
+            const push = StackActions.push('Fluxo Cadastro Cliente', { screen: 'Contratacao' });
+
+            this.oNavegacao.dispatch(push);
         }
     }
 
@@ -257,27 +268,25 @@ export class AreaDados extends Component {
             if(oDadosContrato.url_pdf) {
                 source.uri = oDadosContrato.url_pdf;
             }
-            areaContrato = <View style={styles.areaDadosCliente}>
-                <Pdf
-                    source={source}
-                    onLoadComplete={(numberOfPages,filePath)=>{
-                    }}
-                    onPageChanged={(page,numberOfPages)=>{
-                    }}
-                    onError={(error)=>{
-                        if(source.uri) {
-                            this.oComunicacaoHTTP.obterJsonResposta(error);
-                        }
-                    }}
-                    onPressLink={(uri)=>{
-                    }}
-                    style={{
-                        flex:1,
-                        width:Dimensions.get('window').width,
-                        height:Dimensions.get('window').height,
-                    }}
-                />
-            </View>
+            areaContrato = <Pdf
+                source={source}
+                onLoadComplete={(numberOfPages,filePath)=>{
+                }}
+                onPageChanged={(page,numberOfPages)=>{
+                }}
+                onError={(error)=>{
+                    if(source.uri) {
+                        this.oComunicacaoHTTP.obterJsonResposta(error);
+                    }
+                }}
+                onPressLink={(uri)=>{
+                }}
+                style={{
+                    flex:1,
+                    width:Dimensions.get('window').width,
+                    height:Dimensions.get('window').height,
+                }}
+            />
         }
         return (
             <View style={styles.areaDadosCliente}>

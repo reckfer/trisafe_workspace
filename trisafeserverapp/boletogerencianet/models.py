@@ -6,7 +6,7 @@ from django.db import models
 from rest_framework import status
 from comum.retorno import Retorno
 from gerencianet import Gerencianet
-from contrato.models import Contrato
+from cliente.models import Cliente
 
 credentials = {
     'client_id': 'Client_Id_add8181cd3a52a8343ca8912c17bebf2acc579ae',
@@ -21,28 +21,28 @@ class BoletoGerenciaNet(models.Model):
     
     def gerar(self, m_contrato):
         try:
-            m_contrato_cadastro = Contrato()
-            if len(str(m_contrato.id_contrato)) > 0:
-                m_contrato_cadastro.id_contrato = m_contrato.id_contrato
+            # m_contrato_cadastro = Contrato()
+            # if len(str(m_contrato.id_contrato)) > 0:
+            #     m_contrato_cadastro.id_contrato = m_contrato.id_contrato
             
-                retorno_contrato = m_contrato_cadastro.obter()
-                if not retorno_contrato.estado.ok:
-                    if len(str(m_contrato.cliente.cpf)) > 0:
-                        m_cliente = Cliente()
-                        m_cliente.cpf = m_contrato_cadastro.cliente.cpf
-                        m_contrato.cliente = m_cliente
-                        retorno_contrato = m_contrato.obter_por_cliente() 
+            #     retorno_contrato = m_contrato_cadastro.obter()
+            #     if not retorno_contrato.estado.ok:
+            #         if len(str(m_contrato.cliente.cpf)) > 0:
+            #             m_cliente = Cliente()
+            #             m_cliente.cpf = m_contrato_cadastro.cliente.cpf
+            #             m_contrato.cliente = m_cliente
+            #             retorno_contrato = m_contrato.obter_por_cliente() 
                         
-                        if not retorno_contrato.estado.ok:
-                            return retorno_contrato
+            #             if not retorno_contrato.estado.ok:
+            #                 return retorno_contrato
 
-            m_contrato_cadastro = retorno_contrato.dados
+            # m_contrato_cadastro = retorno_contrato.dados
 
             today = date.today()
             data_vencimento = today.strftime("%Y-%m-%d")
  
             params = {
-                'id': m_contrato_cadastro.chave_boleto_ext
+                'id': m_contrato.chave_boleto_ext
             }
             
             body = {
@@ -50,11 +50,11 @@ class BoletoGerenciaNet(models.Model):
                     'banking_billet': {
                         'expire_at': data_vencimento,
                         'customer': {
-                            'name': m_contrato_cadastro.cliente.nome,
-                            'email': m_contrato_cadastro.cliente.email,
-                            'cpf': m_contrato_cadastro.cliente.cpf,
-                            # 'birth': m_contrato_cadastro.cliente.,
-                            'phone_number': m_contrato_cadastro.cliente.telefone
+                            'name': m_contrato.cliente.nome,
+                            'email': m_contrato.cliente.email,
+                            'cpf': m_contrato.cliente.cpf,
+                            # 'birth': m_contrato.cliente.,
+                            'phone_number': m_contrato.cliente.telefone
                         }
                     }
                 }
@@ -74,25 +74,25 @@ class BoletoGerenciaNet(models.Model):
     
     def obter(self, m_contrato):
         try:
-            m_contrato_cadastro = Contrato()
-            if len(str(m_contrato.id_contrato)) > 0:
-                m_contrato_cadastro.id_contrato = m_contrato.id_contrato
+            # m_contrato_cadastro = Contrato()
+            # if len(str(m_contrato.id_contrato)) > 0:
+            #     m_contrato_cadastro.id_contrato = m_contrato.id_contrato
             
-                retorno_contrato = m_contrato_cadastro.obter()
-                if not retorno_contrato.estado.ok:
-                    if len(str(m_contrato.cliente.cpf)) > 0:
-                        m_cliente = Cliente()
-                        m_cliente.cpf = m_contrato_cadastro.cliente.cpf
-                        m_contrato.cliente = m_cliente
-                        retorno_contrato = m_contrato.obter_por_cliente() 
+            #     retorno_contrato = m_contrato_cadastro.obter()
+            #     if not retorno_contrato.estado.ok:
+            #         if len(str(m_contrato.cliente.cpf)) > 0:
+            #             m_cliente = Cliente()
+            #             m_cliente.cpf = m_contrato_cadastro.cliente.cpf
+            #             m_contrato.cliente = m_cliente
+            #             retorno_contrato = m_contrato.obter_por_cliente() 
                         
-                        if not retorno_contrato.estado.ok:
-                            return retorno_contrato
+            #             if not retorno_contrato.estado.ok:
+            #                 return retorno_contrato
 
-            m_contrato_cadastro = retorno_contrato.dados
+            # m_contrato_cadastro = retorno_contrato.dados
  
             params = {
-                'id': m_contrato_cadastro.chave_boleto_ext
+                'id': m_contrato.chave_boleto_ext
             }
 
             m_gerencia_net = Gerencianet(credentials)

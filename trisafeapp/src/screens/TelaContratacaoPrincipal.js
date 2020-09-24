@@ -20,9 +20,11 @@ import AreaRodape from '../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
 import Util from '../common/Util';
 import Orientation from 'react-native-orientation';
-import WebView from 'react-native-webview';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import Configuracao from '../common/Configuracao';
+import RNFetchBlob from 'rn-fetch-blob';
+import { StackActions } from '@react-navigation/native';
 
 export default class TelaModalContratoClicksign extends Component {
 	
@@ -90,6 +92,7 @@ export default class TelaModalContratoClicksign extends Component {
         if(oEstado.ok) {
             this.oGerenciadorContextoApp.atribuirDados('contrato', oDados);
             this.oGerenciadorContextoApp.atribuirDados('cliente', oDados.cliente);
+            this.oGerenciadorContextoApp.atribuirDados('boleto', oDados.boleto);
             
             let oCliente = this.oDadosApp.cliente;
             
@@ -105,6 +108,11 @@ export default class TelaModalContratoClicksign extends Component {
 
                 if(this.oDadosContrato.url_doc) {
                     
+                    const pop = StackActions.pop(1);
+                
+                    console.log('Removendo tela atual...', JSON.stringify(pop));
+                    this.oNavegacao.dispatch(pop);
+
                     this.oNavegacao.navigate('Fluxo Modais', { screen: 'Contrato Clicksign' });
                 } else {
 
@@ -175,12 +183,16 @@ export class AreaDados extends Component {
 
             this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
             this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
+            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
             this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp);
+            this.oConfiguracao = new Configuracao(this.oGerenciadorContextoApp, this);
             this.oUtil = new Util(this.oGerenciadorContextoApp);
             this.state = this.oGerenciadorContextoApp.dadosAppGeral;
         }
 
         this.montarIcone = this.montarIcone.bind(this);
+        this.baixarContrato = this.baixarContrato.bind(this);
+        this.baixarBoleto = this.baixarBoleto.bind(this);
     }
 
     montarIcone(nomeIcone, descricao, oFuncaoOnPress, oFuncaoOnLongPress, habilitado) {
@@ -209,6 +221,89 @@ export class AreaDados extends Component {
         }
     }
 
+    baixarContrato() {
+        
+        let nome_prefixo = 'Contrato_Trisafe';
+        let tipoArquivo = 'docx';
+        let tipoMidia  = 'application/msword';
+        let url = this.oDadosApp.contrato.url_doc;
+
+        if(this.oDadosApp.contrato.url_pdf) {
+            nome_prefixo = 'Contrato_Trisafe_Assinado';
+            tipoArquivo = 'pdf';
+            tipoMidia  = 'application/pdf';
+            url = this.oDadosApp.contrato.url_pdf;
+        }
+
+        RNFetchBlob
+        .config({
+            fileCache : true,
+            appendExt: tipoArquivo,
+        })
+        .fetch('GET', url)
+        .then((res) => {
+            let caminhoLocal = res.path();
+            // the temp file path
+            console.log('The file saved to ', caminhoLocal);
+            console.log('Caminho downloads:', RNFetchBlob.fs.dirs.DownloadDir);
+            
+            let nomeArquivo = `${nome_prefixo}_${this.oDadosApp.contrato.id_contrato}.${tipoArquivo}`;
+            let caminhoArquivoDestino = `${RNFetchBlob.fs.dirs.DownloadDir}/${nomeArquivo}`;
+            
+            RNFetchBlob.android.actionViewIntent(caminhoLocal, tipoMidia)
+            .then((valor) => {
+                console.log(valor);
+            }).catch((e) => {
+                this.oUtil.tratarExcecao(e);    
+            });
+
+            RNFetchBlob.fs.cp(caminhoLocal, caminhoArquivoDestino).then((resultado) => {
+                console.log('Arquivo movido: ', resultado);
+                Alert.alert('TriSafe', `Seu contrato salvo. Verifique na pasta Downloads o arquivo ${nomeArquivo}.`);
+            });
+        }).catch((e) =>{
+            this.oUtil.tratarExcecao(e);
+        })
+    };
+
+    baixarBoleto() {
+        
+        let nome_prefixo = 'Boleto_Trisafe';
+        let tipoArquivo = 'pdf';
+        let tipoMidia  = 'application/pdf';
+        let url = this.oDadosApp.boleto.url_pdf;
+
+        RNFetchBlob
+        .config({
+            fileCache : true,
+            appendExt: tipoArquivo,
+        })
+        .fetch('GET', url)
+        .then((res) => {
+            let caminhoLocal = res.path();
+            // the temp file path
+            console.log('Caminho arquivo local: ', caminhoLocal);
+            console.log('Caminho downloads:', RNFetchBlob.fs.dirs.DownloadDir);
+            
+            let nomeArquivo = `${nome_prefixo}_${this.oDadosApp.contrato.id_contrato}.${tipoArquivo}`;
+            let caminhoArquivoDestino = `${RNFetchBlob.fs.dirs.DownloadDir}/${nomeArquivo}`;
+            
+            RNFetchBlob.android.actionViewIntent(caminhoLocal, tipoMidia)
+            .then((valor) => {
+                console.log(valor);
+            }).catch((e) => {
+                this.oUtil.tratarExcecao(e);    
+            });
+
+            RNFetchBlob.fs.cp(caminhoLocal, caminhoArquivoDestino).then((resultado) => {
+                console.log('Arquivo movido: ', resultado);
+                Alert.alert('TriSafe', `Seu contrato salvo. Verifique na pasta Downloads o arquivo ${nomeArquivo}.`);
+            });
+        }).catch((e) =>{
+            this.oUtil.tratarExcecao(e);
+        })
+    };
+
     render() {
         let oDadosApp = this.props.dadosApp;
         let oNavegacao = this.props.navigation;
@@ -223,24 +318,24 @@ export class AreaDados extends Component {
         
         if(oDadosContrato.aceito) {
 
-            areaContrato = <View style={{flexDirection:'column', alignItems:'center', justifyContent:'center' }}>
+            areaContrato = <View style={{flexDirection:'column', alignItems:'center', justifyContent:'center'}}>
                 <Text>Obrigado por contratar a TriSafe...</Text>
                 <Card key={1} 
                     title='Contrato'
-                    containerStyle={{backgroundColor: '#f0f5f5', borderWidth: 0, borderRadius:5, flexDirection:'column'}} 
+                    containerStyle={{backgroundColor: '#f0f5f5', borderWidth: 0, borderRadius:5, flexDirection:'column', width:'90%'}} 
                 >
-                    <View  style={{flexDirection:'row', alignItems:'center', alignSelf:'stretch', justifyContent:'center' }}>
-                        {this.montarIcone('bars', 'Baixar', () => {Alert.alert('a');}, () => {}, true)}
-                        {this.montarIcone('bars', 'Visualizar', () => {oNavegacao.navigate('Fluxo Modais', { screen: 'Contrato Clicksign' });}, () => {}, true)}
+                    <View  style={{flexDirection:'row', alignItems:'center', alignSelf:'stretch', justifyContent:'space-evenly' }}>
+                        {this.montarIcone('download', 'Baixar', () => {this.oConfiguracao.solicitarPermissaoArmazenamento(this.baixarContrato);}, () => {}, true)}
+                        {this.montarIcone('file-o', 'Visualizar', () => {oNavegacao.navigate('Fluxo Modais', { screen: 'Contrato Clicksign' });}, () => {}, true)}
                     </View>
                 </Card>
                 <Card key={2} 
                     title='Boleto'
-                    containerStyle={{backgroundColor: '#f0f5f5', borderWidth: 0, borderRadius:5, flexDirection:'column'}} 
+                    containerStyle={{backgroundColor: '#f0f5f5', borderWidth: 0, borderRadius:5, flexDirection:'column', width:'90%'}} 
                 >
-                    <View  style={{flexDirection:'row', alignItems:'center', alignSelf:'stretch', justifyContent:'center' }}>
-                        {this.montarIcone('bars', 'Baixar', () => {Alert.alert('c');}, () => {}, true)}
-                        {this.montarIcone('bars', 'Visualizar', () => {Alert.alert('d');}, () => {}, true)}
+                    <View  style={{flexDirection:'row', alignItems:'center', alignSelf:'stretch', justifyContent:'space-evenly' }}>
+                        {this.montarIcone('download', 'Baixar', () => {this.oConfiguracao.solicitarPermissaoArmazenamento(this.baixarBoleto);}, () => {}, true)}
+                        {this.montarIcone('file-o', 'Visualizar', () => {oNavegacao.navigate('Fluxo Modais', { screen: 'Boleto Gerencianet' });}, () => {}, true)}
                     </View>
                 </Card>
             </View>
@@ -290,57 +385,12 @@ export class AreaDados extends Component {
 
 
             
-    } else if(oDadosContrato.url_doc) {
-        
-            areaContrato = <WebView source={{ uri: `${oDadosContrato.url_doc}` }}></WebView>
-
-            // areaContrato = <WebView source={{ html:`<!DOCTYPE html>
-            // <html>
-            //   <head>
-            //     <meta charset="UTF-8">
-            //     <meta name="viewport" content="width=device-width, initial-scale=1">
-            //     <title>Simple widget usage</title>
-            //     <script src='embedded.js'></script>
-            //   </head>
-            
-            //   <body>
-            //     <input id='request_signature_key' />
-            //     <input type='button' value='Load' onclick='run()'/>
-            //     <div id='container' style='height: 100%'>
-            //         <iframe style='height: 100%' src="https://docs.google.com/gview?url=${oDadosContrato.url_doc}"></iframe>
-            //     </div>
-            
-            //     <script type='text/javascript'>
-            //       var widget,
-            //           input = document.getElementById('request_signature_key');
-            
-            //       function run () {
-            //         var request_signature_key = input.value;
-            
-            //         if(widget) { widget.unmount(); }
-            
-            //         widget = new Clicksign(request_signature_key);
-            
-            //         widget.endpoint = '${oDadosContrato.url_doc}';
-            //         widget.origin = 'http://www.seusite.com.br';
-            //         widget.mount('container');
-            
-            //         widget.on('loaded', function(ev) { console.log('loaded!'); });
-            //         widget.on('signed', function(ev) { console.log('signed!'); });
-            //         widget.on('resized', function(height) {
-            //           console.log('resized!');
-            //           document.getElementById('container').style.height = height+'px';
-            //         });
-            //       };
-            //     </script>
-            //   </body>
-            // </html>` }}></WebView>
-        }
-        return (
-            <View style={styles.areaDadosCliente}>
-                {areaContrato}
-            </View>
-        );
     }
+    
+    return (
+        <View style={styles.areaDadosCliente}>
+            {areaContrato}
+        </View>
+    );}
 }
 AreaDados.contextType = ContextoApp;
