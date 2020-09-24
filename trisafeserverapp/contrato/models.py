@@ -339,6 +339,16 @@ class Contrato(models.Model):
                 retorno = Retorno(False, 'O contrato foi cancelado. Atualize seu cadastro pelo aplicativo e gere novo contrato.\nObrigado.', 'ContratoCancelado', 451)
                 return retorno
 
+            if(d_contrato_clicksign):
+                if 'downloads' in d_contrato_clicksign:
+                    d_downloads = d_contrato_clicksign['downloads']
+                    if 'signed_file_url' in d_downloads:
+                        
+                        url = d_downloads['signed_file_url']
+
+                        if(url and len(str(url).strip()) > 0):
+                            m_contrato.url_pdf = url
+
             m_produtos_contratados = m_contrato.produtos_contratados.all()
             d_dados_pedido = self.gerar_dados_pedido_transacao_gerencia_net(m_produtos_contratados)
 

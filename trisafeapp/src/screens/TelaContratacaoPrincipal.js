@@ -56,8 +56,6 @@ export default class TelaModalContratoClicksign extends Component {
         
         this.incluirContrato = this.incluirContrato.bind(this);
         this.tratarIncluirContrato = this.tratarIncluirContrato.bind(this);
-        this.contratado = this.contratado.bind(this);
-        this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
         this.voltar = this.voltar.bind(this);
 
         this.texto_instrucao = 'Contrato de serviço de rastreamento.'
@@ -124,27 +122,28 @@ export default class TelaModalContratoClicksign extends Component {
         }
     }
 
-    contratado() {
-        try {
-            let metodoURI = '/contratos/aceitar/';
+    // contratado() {
+    //     try {
+    //         let metodoURI = '/contratos/aceitar/';
             
-            let oDadosParametros = JSON.stringify(this.state);
+    //         let oDadosParametros = JSON.stringify(this.state);
 
-            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarDadosRetorno);
+    //         this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarDadosRetorno);
 
-        } catch (oExcecao) {
-            this.oUtil.tratarExcecao(oExcecao);
-        }
-    }
+    //     } catch (oExcecao) {
+    //         this.oUtil.tratarExcecao(oExcecao);
+    //     }
+    // }
 
-    tratarDadosRetorno(oDados, oEstado) {
-        this.oGerenciadorContextoApp.atribuirDados('contrato', oDados);
-        this.oGerenciadorContextoApp.atribuirDados('boleto', oDados);
+    // tratarDadosRetorno(oDados, oEstado) {
+    //     this.oGerenciadorContextoApp.atribuirDados('contrato', oDados);
+    //     this.oGerenciadorContextoApp.atribuirDados('boleto', oDados.boleto);
 
-        if(oEstado.ok) {
-            this.oNavegacao.navigate('Boleto', this.state);
-        }
-    }
+    //     if(oEstado.ok) {
+    //         this.oDadosContrato.url_doc
+    //         this.oNavegacao.navigate('Boleto', this.state);
+    //     }
+    // }
 
     voltar() {
 
@@ -152,7 +151,7 @@ export default class TelaModalContratoClicksign extends Component {
     }
 
     botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;        
-    botaoPronto = () => <Button title="Pronto" onPress={this.contratado} loading={this.oDadosControleApp.processando_requisicao}></Button>;
+    botaoPronto = () => <Button title="Pronto" loading={this.oDadosControleApp.processando_requisicao}></Button>;
 
     render() {
 

@@ -155,6 +155,7 @@ export default class TelaModalContratoClicksign extends Component {
         }
 
         if(oEstado.ok) {
+            this.oDadosApp.contrato.url_doc = '';
             const pop = StackActions.pop(1);
                 
             console.log('Removendo tela contrato clicksign...', JSON.stringify(pop));

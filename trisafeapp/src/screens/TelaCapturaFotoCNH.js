@@ -220,9 +220,6 @@ export default class TelaCapturaFotoCNH extends PureComponent {
                             <View style={{width:"17%",  backgroundColor:'black', opacity: .7, justifyContent:'center', alignItems:'center'}}>
                                 <TouchableOpacity onPress={this.capturarFotoCNH}>
                                     <Icon name="camera" size={40} color="blue" />
-                                </TouchableOpacity>   
-                                <TouchableOpacity onPress={() => {this.oGerenciadorContextoApp.atualizarEstadoTela(this);}}>
-                                    <Icon name="camera" size={40} color="yellow" />
                                 </TouchableOpacity> 
                             </View>
                         </View>
