@@ -19,32 +19,18 @@ import Cabecalho from '../common/CabecalhoTela';
 import { styles, theme } from '../common/Estilos';
 import AreaRodape from '../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
-import Util from '../common/Util';
+import Util, { inicializarContextoComum } from '../common/Util';
 import Orientation from 'react-native-orientation';
+
+const NOME_COMPONENTE = 'TelaModalBoleto';
+const INSTRUCAO_INICIAL = 'Contratação finalizada. Obrigado.';
 
 export default class TelaModalBoleto extends Component {
 	
-    constructor(props, value) {
-        super(props);
+    constructor(props, contexto) {
+        super();
         
-        if(props && props.navigation) {
-            this.oNavegacao = props.navigation;
-        }
-        
-        if(value && value.gerenciador) {
-            // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
-            this.oGerenciadorContextoApp = value.gerenciador;
-            
-            this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
-            this.oRegistradorLog.registrar('TelaModalBoleto.constructor() => Iniciou.');
-
-            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
-            this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
-            this.state = this.oGerenciadorContextoApp.dadosAppGeral;
-        }
+        inicializarContextoComum(props, contexto, this, INSTRUCAO_INICIAL);
 
         this.inicializarDadosTela = this.inicializarDadosTela.bind(this);
         this.obterBoleto = this.obterBoleto.bind(this);
@@ -52,17 +38,17 @@ export default class TelaModalBoleto extends Component {
         this.finalizar = this.finalizar.bind(this);
         this.tratarRetornoEmail = this.tratarRetornoEmail.bind(this);
         this.voltar = this.voltar.bind(this);
-
-        this.texto_instrucao = 'Contratação finalizada. Obrigado.';
-        this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
-
-        this.oRegistradorLog.registrar('TelaModalBoleto.constructor() => Finalizou.');
     }
 
     componentDidMount() {
+        let nomeFuncao = 'componentDidMount';
+        
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
         
         Orientation.unlockAllOrientations();
         this.inicializarDadosTela();
+
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
 
     inicializarDadosTela() {
@@ -131,8 +117,8 @@ TelaModalBoleto.contextType = ContextoApp;
 
 export class AreaDados extends Component {
 
-    constructor(props) {
-        super(props);
+    constructor(props, contexto) {
+        super();
     }
 
     render() {

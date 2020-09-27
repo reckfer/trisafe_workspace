@@ -18,52 +18,36 @@ import Cabecalho from '../common/CabecalhoTela';
 import AreaRodape from '../common/AreaRodape';
 import { styles, theme } from '../common/Estilos';
 import { ContextoApp } from '../contexts/ContextoApp';
-import Util from '../common/Util';
+import Util, { inicializarContextoComum } from '../common/Util';
 import Orientation from 'react-native-orientation';
+
+const NOME_COMPONENTE = 'TelaClienteInicio';
+const INSTRUCAO_INICIAL = 'Informe seu CPF ou e-mail para iniciar.';
 
 export default class TelaClienteInicio extends Component {
     
-    constructor(props, value) {
-        super(props);
+    constructor(props, contexto) {
+        super();
         
-        if(props && props.navigation) {
-            this.oNavegacao = props.navigation;
-        }
-        
-        if(value && value.gerenciador) {
-            // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
-            this.oGerenciadorContextoApp = value.gerenciador;
-            
-            this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
-            this.oRegistradorLog.registrar('TelaClienteInicio.constructor() => Iniciou.');
-
-            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
-            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
-            this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
-            this.state = this.oGerenciadorContextoApp.dadosAppGeral;
-        }
+        inicializarContextoComum(props, contexto, this, INSTRUCAO_INICIAL);
         
         this.obterCliente = this.obterCliente.bind(this);
         this.tratarDadosCliente = this.tratarDadosCliente.bind(this);
         this.irParaTestesRapidos = this.irParaTestesRapidos.bind(this);
         this.registrarEventoFoco = this.registrarEventoFoco.bind(this);
-
-        this.texto_instrucao = 'Informe seu CPF ou e-mail para iniciar.';
-        this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
-        
-        this.oRegistradorLog.registrar('TelaClienteInicio.constructor() => Finalizou.');
     }
     
     componentDidMount() {
+        let nomeFuncao = 'componentDidMount';
+        
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
         
         Orientation.unlockAllOrientations();
+
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
 
-    componentWillUnmount() {
-        console.log('componentWillUnmount(), vai registrar Orientation.lockToLandscapeLeft(); ao refocar...');
-        
+    componentWillUnmount() {        
         this.registrarEventoFoco();
     }
 
@@ -136,8 +120,8 @@ TelaClienteInicio.contextType = ContextoApp;
 
 export class AreaDados extends Component {
 
-    constructor(props) {
-        super(props);
+    constructor(props, contexto) {
+        super();
     }
 
     render() {

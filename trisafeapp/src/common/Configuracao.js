@@ -99,6 +99,9 @@ export default class Configuracao {
                 } else {
                     console.log("Acesso ao armazenamento negado.");
                 }
+            })
+            .catch((oExcecao) => {
+                this.oUtil.tratarExcecao(oExcecao);
             });
         } catch (err) {
           console.warn(err);
@@ -123,10 +126,15 @@ export default class Configuracao {
                     .then((numTelefone) => {
                         this.oDadosApp.cliente.telefone = numTelefone;
                         console.log('Num. telefone: ' + this.oDadosApp.cliente.telefone);
+                    }).catch((oExcecao) => {
+                        this.oUtil.tratarExcecao(oExcecao);
                     });
                 } else {
                     console.log("Acesso ao número do telefone negado.");
                 }
+            })
+            .catch((oExcecao) => {
+                this.oUtil.tratarExcecao(oExcecao);
             });
         } catch (err) {
           console.warn(err);

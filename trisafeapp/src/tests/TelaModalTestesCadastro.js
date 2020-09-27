@@ -13,40 +13,25 @@ import {
     Alert,
     View
 } from 'react-native';
-import ComunicacaoHTTP from '../common/ComunicacaoHTTP';
 import Cabecalho from '../common/CabecalhoTela';
 import AreaRodape from '../common/AreaRodape';
 import { styles, theme } from '../common/Estilos';
 import UtilTests from './UtilTests';
 import { ContextoApp } from '../contexts/ContextoApp';
-import Util from '../common/Util';
+import { inicializarContextoComum } from '../common/Util';
 import RNFetchBlob from 'rn-fetch-blob';
-import Configuracao from '../common/Configuracao';
+import Orientation from 'react-native-orientation';
+
+const NOME_COMPONENTE = 'TelaModalTestesCadastro';
+const INSTRUCAO_INICIAL = 'Selecione a opção de teste.';
 
 export default class TelaModalTestesCadastro extends Component {
 
-    constructor(props, value) {
-        super(props);
+    constructor(props, contexto) {
+        super();
         
-        if(value && value.gerenciador) {
-            // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
-            this.oGerenciadorContextoApp = value.gerenciador;
-            this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
-            this.oRegistradorLog.registrar('TelaModalTestesCadastro.constructor() => Iniciou.');
+        inicializarContextoComum(props, contexto, this, INSTRUCAO_INICIAL);
 
-            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
-            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
-            this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
-            this.oConfiguracao = new Configuracao(this.oGerenciadorContextoApp, this);
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
-
-            this.state = this.oGerenciadorContextoApp.dadosAppGeral;            
-        }
-        
-        if(props && props.navigation) {
-            this.oNavegacao = props.navigation;
-        }
         this.objUtilTests = new UtilTests();
 
         this.inicializarDadosTela = this.inicializarDadosTela.bind(this);
@@ -68,15 +53,17 @@ export default class TelaModalTestesCadastro extends Component {
         this.gerarDadosTestes = this.gerarDadosTestes.bind(this);
         this.incluirSignatario = this.incluirSignatario.bind(this);
         this.voltar = this.voltar.bind(this);
-        
-        this.texto_instrucao = 'Selecione a opção de teste.';
-        this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
-
-        this.oRegistradorLog.registrar('TelaModalTestesCadastro.constructor() => Finalizou.');
     }
 
     componentDidMount() {
+        let nomeFuncao = 'componentDidMount';
+        
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+        
+        Orientation.unlockAllOrientations();
         this.inicializarDadosTela();
+        
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
 
     inicializarDadosTela() {
@@ -195,23 +182,7 @@ export default class TelaModalTestesCadastro extends Component {
             RNFetchBlob
             .config({
                 fileCache : true,
-                //path: RNFetchBlob.fs.dirs.DownloadDir + '/a.docx',
                 appendExt: 'docx',
-                // addAndroidDownloads : {
-                //     useDownloadManager : true, // <-- this is the only thing required
-                //     // Optional, override notification setting (default to true)
-                //     notification : true,
-                //     // Optional, but recommended since android DownloadManager will fail when
-                //     // the url does not contains a file extension, by default the mime type will be text/plain
-                //     // mime : 'application/msword',
-                //     //description : 'File downloaded by download manager.',
-                //     // mediaScannable : true,
-                // },
-                
-            //   // add this option that makes response data to be stored as a file,
-            //   // this is much more performant.
-            //   fileCache : true,
-            //   appendExt: 'docx'
             })
             .fetch('GET', oDados)
             .then((res) => {
@@ -232,6 +203,8 @@ export default class TelaModalTestesCadastro extends Component {
                 RNFetchBlob.fs.cp(res.path(), caminhoArquivoDestino).then((resultado) => {
                     console.log('Arquivo movido: ', resultado);
                     Alert.alert('TriSafe', `Seu contrato salvo. Verifique na pasta Downloads o arquivo ${nomeArquivo}.`);
+                }).catch((oExcecao) => {
+                    this.oUtil.tratarExcecao(oExcecao);
                 });
             }).catch((e) =>{
                 this.oUtil.tratarExcecao(e);
@@ -322,8 +295,8 @@ export default class TelaModalTestesCadastro extends Component {
 
 export class AreaDados extends Component {
 
-    constructor(props) {
-        super(props);
+    constructor(props, contexto) {
+        super();
 
         this.atualizarDados = this.atualizarDados.bind(this);
     }

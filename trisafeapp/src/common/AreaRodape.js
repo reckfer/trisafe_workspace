@@ -14,22 +14,14 @@ import { ButtonGroup } from 'react-native-elements';
 import AreaBarraEstado from './AreaBarraEstado';
 import { ContextoApp } from '../contexts/ContextoApp';
 import { styles } from './Estilos';
-import ComunicacaoHTTP from './ComunicacaoHTTP';
+import { inicializarContextoComum } from './Util';
 
 export default class AreaRodape extends Component {
 
-    constructor(props, value) {
-        super(props);
-
-        if(value && value.gerenciador) {
-            // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
-            this.oGerenciadorContextoApp = value.gerenciador;
-            
-            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
-            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
-            this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
-        }
+    constructor(props, contexto) {
+        super();
+        
+        inicializarContextoComum(props, contexto, this);
     }
     
     render() {

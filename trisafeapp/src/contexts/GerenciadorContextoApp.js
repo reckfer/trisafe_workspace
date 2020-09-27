@@ -1,7 +1,9 @@
 'use strict';
 import { DADOS_APP_GERAL, clonarObjeto } from './DadosAppGeral';
 import RegistradorLog from './RegistradorLog';
-import { AppState, BackHandler } from 'react-native';
+import { AppState } from 'react-native';
+
+const NOME_COMPONENTE = 'GerenciadorContextoApp';
 
 export default class GerenciadorContextoApp {
     
@@ -11,6 +13,7 @@ export default class GerenciadorContextoApp {
         this.oRegistradorLog = new RegistradorLog(this);
         this.oDadosReferencia.registros_log = this.oRegistradorLog.registrosLog;
         
+        this.criarAtalhosDadosContexto = this.criarAtalhosDadosContexto.bind(this);
         this.atualizarEstadoTela = this.atualizarEstadoTela.bind(this);
         this.atribuirDados = this.atribuirDados.bind(this);
         this.temDados = this.temDados.bind(this);
@@ -20,8 +23,7 @@ export default class GerenciadorContextoApp {
         this.oTelaAtual = null;
         this.oTelaAnterior = null;
 
-        AppState.addEventListener('change', this._transportarLogServidor);
-        
+        AppState.addEventListener('change', this._transportarLogServidor);        
     };
 
     get dadosApp() {
@@ -37,6 +39,10 @@ export default class GerenciadorContextoApp {
 
     get dadosAppGeral() {
         return this.oDadosReferencia;
+    };
+    
+    get instrucaoUsuarioApp() {
+        return this.oDadosReferencia.dados_app.instrucao_usuario;
     };
 
     get registradorLog() {
@@ -65,6 +71,17 @@ export default class GerenciadorContextoApp {
         return this.oTelaAnterior;
     }
 
+    criarAtalhosDadosContexto(oComponente) {
+        oComponente.oGerenciadorContextoApp = this;
+        oComponente.oRegistradorLog = this.registradorLog;         
+        oComponente.oDadosApp = this.dadosApp;
+        oComponente.oDadosControleApp = this.dadosControleApp;
+        oComponente.oDadosInstrucao = this.instrucaoUsuarioApp;
+        oComponente.oDadosContrato = this.dadosApp.contrato;
+        oComponente.oDadosChaves = this.dadosApp.chaves;
+        oComponente.state = this.dadosAppGeral;
+    }
+
     /*** FUNCOES DE ATRIBUICOES ****/
     atualizarEstadoTela(objetoTela) {
         let oTela = objetoTela;
@@ -80,6 +97,10 @@ export default class GerenciadorContextoApp {
     };
 
     atribuirDados(nomeAtributo, oDadosAtribuir, instanciaComponente) {
+        let nomeFuncao = 'atribuirDados';
+
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
         let oDados = this.oDadosReferencia.dados_app;
         let oArrayDados;
         let oItemArray;
@@ -94,7 +115,7 @@ export default class GerenciadorContextoApp {
         let tentarPreencher = false;
         
         this.oRegistradorLog.limpar();
-        this.oRegistradorLog.registrar(`GerenciadorContextoApp.atribuirDados => Vai atribuir ${nomeAtributo}: ${JSON.stringify(oDadosAtribuir)}`);
+        this.oRegistradorLog.registrar(`Vai atribuir ${nomeAtributo}: ${JSON.stringify(oDadosAtribuir)}`);
         
         if(oDadosAtribuir) {
             if(oDadosAtribuir instanceof Array) {
@@ -189,6 +210,9 @@ export default class GerenciadorContextoApp {
         if(instanciaComponente) {
             this.atualizarEstadoTela(instanciaComponente);
         }
+
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+
         return this.oDadosReferencia;
     };
 

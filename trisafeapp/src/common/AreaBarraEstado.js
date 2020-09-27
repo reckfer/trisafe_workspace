@@ -15,8 +15,8 @@ import {
 
 export default class AreaBarraEstado extends Component {
 
-    constructor(props) {
-        super(props);
+    constructor(props, contexto) {
+        super();
     }
             
     render() {

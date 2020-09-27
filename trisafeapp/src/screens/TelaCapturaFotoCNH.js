@@ -7,18 +7,13 @@
  */
 import React, { PureComponent } from 'react';
 import {
-    StyleSheet,
-    Alert,
     View,
     Text,
-    ImageBackground,
     BackHandler
 } from 'react-native';
-import { styles } from '../common/Estilos';
-import ComunicacaoHTTP from '../common/ComunicacaoHTTP';
 import { Button } from 'react-native-elements';
 import { ContextoApp } from '../contexts/ContextoApp';
-import Util from '../common/Util';
+import { inicializarContextoComum } from '../common/Util';
 import { RNCamera } from 'react-native-camera';
 import Orientation from 'react-native-orientation';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -27,49 +22,36 @@ import { clonarObjeto, DADOS_FOTOS } from '../contexts/DadosAppGeral';
 import { StackActions } from '@react-navigation/native';
 import Svg, { Rect } from 'react-native-svg';
 
+const NOME_COMPONENTE = 'TelaCapturaFotoCNH';
+const INSTRUCAO_INICIAL = 'Posicione a CNH no retângulo e tire uma foto.';
+
 export default class TelaCapturaFotoCNH extends PureComponent {
     
-    constructor(props, value) {
-        super(props);
+    constructor(props, contexto) {
+        super();
         
-        Orientation.lockToLandscapeLeft();
+        inicializarContextoComum(props, contexto, this, INSTRUCAO_INICIAL);
 
-        if(value && value.gerenciador) {
-            // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
-            this.oGerenciadorContextoApp = value.gerenciador;
-            this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
-            this.oRegistradorLog.registrar('TelaCapturaFotoCNH.constructor() => Iniciou.');
-
-            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
-            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
-            this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
-            this.state = this.oGerenciadorContextoApp.dadosAppGeral;
-        }
-        
-        if(props && props.navigation) {
-            this.oNavegacao = props.navigation;
-        }
         this.capturarFotoCNH = this.capturarFotoCNH.bind(this);
         this.registrarEventoFoco = this.registrarEventoFoco.bind(this);
-        this._tratarVoltarPeloDispositivo = this._tratarVoltarPeloDispositivo.bind(this);
         this.voltar = this.voltar.bind(this);
-        
-        this.texto_instrucao = 'Produtos TriSafe a contratar.';
-        this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
-        this.oRegistradorLog.registrar('TelaCapturaFotoCNH.constructor() => Finalizou.');
+        this._tratarVoltarPeloDispositivo = this._tratarVoltarPeloDispositivo.bind(this);
+
         BackHandler.addEventListener('hardwareBackPress', this._tratarVoltarPeloDispositivo);
     }
 
     componentDidMount() {
-        console.log('componentDidMount() ...');
+        let nomeFuncao = 'componentDidMount';
         
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+        
+        Orientation.lockToLandscapeLeft();
         this.oDadosControleApp.abrir_camera = false;
+
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
     
     componentWillUnmount() {
-        console.log('componentWillUnmount(), vai registrar Orientation.lockToLandscapeLeft(); ao refocar...');
         this.registrarEventoFoco();
     }
 
@@ -77,10 +59,6 @@ export default class TelaCapturaFotoCNH extends PureComponent {
         this.oNavegacao.addListener('focus', () => {
             Orientation.lockToLandscapeLeft();
         });
-    }
-
-    componentDidUpdate() {
-        console.log('componentDidUpdate() ...');
     }
     
     voltar() {
@@ -117,14 +95,10 @@ export default class TelaCapturaFotoCNH extends PureComponent {
 
                 console.log('Removendo tela camera...', JSON.stringify(pop));
                 this.oNavegacao.dispatch(pop);
-
-                // const push = StackActions.push('Cadastro Cliente', { screen: 'Visualizacao Foto CNH' });
-
-                // this.oNavegacao.dispatch(push);
-                
                 this.oNavegacao.navigate('Visualizacao Foto CNH');
+            }).catch((oExcecao) => {
+                this.oUtil.tratarExcecao(oExcecao);
             });
-
         }
     };
 
@@ -136,31 +110,12 @@ export default class TelaCapturaFotoCNH extends PureComponent {
             flex: 1,
             flexDirection: 'column',
             justifyContent: 'flex-start',
-            // flexDirection: 'column',
-            // justifyContent: 'flex-start',
-            //alignItems: 'center',
             backgroundColor: 'black',
-           // padding: 50,
         }
         let estiloFoto =  {
             flex: 1,
             justifyContent: 'flex-start',
-            //alignItems: 'center',
-            // flexDirection: 'column',
-            // justifyContent: 'center',
-            // alignItems: 'center',
-            //backgroundColor: '#f5f5f5',
-           // padding: 50,
         }
-
-        // if(!this.oDadosControleApp.abrir_camera){
-        //     console.log('Tela Abrindo camera...');
-        //     return (
-        //         <View style={styles.areaCliente}>
-        //             <Text>Abrindo camera...</Text>
-        //         </View>
-        //     );
-        // } else {
         console.log('Abrindo camera...');
         return (
             <View style={estiloAreaFoto}>
@@ -172,30 +127,9 @@ export default class TelaCapturaFotoCNH extends PureComponent {
                     type={RNCamera.Constants.Type.back}
                     flashMode={RNCamera.Constants.FlashMode.off}
                     onCameraReady={() => {
-                        // this.oGerenciadorContextoApp.dadosAppGeral.a = 1;
-                        // const pop = StackActions.pop(1);
-
-                        // console.log('Removendo tela camera...', JSON.stringify(pop));
-                        // this.oNavegacao.dispatch(pop);
-
-                        // const push = StackActions.push('Cadastro Cliente', { screen: 'Foto CNH' });
-
-                        // this.oNavegacao.dispatch(push);
                     }}
                     captureAudio={false}
                     autoFocusPointOfInterest={{x: 0.7, y: 0.7}}
-                    // androidCameraPermissionOptions={{
-                    //     title: 'Permission to use camera',
-                    //     message: 'We need your permission to use your camera',
-                    //     buttonPositive: 'Ok',
-                    //     buttonNegative: 'Cancel',
-                    // }}
-                    // androidRecordAudioPermissionOptions={{
-                    //     title: 'Permission to use audio recording',
-                    //     message: 'We need your permission to use your audio',
-                    //     buttonPositive: 'Ok',
-                    //     buttonNegative: 'Cancel',
-                    // }}
                     onGoogleVisionBarcodesDetected={({ barcodes }) => {
                         console.log(barcodes);
                     }}
@@ -232,31 +166,5 @@ export default class TelaCapturaFotoCNH extends PureComponent {
         );
     }
 }
-TelaCapturaFotoCNH.contextType = ContextoApp;
 
-// const styles = StyleSheet.create({
-//     container: {
-//       flex: 1,
-//       flexDirection: 'column',
-//       backgroundColor: 'black',
-//     },
-//     preview: {
-//       flex: 1,
-//       justifyContent: 'flex-end',
-//       alignItems: 'center',
-//     },
-//     capture: {
-//       flex: 0,
-//       backgroundColor: '#fff',
-//       borderRadius: 5,
-//       padding: 2,
-//       paddingVertical: 7,
-//       alignSelf: 'center',
-//       margin: 7,
-//     },
-//     imgBG: {
-//         flex: 1,
-//         alignItems:'center',
-//         justifyContent:'space-between'
-//     }
-// });
+TelaCapturaFotoCNH.contextType = ContextoApp;

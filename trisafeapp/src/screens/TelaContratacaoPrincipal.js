@@ -12,58 +12,39 @@ import {
     View,
     Text
 } from 'react-native';
-import ComunicacaoHTTP from '../common/ComunicacaoHTTP';
-import { Button, Card, Divider } from 'react-native-elements';
+import { Button, Card } from 'react-native-elements';
 import Cabecalho from '../common/CabecalhoTela';
 import { styles } from '../common/Estilos';
 import AreaRodape from '../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
-import Util from '../common/Util';
+import { inicializarContextoComum } from '../common/Util';
 import Orientation from 'react-native-orientation';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import Configuracao from '../common/Configuracao';
 import RNFetchBlob from 'rn-fetch-blob';
 import { StackActions } from '@react-navigation/native';
 
+const NOME_COMPONENTE = 'TelaModalContratoClicksign';
+const INSTRUCAO_INICIAL = 'Contrato de serviço de rastreamento.';
+
 export default class TelaModalContratoClicksign extends Component {
 	
-    constructor(props, value) {
-        super(props);
+    constructor(props, contexto) {
+        super();
         
-        Orientation.unlockAllOrientations();
-
-        if(props && props.navigation) {
-            this.oNavegacao = props.navigation;
-        }
-        
-        if(value && value.gerenciador) {
-            // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
-            this.oGerenciadorContextoApp = value.gerenciador;
-            
-            this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
-            this.oRegistradorLog.registrar('TelaModalContratoClicksign.constructor() => Iniciou.');
-
-            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
-            this.oDadosContrato = this.oDadosApp.contrato;
-            this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
-            this.oDadosControleApp.processando_requisicao = false;
-            this.state = this.oGerenciadorContextoApp.dadosAppGeral;
-        }
+        inicializarContextoComum(props, contexto, this, INSTRUCAO_INICIAL);
         
         this.incluirContrato = this.incluirContrato.bind(this);
         this.tratarIncluirContrato = this.tratarIncluirContrato.bind(this);
         this.voltar = this.voltar.bind(this);
-
-        this.texto_instrucao = 'Contrato de serviço de rastreamento.'
-        this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
-        this.oRegistradorLog.registrar('TelaModalContratoClicksign.constructor() => Finalizou.');
     }
     
-    componentDidMount() {        
+    componentDidMount() {
+        let nomeFuncao = 'componentDidMount';
+
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+        
+        Orientation.unlockAllOrientations();
 
         if(this.oGerenciadorContextoApp.temDados()) {
             
@@ -71,6 +52,7 @@ export default class TelaModalContratoClicksign extends Component {
                 this.incluirContrato();
             }
         }
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
 
     incluirContrato() {
@@ -86,6 +68,9 @@ export default class TelaModalContratoClicksign extends Component {
     }
 
     tratarIncluirContrato(oDados, oEstado) {
+        let nomeFuncao = 'tratarIncluirContrato';
+
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
         
         if(oEstado.ok) {
             this.oGerenciadorContextoApp.atribuirDados('contrato', oDados);
@@ -102,7 +87,7 @@ export default class TelaModalContratoClicksign extends Component {
                     this.oDadosContrato.url_doc = `https://sandbox.clicksign.com/sign/${partesSignatario[1]}`;
                 }
 
-                this.oRegistradorLog.registrar('tratarIncluirContrato() URL do contrato: ', this.oDadosContrato.url_doc);
+                this.oRegistradorLog.registrar('URL do contrato: ', this.oDadosContrato.url_doc);
 
                 if(this.oDadosContrato.url_doc) {
                     
@@ -114,37 +99,15 @@ export default class TelaModalContratoClicksign extends Component {
                     this.oNavegacao.navigate('Fluxo Modais', { screen: 'Contrato Clicksign' });
                 } else {
 
-                    this.oRegistradorLog.registrar('tratarIncluirContrato() Não foi possível obter o link do contrato.');
+                    this.oRegistradorLog.registrar('Não foi possível obter o link do contrato.');
 
                     Alert.alert('TriSafe', 'Não foi possível obter o link do contrato. Enviamos uma cópia por e-mail. Por favor, verifique seu e-mail');
                 }
             }
         }
+        
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
-
-    // contratado() {
-    //     try {
-    //         let metodoURI = '/contratos/aceitar/';
-            
-    //         let oDadosParametros = JSON.stringify(this.state);
-
-    //         this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarDadosRetorno);
-
-    //     } catch (oExcecao) {
-    //         this.oUtil.tratarExcecao(oExcecao);
-    //     }
-    // }
-
-    // tratarDadosRetorno(oDados, oEstado) {
-    //     this.oGerenciadorContextoApp.atribuirDados('contrato', oDados);
-    //     this.oGerenciadorContextoApp.atribuirDados('boleto', oDados.boleto);
-
-    //     if(oEstado.ok) {
-    //         this.oDadosContrato.url_doc
-    //         this.oNavegacao.navigate('Boleto', this.state);
-    //     }
-    // }
-
     voltar() {
 
         this.oNavegacao.goBack();
@@ -170,24 +133,10 @@ TelaModalContratoClicksign.contextType = ContextoApp;
 
 export class AreaDados extends Component {
 
-    constructor(props, value) {
-        super(props);
+    constructor(props, contexto) {
+        super();
         
-        if(value && value.gerenciador) {
-            // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
-            this.oGerenciadorContextoApp = value.gerenciador;
-            
-            this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
-            this.oRegistradorLog.registrar('TelaModalContratoClicksign.constructor() => Iniciou.');
-
-            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
-            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
-            this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp);
-            this.oConfiguracao = new Configuracao(this.oGerenciadorContextoApp, this);
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
-            this.state = this.oGerenciadorContextoApp.dadosAppGeral;
-        }
+        inicializarContextoComum(props, contexto, this);
 
         this.montarIcone = this.montarIcone.bind(this);
         this.baixarContrato = this.baixarContrato.bind(this);
@@ -259,6 +208,8 @@ export class AreaDados extends Component {
             RNFetchBlob.fs.cp(caminhoLocal, caminhoArquivoDestino).then((resultado) => {
                 console.log('Arquivo movido: ', resultado);
                 Alert.alert('TriSafe', `Seu contrato salvo. Verifique na pasta Downloads o arquivo ${nomeArquivo}.`);
+            }).catch((oExcecao) => {
+                this.oUtil.tratarExcecao(oExcecao);
             });
         }).catch((e) =>{
             this.oUtil.tratarExcecao(e);
@@ -297,6 +248,8 @@ export class AreaDados extends Component {
             RNFetchBlob.fs.cp(caminhoLocal, caminhoArquivoDestino).then((resultado) => {
                 console.log('Arquivo movido: ', resultado);
                 Alert.alert('TriSafe', `Seu contrato salvo. Verifique na pasta Downloads o arquivo ${nomeArquivo}.`);
+            }).catch((oExcecao) => {
+                this.oUtil.tratarExcecao(oExcecao);
             });
         }).catch((e) =>{
             this.oUtil.tratarExcecao(e);
@@ -308,82 +261,36 @@ export class AreaDados extends Component {
         let oNavegacao = this.props.navigation;
         let oDadosContrato = oDadosApp.contrato;
         let areaContrato = (
-            <View>
-                <Text>Buscando contrato. Aguarde...</Text>
-            </View>);
+                        <View>
+                            <Text>Buscando contrato. Aguarde...</Text>
+                        </View>);
 
         
         console.log('oDadosContrato.url_doc... ', oDadosContrato.url_doc);
         
         if(oDadosContrato.aceito) {
 
-            areaContrato = <View style={{flexDirection:'column', alignItems:'center', justifyContent:'center'}}>
-                <Text>Obrigado por contratar a TriSafe...</Text>
-                <Card key={1} 
-                    title='Contrato'
-                    containerStyle={{backgroundColor: '#f0f5f5', borderWidth: 0, borderRadius:5, flexDirection:'column', width:'90%'}} 
-                >
-                    <View  style={{flexDirection:'row', alignItems:'center', alignSelf:'stretch', justifyContent:'space-evenly' }}>
-                        {this.montarIcone('download', 'Baixar', () => {this.oConfiguracao.solicitarPermissaoArmazenamento(this.baixarContrato);}, () => {}, true)}
-                        {this.montarIcone('file-o', 'Visualizar', () => {oNavegacao.navigate('Fluxo Modais', { screen: 'Contrato Clicksign' });}, () => {}, true)}
-                    </View>
-                </Card>
-                <Card key={2} 
-                    title='Boleto'
-                    containerStyle={{backgroundColor: '#f0f5f5', borderWidth: 0, borderRadius:5, flexDirection:'column', width:'90%'}} 
-                >
-                    <View  style={{flexDirection:'row', alignItems:'center', alignSelf:'stretch', justifyContent:'space-evenly' }}>
-                        {this.montarIcone('download', 'Baixar', () => {this.oConfiguracao.solicitarPermissaoArmazenamento(this.baixarBoleto);}, () => {}, true)}
-                        {this.montarIcone('file-o', 'Visualizar', () => {oNavegacao.navigate('Fluxo Modais', { screen: 'Boleto Gerencianet' });}, () => {}, true)}
-                    </View>
-                </Card>
-            </View>
-            // botaoCadastro = () => <Button title="Testar Cadastro" onPress={this.irParaTesteCadastroIter} ></Button>
-            // botaoGerarDados = () => <Button title="Gerar Dados Teste" onPress={this.gerarDadosTestes} ></Button>
-            // botaoContrato = () => <Button title="Testar Contrato" onPress={this.irParaTesteContratoPDF} ></Button>
-            // botaoBoleto = () => <Button title="Testar Boleto" onPress={this.irParaTesteBoletoGerenciaNet} ></Button>
-            // botaoDownloadContrato = () => <Button title="Download Contrato" onPress={this.irParaTesteDownloadContrato} ></Button>
-            // botaoDownloadBoleto = () => <Button title="Download Boleto" onPress={this.irParaTesteDownloadBoleto} ></Button>
-            // botaoIncluirSignatario = () => <Button title="Testar Incluir Signatario" onPress={this.irParaTesteIncluirSignatario} ></Button>
-            // botaoAssinarContrato = () => <Button title="Testar Assinar Contrato" onPress={this.irParaTesteAssinarContrato} ></Button>
-            // botaoFotoCNH = () => <Button title="Testar Foto CNH" onPress={this.irParaTesteFotoCNH} ></Button>
-            // botaoFotoDocVeiculo = () => <Button title="Testar Foto Doc" onPress={this.irParaTesteFotoDocVeiculo} ></Button>
-            // botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;
-
-            // let botoesTestes1 = [ 
-            //     { element: this.botaoCadastro }, { element: this.botaoGerarDados } 
-            // ];
-            // let botoesTestes2 = [ 
-            //     { element: this.botaoContrato }, { element: this.botaoBoleto } 
-            // ];
-            // let botoesTestes3 = [ 
-            //     { element: this.botaoDownloadContrato }, { element: this.botaoDownloadBoleto } 
-            // ];
-            // let botoesTestes4 = [ 
-            //     { element: this.botaoIncluirSignatario }, { element: this.botaoAssinarContrato } 
-            // ];
-            // let botoesTestes5 = [ 
-            //     { element: this.botaoFotoCNH }, { element: this.botaoFotoDocVeiculo } 
-            // ];
-            // let botoesTela = [ 
-            //     { element: this.botaoVoltar }, 
-            // ];
-            
-            // let areaContrato = (
-            //     <View style={styles.areaCliente}>
-            //     <Cabecalho titulo='Testes Cadastro' nomeTela='Início' navigation={this.oNavegacao} />
-            //     <AreaDados dadosApp={this.oDadosApp} 
-            //         botoesTestes1={botoesTestes1} 
-            //         botoesTestes2={botoesTestes2} 
-            //         botoesTestes3={botoesTestes3}
-            //         botoesTestes4={botoesTestes4}
-            //         botoesTestes5={botoesTestes5}
-            //     />
-            //     <AreaRodape botoes={botoesTela} mensagem={''}/>
-            // </View>)
-
-
-            
+        areaContrato = <View style={{flexDirection:'column', alignItems:'center', justifyContent:'center'}}>
+            <Text>Obrigado por contratar a TriSafe...</Text>
+            <Card key={1} 
+                title='Contrato'
+                containerStyle={{backgroundColor: '#f0f5f5', borderWidth: 0, borderRadius:5, flexDirection:'column', width:'90%'}} 
+            >
+                <View  style={{flexDirection:'row', alignItems:'center', alignSelf:'stretch', justifyContent:'space-evenly' }}>
+                    {this.montarIcone('download', 'Baixar', () => {this.oConfiguracao.solicitarPermissaoArmazenamento(this.baixarContrato);}, () => {}, true)}
+                    {this.montarIcone('file-o', 'Visualizar', () => {oNavegacao.navigate('Fluxo Modais', { screen: 'Contrato Clicksign' });}, () => {}, true)}
+                </View>
+            </Card>
+            <Card key={2} 
+                title='Boleto'
+                containerStyle={{backgroundColor: '#f0f5f5', borderWidth: 0, borderRadius:5, flexDirection:'column', width:'90%'}} 
+            >
+                <View  style={{flexDirection:'row', alignItems:'center', alignSelf:'stretch', justifyContent:'space-evenly' }}>
+                    {this.montarIcone('download', 'Baixar', () => {this.oConfiguracao.solicitarPermissaoArmazenamento(this.baixarBoleto);}, () => {}, true)}
+                    {this.montarIcone('file-o', 'Visualizar', () => {oNavegacao.navigate('Fluxo Modais', { screen: 'Boleto Gerencianet' });}, () => {}, true)}
+                </View>
+            </Card>
+        </View>
     }
     
     return (

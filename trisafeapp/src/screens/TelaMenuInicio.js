@@ -7,62 +7,41 @@
  */
 import React, { Component } from 'react';
 import { Button } from 'react-native-elements';
-import { clonarObjeto } from '../contexts/DadosAppGeral';
 import {
-    View,
-    Text, BackHandler, Alert
+    View
 } from 'react-native';
 import Cabecalho from '../common/CabecalhoTela';
 import { styles } from '../common/Estilos';
 import { ContextoApp } from '../contexts/ContextoApp';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import Configuracao from '../common/Configuracao';
 import AreaRodape from '../common/AreaRodape';
 import Orientation from 'react-native-orientation';
-import { StackActions } from '@react-navigation/native';
+import { inicializarContextoComum } from '../common/Util';
+
+const NOME_COMPONENTE = 'TelaMenuInicio';
+const INSTRUCAO_INICIAL = 'Bem vindo a Trisafe.';
 
 export default class TelaMenuInicio extends Component {
-    
-    constructor(props, value) {
-        super(props);
 
-        if(props && props.navigation) {
-            this.oNavegacao = props.navigation;
-        }
+    constructor(props, contexto) {
+        super();
         
-        if(value && value.gerenciador) {
-            // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
-            this.oGerenciadorContextoApp = value.gerenciador;
-            this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
-            this.oRegistradorLog.registrar('TelaMenuInicio.constructor() ++++++++++++ iniciou ++++++++++++');
+        inicializarContextoComum(props, contexto, this, INSTRUCAO_INICIAL);
 
-            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
-            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
-            this.oConfiguracao = new Configuracao(this.oGerenciadorContextoApp, this);
-            
-            this.texto_instrucao = 'Bem vindo a Trisafe.';
-            this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
-
-            this.state = this.oGerenciadorContextoApp.dadosAppGeral;
-        }
-        
         this.irParaMeusDados = this.irParaMeusDados.bind(this);
         this.irParaMeusVeiculos = this.irParaMeusVeiculos.bind(this);
-        // this.tratarVoltarPeloDispositivo = this.tratarVoltarPeloDispositivo.bind(this);
-        
-        this.oRegistradorLog.registrar('TelaMenuInicio.constructor() ------------ terminou ------------');
     }
 
     componentDidMount() {
+        let nomeFuncao = 'componentDidMount';
+        
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
 
         Orientation.unlockAllOrientations();
 
-        this.oRegistradorLog.registrar('TelaMenuInicio.componentDidMount() ++++++++++++ iniciou ++++++++++++');
-        
         this.inicializar();
         
-        this.oRegistradorLog.registrar('TelaMenuInicio.componentDidMount() ------------ terminou ------------');
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
     
     inicializar() {
@@ -99,15 +78,9 @@ TelaMenuInicio.contextType = ContextoApp;
 
 export class AreaDados extends Component {
 
-    constructor(props) {
-        super(props);
-    }
-
     render() {
-        let estiloAreaDadosCliente = clonarObjeto(styles.areaDadosCliente);
-
         return (
-            <View style={estiloAreaDadosCliente} >
+            <View style={styles.areaDadosCliente} >
                 {this.props.botoes}
             </View>
         );

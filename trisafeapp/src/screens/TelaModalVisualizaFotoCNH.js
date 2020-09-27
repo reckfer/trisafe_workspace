@@ -7,18 +7,13 @@
  */
 import React, { Component } from 'react';
 import {
-    StyleSheet,
-    Alert,
     View,
     Text,
-    ImageBackground, 
-    ScrollView,
-    Image
+    ImageBackground,
 } from 'react-native';
-import ComunicacaoHTTP from '../common/ComunicacaoHTTP';
 import { Button } from 'react-native-elements';
 import { ContextoApp } from '../contexts/ContextoApp';
-import Util from '../common/Util';
+import { inicializarContextoComum } from '../common/Util';
 import { styles } from '../common/Estilos';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { clonarObjeto, DADOS_FOTOS } from '../contexts/DadosAppGeral';
@@ -27,52 +22,39 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Orientation from 'react-native-orientation';
 
+const NOME_COMPONENTE = 'TelaModalVisualizaFotoCNH';
+const INSTRUCAO_INICIAL = 'A foto ficou nítida?';
+
 export default class TelaModalVisualizaFotoCNH extends Component {
     
-    constructor(props, value) {
-        super(props);
-    
-        Orientation.lockToLandscapeLeft();
-
-        if(value && value.gerenciador) {
-            // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
-            this.oGerenciadorContextoApp = value.gerenciador;
-            this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
-            this.oRegistradorLog.registrar('TelaModalVisualizaFotoCNH.constructor() => Iniciou.');
-
-            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
-            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
-            this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
-            this.state = this.oGerenciadorContextoApp.dadosAppGeral;
-        }
+    constructor(props, contexto) {
+        super();
         
-        if(props && props.navigation) {
-            this.oNavegacao = props.navigation;
-        }
+        inicializarContextoComum(props, contexto, this, INSTRUCAO_INICIAL);
+
         this.enviarFotoCNHServidor = this.enviarFotoCNHServidor.bind(this);
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
         this.capturarNovamente = this.capturarNovamente.bind(this);
         this.registrarEventoFoco = this.registrarEventoFoco.bind(this);
         this.avancar = this.avancar.bind(this);
         this.voltar = this.voltar.bind(this);
-        
-        this.texto_instrucao = 'A foto ficou nítida?';
-        this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
-        this.oRegistradorLog.registrar('TelaModalVisualizaFotoCNH.constructor() => Finalizou.');
     }
 
     componentDidMount() {
+        let nomeFuncao = 'componentDidMount';
         
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+        
+        Orientation.lockToLandscapeLeft();
+
         if(this.oDadosControleApp.abrir_camera) {
-            console.log('componentDidMount() vai chamar o voltar() para abrir a camera...');
             this.voltar();
         }
+
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
 
     componentWillUnmount() {
-        console.log('componentWillUnmount(), vai registrar Orientation.lockToLandscapeLeft(); ao refocar...');
         this.registrarEventoFoco();
     }
 

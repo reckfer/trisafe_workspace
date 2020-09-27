@@ -5,20 +5,18 @@ import {
 import { clonarObjeto, ESTADO } from '../contexts/DadosAppGeral';
 import Util from './Util';
 
+const NOME_COMPONENTE = 'ComunicacaoHTTP';
+
 export default class ComunicacaoHTTP {
 
     constructor(gerenciadorContexto, instanciaComponente) {
         this.oComponente = instanciaComponente;
 
         if(gerenciadorContexto) {
-            this.oGerenciadorContextoApp = gerenciadorContexto;
-            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosChaves = this.oDadosApp.chaves;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
-            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
-            this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;
+            gerenciadorContexto.criarAtalhosDadosContexto(this);
             this.oUtil = new Util(this.oGerenciadorContextoApp);
         }
+        
         this.fazerRequisicaoHTTP = this.fazerRequisicaoHTTP.bind(this);
         this.fazerRequisicaoHTTPSemDadosRetorno = this.fazerRequisicaoHTTPSemDadosRetorno.bind(this);
         this.obterJsonResposta = this.obterJsonResposta.bind(this);
@@ -58,6 +56,10 @@ export default class ComunicacaoHTTP {
     };
 
     fazerRequisicaoHTTP(metodoURI, oDadosParametros, oFuncaoCallback, suprimirMsgServidor, ignorarCallbackSeErro) {
+        let nomeFuncao = 'fazerRequisicaoHTTP';
+
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
         this.oDadosControleApp.processando_requisicao = true;
         
         if(this.oComponente) {
@@ -68,7 +70,7 @@ export default class ComunicacaoHTTP {
         
         let url = this.getURL(metodoURI);
         
-        this.oRegistradorLog.registrar(`ComunicacaoHTTP.fazerRequisicaoHTTP() Realizando requisicao para ${url}, parametros = ${oDadosParametros}`);
+        this.oRegistradorLog.registrar(`Realizando requisicao para ${url}, parametros = ${oDadosParametros}`);
 
         fetch(url, this.getParametrosHTTPS(oDadosParametros))
             .then(this.obterJsonResposta)
@@ -78,13 +80,18 @@ export default class ComunicacaoHTTP {
             .catch((oExcecao) => {
                 this.oUtil.tratarExcecao(oExcecao);
             });
+        
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     };
 
     fazerRequisicaoHTTPSemDadosRetorno(metodoURI, oDadosParametros, oFuncaoCallback, ignorarErro) {
-        
+        let nomeFuncao = 'fazerRequisicaoHTTPSemDadosRetorno';
+
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
         let url = this.getURL(metodoURI);
         
-        this.oRegistradorLog.registrar(`ComunicacaoHTTP.fazerRequisicaoHTTPSemDadosRetorno() url = ${url}`);
+        this.oRegistradorLog.registrar(`url = ${url}`);
         
         fetch(url, this.getParametrosHTTPS(oDadosParametros)).then((oRespostaHTTP) => { 
                 this.obterJsonResposta(oRespostaHTTP, ignorarErro); 
@@ -97,14 +104,19 @@ export default class ComunicacaoHTTP {
             ).catch((oExcecao) => {
                 this.oUtil.tratarExcecao(oExcecao);
             });
+        
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     };
 
     fazerRequisicaoHTTPRegistrarLogs(oFuncaoCallback) {
-        
+        let nomeFuncao = 'fazerRequisicaoHTTPRegistrarLogs';
+
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
         let metodoURI = '/gerenciadorlogs/registrar_do_cliente/';
         let url = this.getURL(metodoURI);
 
-        this.oRegistradorLog.registrar(`ComunicacaoHTTP.fazerRequisicaoHTTPRegistrarLogs() url = ${url}`);
+        this.oRegistradorLog.registrar(`url = ${url}`);
 
         let oMensagensLog = {
             'registros_log' : this.oRegistradorLog.registrosLog,
@@ -118,26 +130,32 @@ export default class ComunicacaoHTTP {
                     oFuncaoCallback();
                 }
             }).catch((oExcecao) => {
-                this.oUtil.tratarExcecao(oExcecao);
+                this.oUtil.tratarExcecaoLogs(oExcecao);
             });
-    };
+        
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+    }
     
     obterJsonResposta(oRespostaHTTP, ignorarErro) {
-
-        this.oRegistradorLog.registrar(`ComunicacaoHTTP.obterJsonResposta() Resposta HTTP = ${JSON.stringify(oRespostaHTTP)}`);
-
+        let nomeFuncao = 'obterJsonResposta';
+        
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+        
+        this.oRegistradorLog.registrar(`Resposta HTTP = ${JSON.stringify(oRespostaHTTP)}`);
+        
+        let retornoJson = null;
         if(oRespostaHTTP) {
 
             if(oRespostaHTTP.ok) {
                 let oJsonDados = oRespostaHTTP.json();
     
-                return oJsonDados;
+                retornoJson = oJsonDados;
             } else {
 
                 if(!ignorarErro) {
                     if(oRespostaHTTP.status && oRespostaHTTP.url) {
                         
-                        this.oRegistradorLog.registrar(`ComunicacaoHTTP.obterJsonResposta() Erro HTTP status: ${oRespostaHTTP.status}. URL chamada:  ${oRespostaHTTP.url}`);
+                        this.oRegistradorLog.registrar(`Erro HTTP status: ${oRespostaHTTP.status}. URL chamada:  ${oRespostaHTTP.url}`);
                     } else if (oRespostaHTTP instanceof Error) {
                         
                         this.oUtil.tratarExcecao(oRespostaHTTP);
@@ -145,10 +163,17 @@ export default class ComunicacaoHTTP {
                 }
             }
         }
-        return null;
+
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+
+        return retornoJson;
     }
 
     tratarRetornoServidor(oJsonRetorno, oFuncaoCallback, suprimirMsgServidor, ignorarCallbackSeErro) {
+        let nomeFuncao = 'tratarRetornoServidor';
+
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
         let oEstado = clonarObjeto(ESTADO);
         let oDados = {};
 
@@ -172,7 +197,7 @@ export default class ComunicacaoHTTP {
                 this.oDadosChaves.token_trisafe = oJsonRetorno.credencial.token_trisafe;
             }
         } else {
-            this.oRegistradorLog.registrar(`ComunicacaoHTTP.tratarRetornoServidor() O servidor não retornou dados.`);
+            this.oRegistradorLog.registrar(`O servidor não retornou dados.`);
         }
 
         if (!suprimirMsgServidor && oEstado.mensagem && oEstado.mensagem.trim()) {
@@ -183,7 +208,7 @@ export default class ComunicacaoHTTP {
             oDados = oDados.trim();
         }
         
-        this.oRegistradorLog.registrar(`ComunicacaoHTTP.tratarRetornoServidor() Estado da resposta do servidor = ${JSON.stringify(oEstado)}`);
+        this.oRegistradorLog.registrar(`Estado da resposta do servidor = ${JSON.stringify(oEstado)}`);
 
         if(oFuncaoCallback) {
              
@@ -195,5 +220,6 @@ export default class ComunicacaoHTTP {
                 oFuncaoCallback(oDados, oEstado);
             }
         }
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);        
     }
 }

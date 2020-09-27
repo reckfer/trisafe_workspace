@@ -18,55 +18,37 @@ import Cabecalho from '../common/CabecalhoTela';
 import { styles } from '../common/Estilos';
 import AreaRodape from '../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
-import Util from '../common/Util';
+import Util, { inicializarContextoComum } from '../common/Util';
 import Orientation from 'react-native-orientation';
 import WebView from 'react-native-webview';
 import Pdf from 'react-native-pdf';
 import { StackActions } from '@react-navigation/native';
 
+const NOME_COMPONENTE = 'TelaModalContratoClicksign';
+const INSTRUCAO_INICIAL = 'Contrato de serviço de rastreamento.';
+
 export default class TelaModalContratoClicksign extends Component {
 	
-    constructor(props, value) {
-        super(props);
+    constructor(props, contexto) {
+        super();
         
-        Orientation.unlockAllOrientations();
-
-        if(props && props.navigation) {
-            this.oNavegacao = props.navigation;
-        }
-        
-        if(value && value.gerenciador) {
-            // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
-            this.oGerenciadorContextoApp = value.gerenciador;
-            
-            this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
-            this.oRegistradorLog.registrar('TelaModalContratoClicksign.constructor() => Iniciou.');
-
-            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
-            this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
-            this.oDadosControleApp.processando_requisicao = false;
-            this.state = this.oGerenciadorContextoApp.dadosAppGeral;
-        }
-        
+        inicializarContextoComum(props, contexto, this, INSTRUCAO_INICIAL);
+                
         this.incluirContrato = this.incluirContrato.bind(this);
         this.tratarIncluirContrato = this.tratarIncluirContrato.bind(this);
         this.contratado = this.contratado.bind(this);
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
         this.voltar = this.voltar.bind(this);
-
-        this.texto_instrucao = 'Contrato de serviço de rastreamento.'
-        this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
-        this.oRegistradorLog.registrar('TelaModalContratoClicksign.constructor() => Finalizou.');
     }
     
-    componentDidMount() {        
+    componentDidMount() {
+        let nomeFuncao = 'componentDidMount';
 
-        // if(!this.oDadosApp.contrato.url_pdf && this.oGerenciadorContextoApp.temDados()) {
-        //     this.incluirContrato();
-        // }
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+        
+        Orientation.unlockAllOrientations();
+
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
 
     incluirContrato() {
@@ -82,7 +64,10 @@ export default class TelaModalContratoClicksign extends Component {
     }
 
     tratarIncluirContrato(oDados, oEstado) {
-        
+        let nomeFuncao = 'tratarIncluirContrato';
+
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
         if(oEstado.ok) {
             this.oGerenciadorContextoApp.atribuirDados('contrato', oDados);
             this.oGerenciadorContextoApp.atribuirDados('cliente', oDados.cliente);
@@ -99,17 +84,19 @@ export default class TelaModalContratoClicksign extends Component {
                 }
             }
 
-            this.oRegistradorLog.registrar('tratarIncluirContrato() URL do contrato: ', oDadosContrato.url_doc);
+            this.oRegistradorLog.registrar('URL do contrato: ', oDadosContrato.url_doc);
 
             if(!oDadosContrato.url_doc) {
                 
-                this.oRegistradorLog.registrar('tratarIncluirContrato() Não foi possível obter o link do contrato.');
+                this.oRegistradorLog.registrar('Não foi possível obter o link do contrato.');
 
                 Alert.alert('TriSafe', 'Não foi possível obter o link do contrato. Enviamos uma cópia por e-mail. Por favor, verifique seu e-mail');
             }
 
             this.oGerenciadorContextoApp.atualizarEstadoTela(this);
         }
+        
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
 
     // obterURLContrato() {
@@ -192,22 +179,10 @@ TelaModalContratoClicksign.contextType = ContextoApp;
 
 export class AreaDados extends Component {
 
-    constructor(props, value) {
-        super(props);
+    constructor(props, contexto) {
+        super();
         
-        if(value && value.gerenciador) {
-            // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
-            this.oGerenciadorContextoApp = value.gerenciador;
-            
-            this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
-            this.oRegistradorLog.registrar('TelaModalContratoClicksign.constructor() => Iniciou.');
-
-            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
-            this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp);
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
-            this.state = this.oGerenciadorContextoApp.dadosAppGeral;
-        }
+        inicializarContextoComum(props, contexto, this, INSTRUCAO_INICIAL);
     }
 
     render() {

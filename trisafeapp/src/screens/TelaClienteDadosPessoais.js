@@ -19,71 +19,30 @@ import { styles, theme } from './../common/Estilos';
 import AreaRodape from './../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
 import Orientation from 'react-native-orientation';
-import { StackActions } from '@react-navigation/native';
+import { inicializarContextoComum } from '../common/Util';
+
+const NOME_COMPONENTE = 'TelaClienteDadosPessoais';
+const INSTRUCAO_INICIAL = 'Informe seus dados pessoais.';
 
 export default class TelaClienteDadosPessoais extends Component {
 	
-    constructor(props, value) {
-        super(props);
+    constructor(props, contexto) {
+        super();
         
-        if(props && props.navigation) {
-            this.oNavegacao = props.navigation;
-        }
-        
-        if(value && value.gerenciador) {
-            // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
-            this.oGerenciadorContextoApp = value.gerenciador;
-            this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
-            this.oRegistradorLog.registrar('TelaClienteDadosPessoais.constructor() => Iniciou.');
-
-            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
-            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
-            this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
-
-            this.state = this.oGerenciadorContextoApp.dadosAppGeral;
-        }
-        
-        this.texto_instrucao = 'Informe seus dados pessoais.';
-        this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
+        inicializarContextoComum(props, contexto, this, INSTRUCAO_INICIAL);
 
         this.voltar = this.voltar.bind(this);
         this.avancar = this.avancar.bind(this);
-
-        this.oRegistradorLog.registrar('TelaClienteDadosPessoais.constructor() => Finalizou.');
     }
 
     componentDidMount() {
+        let nomeFuncao = 'componentDidMount';
+        
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
         
         Orientation.unlockAllOrientations();
 
-        console.log('Adicionando listener beforeRemove()...')
-        
-        // this.oNavegacao.addListener('beforeRemove', (e) => {
-        //     // if (!hasUnsavedChanges) {
-        //     //   // If we don't have unsaved changes, then we don't need to do anything
-        //     //   return;
-        //     // }
-        //     console.log('Impedindo a volta ...');
-        //     // Prevent default behavior of leaving the screen
-        //     e.preventDefault();
-    
-        //     // Prompt the user before leaving the screen
-        //         Alert.alert(
-        //             'Certo, você pode sair agora, se quiser, mas lembre-se que poderá continuar a partir daqui a qualquer momento.',
-        //             'Deseja realmente sair o processo?',
-        //             [
-        //                 { text: "Don't leave", style: 'cancel', onPress: () => {} },
-        //                 {
-        //                     text: 'Discard',
-        //                     style: 'destructive',
-        //                     // If the user confirmed, then we dispatch the action we blocked earlier
-        //                     // This will continue the action that had triggered the removal of the screen
-        //                     onPress: () => this.oNavegacao.dispatch(e.data.action),
-        //                 },
-        //             ]
-        //         );
-        //     })
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
     
     avancar() {
@@ -114,8 +73,8 @@ TelaClienteDadosPessoais.contextType = ContextoApp;
 
 export class AreaDados extends Component {
 
-    constructor(props) {
-        super(props);
+    constructor(props, contexto) {
+        super();
     }
 
     render() {

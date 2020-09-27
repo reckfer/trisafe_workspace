@@ -19,43 +19,30 @@ import { styles, theme } from './../common/Estilos';
 import AreaRodape from './../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
 import Orientation from 'react-native-orientation';
+import { inicializarContextoComum } from '../common/Util';
+
+const NOME_COMPONENTE = 'TelaClienteEndereco';
+const INSTRUCAO_INICIAL = 'Informe seu endereço.';
 
 export default class TelaClienteEndereco extends Component {
 	
-    constructor(props, value) {
-        super(props);
-
-        if(props && props.navigation) {
-            this.oNavegacao = props.navigation;
-        }
+    constructor(props, contexto) {
+        super();
         
-        if(value && value.gerenciador) {
-            // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
-            this.oGerenciadorContextoApp = value.gerenciador;
-            
-            this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
-            this.oRegistradorLog.registrar('TelaClienteEndereco.constructor() => Iniciou.');
-
-            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;            
-            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
-            this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
-
-            this.state = this.oGerenciadorContextoApp.dadosAppGeral;
-        }
+        inicializarContextoComum(props, contexto, this, INSTRUCAO_INICIAL);
         
         this.avancar = this.avancar.bind(this);
         this.voltar = this.voltar.bind(this);
-        
-        this.texto_instrucao = 'Informe seu endereço.';
-        this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
-
-        this.oRegistradorLog.registrar('TelaClienteEndereco.constructor() => Finalizou.');
     }
 
     componentDidMount() {
+        let nomeFuncao = 'componentDidMount';
+        
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
         
         Orientation.unlockAllOrientations();
+
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
 
     avancar() {
@@ -90,8 +77,8 @@ TelaClienteEndereco.contextType = ContextoApp;
 
 export class AreaDados extends Component {
 
-    constructor(props) {
-        super(props);
+    constructor(props, contexto) {
+        super();
     }
 
     render() {

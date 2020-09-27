@@ -18,47 +18,33 @@ import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
 import AreaRodape from './../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
-import Util from '../common/Util';
+import Util, { inicializarContextoComum } from '../common/Util';
 import Orientation from 'react-native-orientation';
+
+const NOME_COMPONENTE = 'TelaClienteConfirmacao';
+const INSTRUCAO_INICIAL = 'Confirme seus dados.';
 
 export default class TelaClienteConfirmacao extends Component {
 	
-    constructor(props, value) {
-        super(props);
-
-        if(props && props.navigation) {
-            this.oNavegacao = props.navigation;
-        }
+    constructor(props, contexto) {
+        super();
         
-        if(value && value.gerenciador) {
-            // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
-            this.oGerenciadorContextoApp = value.gerenciador;
-            
-            this.oRegistradorLog = this.oGerenciadorContextoApp.registradorLog;            
-            this.oRegistradorLog.registrar('TelaClienteConfirmacao.constructor() => Iniciou.');
-
-            this.oDadosApp = this.oGerenciadorContextoApp.dadosApp;
-            this.oDadosControleApp = this.oGerenciadorContextoApp.dadosControleApp;
-            this.oDadosInstrucao = this.oDadosApp.instrucao_usuario;
-            this.oComunicacaoHTTP = new ComunicacaoHTTP(this.oGerenciadorContextoApp, this);
-            this.oUtil = new Util(this.oGerenciadorContextoApp);
-            this.state = this.oGerenciadorContextoApp.dadosAppGeral;
-        }
+        inicializarContextoComum(props, contexto, this, INSTRUCAO_INICIAL);
         
         this.salvar = this.salvar.bind(this);
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
         this.avancar = this.avancar.bind(this);
         this.voltar = this.voltar.bind(this);
-
-        this.texto_instrucao = 'Confirme seus dados.';
-        this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
-        
-        this.oRegistradorLog.registrar('TelaClienteConfirmacao.constructor() => Finalizou.');
     }
 
     componentDidMount() {
+        let nomeFuncao = 'componentDidMount';
+        
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
         
         Orientation.unlockAllOrientations();
+
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
     salvar() {
         try {
@@ -72,6 +58,7 @@ export default class TelaClienteConfirmacao extends Component {
 
             this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarDadosRetorno, true, false);
         } catch (oExcecao) {
+            
             this.oUtil.tratarExcecao(oExcecao);
         }
     }
@@ -117,8 +104,8 @@ TelaClienteConfirmacao.contextType = ContextoApp;
 
 export class AreaDados extends Component {
 
-    constructor(props) {
-        super(props);
+    constructor(props, contexto) {
+        super();
     }
 
     render() {
