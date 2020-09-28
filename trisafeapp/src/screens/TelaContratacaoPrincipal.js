@@ -17,7 +17,7 @@ import Cabecalho from '../common/CabecalhoTela';
 import { styles } from '../common/Estilos';
 import AreaRodape from '../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
-import { inicializarContextoComum } from '../common/Util';
+import { inicializarContextoComum } from '../common/Configuracao';
 import Orientation from 'react-native-orientation';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { TouchableOpacity } from 'react-native-gesture-handler';

@@ -18,7 +18,7 @@ import AreaRodape from '../common/AreaRodape';
 import { styles, theme } from '../common/Estilos';
 import UtilTests from './UtilTests';
 import { ContextoApp } from '../contexts/ContextoApp';
-import { inicializarContextoComum } from '../common/Util';
+import { inicializarContextoComum } from '../common/Configuracao';
 import RNFetchBlob from 'rn-fetch-blob';
 import Orientation from 'react-native-orientation';
 

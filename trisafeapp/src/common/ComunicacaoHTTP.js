@@ -108,32 +108,72 @@ export default class ComunicacaoHTTP {
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     };
 
-    fazerRequisicaoHTTPRegistrarLogs(oFuncaoCallback) {
-        let nomeFuncao = 'fazerRequisicaoHTTPRegistrarLogs';
-
-        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
-
+    fazerRequisicaoHTTPRegistrarLogs(oFuncaoCallback, oFuncaoCallbackErro) {
+        try {
+        let semErros = false;
+        
         let metodoURI = '/gerenciadorlogs/registrar_do_cliente/';
         let url = this.getURL(metodoURI);
+        let oRegistrosLog = this.oRegistradorLog.registrosLog;
 
-        this.oRegistradorLog.registrar(`url = ${url}`);
+        if(this.oRegistradorLog.enviandoEmContingencia) {
+            let oDH = new Date();
+        
+            let oMensagemLog = {
+                'data_hora': oDH.toLocaleString(),
+                'mensagem_log' : '*********** LOGS EM CONTINGENCIA POR ERRO DE ENVIO ANTERIOR [INICIO] ***********',
+            }
+            oRegistrosLog = [];
+            oRegistrosLog.push(oMensagemLog);
+            oRegistrosLog = oRegistrosLog.concat(this.oRegistradorLog.registrosLog);
+            oMensagemLog = {
+                'data_hora': oDH.toLocaleString(),
+                'mensagem_log' : '*********** LOGS EM CONTINGENCIA POR ERRO DE ENVIO ANTERIOR [FIM] ***********',
+            }
+            oRegistrosLog.push(oMensagemLog);
+        }
 
         let oMensagensLog = {
-            'registros_log' : this.oRegistradorLog.registrosLog,
+            'registros_log' : oRegistrosLog,
         }
         let oDadosParametros = JSON.stringify(oMensagensLog);
-
+        //let a = this.b.c;
         fetch(url, this.getParametrosHTTPS(oDadosParametros)).then((oRespostaHTTP) => { 
-                this.obterJsonResposta(oRespostaHTTP, true); 
-            }).then(() => {
-                if(oFuncaoCallback) {
-                    oFuncaoCallback();
+            
+                return this.obterJsonResposta(oRespostaHTTP, true);
+            }).then((oJsonRetorno) => {
+
+                if(oJsonRetorno) {
+                    let oEstado = oJsonRetorno.estado;
+
+                    if(oEstado && oEstado.ok) {
+                        semErros = true;
+                    }
                 }
+                
             }).catch((oExcecao) => {
+
                 this.oUtil.tratarExcecaoLogs(oExcecao);
+
+            }).finally(() => {
+
+                if(semErros) {
+                    if(oFuncaoCallback) {
+                        oFuncaoCallback();
+                    }
+                } else {
+                    if(oFuncaoCallbackErro) {
+                        oFuncaoCallbackErro();
+                    }
+                }
             });
-        
-        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        } catch (oExcecao) {
+
+            this.oUtil.tratarExcecaoLogs(oExcecao);
+            if(oFuncaoCallbackErro) {
+                oFuncaoCallbackErro();
+            }
+        }
     }
     
     obterJsonResposta(oRespostaHTTP, ignorarErro) {

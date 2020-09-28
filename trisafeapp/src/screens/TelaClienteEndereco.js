@@ -13,13 +13,12 @@ import {
     View,
 } from 'react-native';
 import { ThemeProvider, Input, Button } from 'react-native-elements';
-import ComunicacaoHTTP from './../common/ComunicacaoHTTP';
 import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
 import AreaRodape from './../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
 import Orientation from 'react-native-orientation';
-import { inicializarContextoComum } from '../common/Util';
+import { inicializarContextoComum } from '../common/Configuracao';
 
 const NOME_COMPONENTE = 'TelaClienteEndereco';
 const INSTRUCAO_INICIAL = 'Informe seu endereço.';

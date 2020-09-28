@@ -7,4 +7,5 @@ export const CONFIG_LOG = {
 export const DADOS_LOG_GERAL = {
     'config_log': CONFIG_LOG,
     'registros_log': [],
+    'log_contingencia': [],
 };

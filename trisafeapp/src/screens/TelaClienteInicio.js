@@ -13,12 +13,11 @@ import {
     Alert,
     View,
 } from 'react-native';
-import ComunicacaoHTTP from '../common/ComunicacaoHTTP';
 import Cabecalho from '../common/CabecalhoTela';
 import AreaRodape from '../common/AreaRodape';
 import { styles, theme } from '../common/Estilos';
 import { ContextoApp } from '../contexts/ContextoApp';
-import Util, { inicializarContextoComum } from '../common/Util';
+import { inicializarContextoComum } from '../common/Configuracao';
 import Orientation from 'react-native-orientation';
 
 const NOME_COMPONENTE = 'TelaClienteInicio';

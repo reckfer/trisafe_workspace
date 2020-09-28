@@ -19,7 +19,7 @@ import { styles, theme } from './../common/Estilos';
 import AreaRodape from './../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
 import Orientation from 'react-native-orientation';
-import { inicializarContextoComum } from '../common/Util';
+import { inicializarContextoComum } from '../common/Configuracao';
 
 const NOME_COMPONENTE = 'TelaClienteDadosPessoais';
 const INSTRUCAO_INICIAL = 'Informe seus dados pessoais.';

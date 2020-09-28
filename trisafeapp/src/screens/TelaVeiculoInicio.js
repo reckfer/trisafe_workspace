@@ -16,7 +16,7 @@ import {
 import Cabecalho from '../common/CabecalhoTela';
 import { styles, theme } from '../common/Estilos';
 import { ContextoApp } from '../contexts/ContextoApp';
-import { inicializarContextoComum } from '../common/Util';
+import { inicializarContextoComum } from '../common/Configuracao';
 
 const NOME_COMPONENTE = 'TelaVeiculoInicio';
 const INSTRUCAO_INICIAL = '';

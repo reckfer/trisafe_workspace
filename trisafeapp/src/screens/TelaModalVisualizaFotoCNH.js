@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { Button } from 'react-native-elements';
 import { ContextoApp } from '../contexts/ContextoApp';
-import { inicializarContextoComum } from '../common/Util';
+import { inicializarContextoComum } from '../common/Configuracao';
 import { styles } from '../common/Estilos';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { clonarObjeto, DADOS_FOTOS } from '../contexts/DadosAppGeral';

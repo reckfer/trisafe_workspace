@@ -14,7 +14,7 @@ import { ButtonGroup } from 'react-native-elements';
 import AreaBarraEstado from './AreaBarraEstado';
 import { ContextoApp } from '../contexts/ContextoApp';
 import { styles } from './Estilos';
-import { inicializarContextoComum } from './Util';
+import { inicializarContextoComum } from './Configuracao';
 
 export default class AreaRodape extends Component {
 

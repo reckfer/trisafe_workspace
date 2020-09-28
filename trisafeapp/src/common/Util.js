@@ -1,7 +1,5 @@
 'use strict';
 import { Alert } from "react-native";
-import ComunicacaoHTTP from "./ComunicacaoHTTP";
-import Configuracao from "./Configuracao";
 
 const NOME_COMPONENTE = 'Util';
 
@@ -85,26 +83,3 @@ export default class Util {
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
 };
-
-export function inicializarContextoComum(propsGeral, contextoGeral, oComponente, textoInstrucao) {
-
-    if(propsGeral && propsGeral.navigation) {
-        oComponente.oNavegacao = propsGeral.navigation;
-    }
-    
-    if(contextoGeral && contextoGeral.gerenciador) {
-        // Atribui o gerenciador de contexto, recebido da raiz de contexto do aplicativo (ContextoApp).
-        let oGerenciador = contextoGeral.gerenciador;
-        
-        oGerenciador.criarAtalhosDadosContexto(oComponente);
-
-        if(textoInstrucao) {
-            oComponente.texto_instrucao = textoInstrucao;
-            oComponente.oDadosInstrucao.texto_instrucao = textoInstrucao;
-        }
-
-        oComponente.oComunicacaoHTTP = new ComunicacaoHTTP(oGerenciador, this);
-        oComponente.oConfiguracao = new Configuracao(oGerenciador, this);
-        oComponente.oUtil = new Util(oGerenciador);
-    }
-}

@@ -15,7 +15,7 @@ import {
 import { styles } from './Estilos';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { ContextoApp } from '../contexts/ContextoApp';
-import { inicializarContextoComum } from './Util';
+import { inicializarContextoComum } from './Configuracao';
 
 export default class Cabecalho extends Component {
 

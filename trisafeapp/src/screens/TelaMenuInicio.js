@@ -16,7 +16,7 @@ import { ContextoApp } from '../contexts/ContextoApp';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AreaRodape from '../common/AreaRodape';
 import Orientation from 'react-native-orientation';
-import { inicializarContextoComum } from '../common/Util';
+import { inicializarContextoComum } from '../common/Configuracao';
 
 const NOME_COMPONENTE = 'TelaMenuInicio';
 const INSTRUCAO_INICIAL = 'Bem vindo a Trisafe.';
@@ -45,6 +45,7 @@ export default class TelaMenuInicio extends Component {
     }
     
     inicializar() {
+        this.oConfiguracao.configurarRotinaDeSegundoPlano();
         this.oConfiguracao.autenticarCliente();
     }
     
