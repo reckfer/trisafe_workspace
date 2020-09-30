@@ -55,6 +55,7 @@ export const DADOS_FOTOS = {
 };
 
 export const DADOS_CONTROLE_APP = {
+    'app_ativo': true,
     'em_producao': false,
     'processando_requisicao': false,
     'novo_cadastro': true,
@@ -76,6 +77,24 @@ export const CHAVES = {
     'token_clicksign': ''
 };
 
+export const DADOS_DISPOSITIVO = {
+    modelo: '',
+    tipo_dispositivo: '',
+    device_id: '',
+    dispositivo: '',
+    nome_dispositivo: '',
+    token_dispositivo: '',
+    hardware: '',
+    numero_serial: '',
+    nome_sistema: '',
+    versao_sistema: '',
+    id_unico: '',
+    id_instancia: '',
+    tablet: '',
+    produto: '',
+    fabricante: ''
+}
+
 export const ESTADO = {
     ok: false,
     mensagem: 'Falha de comunicação. Nenhum dado foi recebido.',
@@ -93,8 +112,9 @@ export const DADOS_APP_GERAL = {
         instrucao_usuario: DADOS_INSTRUCAO_USUARIO,
         fotos: DADOS_FOTOS,
         chaves: CHAVES,
+        dados_dispositivo: DADOS_DISPOSITIVO,
     },
-    registros_log: null,
+    //registros_log: null,
 };
 
 export function clonarObjeto(obj) {

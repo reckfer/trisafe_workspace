@@ -185,7 +185,6 @@ export default class RegistradorLog {
                                 if(!this.enviando && !this.indEnviandoEmContingencia && this.oRegistrosLogs.length > 0) {
                                     this.indEnviandoEmContingencia = true;
                                     
-                                    let a = this.a.v;
                                     this.oComunicacaoHTTP.fazerRequisicaoHTTPRegistrarLogs(this.tratarRetornoLog, this.tratarRetornoLogErro);
                                 }
                             } else {

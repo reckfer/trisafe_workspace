@@ -13,6 +13,9 @@ import {
 import DeviceInfo from 'react-native-device-info';
 import Util from './Util';
 import BackgroundFetch from 'react-native-background-fetch';
+import GerenciadorContextoApp from '../contexts/GerenciadorContextoApp';
+
+const NOME_COMPONENTE = 'Configuracao';
 
 export default class Configuracao {
 
@@ -29,7 +32,6 @@ export default class Configuracao {
         this.autenticarCliente = this.autenticarCliente.bind(this);
         this.apropriarToken = this.apropriarToken.bind(this);
         this.solicitarPermissaoArmazenamento = this.solicitarPermissaoArmazenamento.bind(this);
-        this.solicitarPermissaoNumeroTelefone = this.solicitarPermissaoNumeroTelefone.bind(this);
         this.enviarLogsContingencia = this.enviarLogsContingencia.bind(this);
         this.texto_instrucao = '';
     }
@@ -130,6 +132,8 @@ export default class Configuracao {
     }
 
     solicitarPermissaoNumeroTelefone() {
+        let nomeFuncao = 'solicitarPermissaoNumeroTelefone';
+
         try {
           PermissionsAndroid.request(
             PermissionsAndroid.PERMISSIONS.READ_PHONE_STATE,
@@ -141,19 +145,28 @@ export default class Configuracao {
             }
           )
           .then((granted) => {
+                
                 if (granted === PermissionsAndroid.RESULTS.GRANTED) {
                     
                     DeviceInfo.getPhoneNumber()
                     .then((numTelefone) => {
-                    
+                        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
                         this.oDadosApp.cliente.telefone = numTelefone;
                         this.oRegistradorLog.registrar(`Numero telefone: ${numTelefone}`);
+
+                        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
                     }).catch((oExcecao) => {
                         this.oUtil.tratarExcecao(oExcecao);
                     });
                 } else {
+                    this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
                     this.oRegistradorLog.registrar(`Acesso ao número do telefone negado.`);
+
+                    this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
                 }
+                
             })
             .catch((oExcecao) => {
                 this.oUtil.tratarExcecao(oExcecao);
@@ -185,9 +198,9 @@ export function inicializarContextoComum(propsGeral, contextoGeral, oComponente,
             oComponente.oDadosInstrucao.texto_instrucao = textoInstrucao;
         }
 
-        oComponente.oComunicacaoHTTP = new ComunicacaoHTTP(oGerenciador, this);
+        oComponente.oComunicacaoHTTP = new ComunicacaoHTTP(oGerenciador, oComponente);
         if(!(oComponente instanceof Configuracao)) {
-            oComponente.oConfiguracao = new Configuracao(oGerenciador, this);
+            oComponente.oConfiguracao = new Configuracao(oGerenciador, oComponente);
         }
         oComponente.oUtil = new Util(oGerenciador);
     }
@@ -197,16 +210,19 @@ export function inicializarContextoComum(propsGeral, contextoGeral, oComponente,
 ///
 export const scheduleTask = async (name) => {
     try {
-      await BackgroundFetch.scheduleTask({
-        taskId: name,
-        stopOnTerminate: false,
-        enableHeadless: true,
-        delay: 5000,               // milliseconds (5s)
-        forceAlarmManager: true,   // more precise timing with AlarmManager vs default JobScheduler
-        periodic: false            // Fire once only.
-      });
+        let oConfiguracao = new Configuracao(new GerenciadorContextoApp());
+        oConfiguracao.enviarLogsContingencia(name, true);
+
+        await BackgroundFetch.scheduleTask({
+            taskId: name,
+            stopOnTerminate: false,
+            enableHeadless: true,
+            delay: 5000,               // milliseconds (5s)
+            forceAlarmManager: true,   // more precise timing with AlarmManager vs default JobScheduler
+            periodic: false            // Fire once only.
+        });
     } catch (e) {
-      console.warn('[BackgroundFetch] scheduleTask falhou.', e);
+        console.warn('[BackgroundFetch] scheduleTask falhou.', e);
     }
   }
 
@@ -214,8 +230,8 @@ export const scheduleTask = async (name) => {
 /// All events from the plugin arrive here, including #scheduleTask events.
 ///
 const onBackgroundFetchEvent = async (taskId) => {
-    console.log('[despertadorapp] onBackgroundFetchEvent() ++++++++++++ iniciou ++++++++++++');
-    console.log('[despertadorapp] onBackgroundFetchEvent() taskId = ', taskId);
+    console.log('[trisafeapp] onBackgroundFetchEvent() ++++++++++++ iniciou ++++++++++++');
+    console.log('[trisafeapp] onBackgroundFetchEvent() taskId = ', taskId);
 
     if (taskId === 'react-native-background-fetch') {
         // Test initiating a #scheduleTask when the periodic fetch event is received.
@@ -229,7 +245,7 @@ const onBackgroundFetchEvent = async (taskId) => {
     // If you fail to do this, the OS can terminate your app
     // or assign battery-blame for consuming too much background-time
     BackgroundFetch.finish(taskId);
-    console.log('[despertadorapp] onBackgroundFetchEvent() ------------ terminou ------------');
+    console.log('[trisafeapp] onBackgroundFetchEvent() ------------ terminou ------------');
 };
 
 /// Render BackgroundFetchStatus to text.

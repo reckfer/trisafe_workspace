@@ -45,8 +45,15 @@ export default class TelaMenuInicio extends Component {
     }
     
     inicializar() {
+        let nomeFuncao = 'inicializar';
+        
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+        this.oRegistradorLog.registrar(`Dados do dispositivo: ${JSON.stringify(this.oDadosDispositivo)}`);
+
         this.oConfiguracao.configurarRotinaDeSegundoPlano();
         this.oConfiguracao.autenticarCliente();
+        
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
     
     irParaMeusDados() {

@@ -1,6 +1,7 @@
 'use strict';
 import { DADOS_APP_GERAL, clonarObjeto } from './DadosAppGeral';
 import RegistradorLog from './RegistradorLog';
+import DeviceInfo from 'react-native-device-info';
 import { AppState } from 'react-native';
 
 const NOME_COMPONENTE = 'GerenciadorContextoApp';
@@ -11,19 +12,21 @@ export default class GerenciadorContextoApp {
         this.oDadosReferencia = DADOS_APP_GERAL;
 
         this.oRegistradorLog = new RegistradorLog(this);
-        this.oDadosReferencia.registros_log = this.oRegistradorLog.registrosLog;
+        //this.oDadosReferencia.registros_log = this.oRegistradorLog.registrosLog;
         
         this.criarAtalhosDadosContexto = this.criarAtalhosDadosContexto.bind(this);
         this.atualizarEstadoTela = this.atualizarEstadoTela.bind(this);
         this.atribuirDados = this.atribuirDados.bind(this);
         this.temDados = this.temDados.bind(this);
+        this.coletarInformacoesDispositivo = this.coletarInformacoesDispositivo.bind(this);
         this._atribuirDadosObjeto = this._atribuirDadosObjeto.bind(this);
         this._atribuir = this._atribuir.bind(this);
         this._transportarLogServidor = this._transportarLogServidor.bind(this);
         this.oTelaAtual = null;
         this.oTelaAnterior = null;
 
-        AppState.addEventListener('change', this._transportarLogServidor);        
+        AppState.addEventListener('change', this._transportarLogServidor);
+        this.coletarInformacoesDispositivo();
     };
 
     get dadosApp() {
@@ -43,6 +46,10 @@ export default class GerenciadorContextoApp {
     
     get instrucaoUsuarioApp() {
         return this.oDadosReferencia.dados_app.instrucao_usuario;
+    };
+
+    get dadosDispositivo() {
+        return this.oDadosReferencia.dados_app.dados_dispositivo;
     };
 
     get registradorLog() {
@@ -79,6 +86,8 @@ export default class GerenciadorContextoApp {
         oComponente.oDadosInstrucao = this.instrucaoUsuarioApp;
         oComponente.oDadosContrato = this.dadosApp.contrato;
         oComponente.oDadosChaves = this.dadosApp.chaves;
+        oComponente.oDadosDispositivo = this.dadosApp.dados_dispositivo;
+
         oComponente.state = this.dadosAppGeral;
     }
 
@@ -132,6 +141,7 @@ export default class GerenciadorContextoApp {
         }
         
         if(!tentarPreencher){
+            this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
             return this.oDadosReferencia;
         }
 
@@ -224,7 +234,7 @@ export default class GerenciadorContextoApp {
             let campo;
             let oCampo;
             let oPilhaPendencias = [];
-            let oCamposIgnorar = ['instrucao_usuario', 'chaves'];
+            let oCamposIgnorar = ['instrucao_usuario', 'chaves', 'dados_dispositivo'];
 
             for(let i = 0; i < campos.length; i++) {
                 campo = campos[i];
@@ -267,6 +277,282 @@ export default class GerenciadorContextoApp {
         return false;
     };
 
+    coletarInformacoesDispositivo() {
+        
+        this.dadosDispositivo.device_id = DeviceInfo.getDeviceId();        
+        this.dadosDispositivo.tipo_dispositivo = DeviceInfo.getDeviceType();
+        this.dadosDispositivo.modelo = DeviceInfo.getModel();
+        this.dadosDispositivo.nome_sistema = DeviceInfo.getSystemName();
+        this.dadosDispositivo.versao_sistema = DeviceInfo.getSystemVersion();
+        this.dadosDispositivo.id_unico = DeviceInfo.getUniqueId();
+        this.dadosDispositivo.versao_sistema = DeviceInfo.getVersion();
+        //this.oRegistradorLog.registrar(`Notch: ${DeviceInfo.hasNotch()}`);        
+        //this.oRegistradorLog.registrar(`Tablet: ${DeviceInfo.isTablet()}`);
+        //this.oRegistradorLog.registrar(`ReadableVersion: ${DeviceInfo.getReadableVersion()}`);
+
+
+        // DeviceInfo.getCarrier().then((valor) => {
+        //     let nomeFuncao = 'getCarrier';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`Carrier: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+        // DeviceInfo.getCodename().then((valor) => {
+        //     let nomeFuncao = 'getCodename';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`Codename: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+        DeviceInfo.getDevice().then((valor) => {
+            this.dadosDispositivo.dispositivo = valor;
+        });
+        DeviceInfo.getProduct().then((valor) => {
+            this.dadosDispositivo.produto = valor;
+        });
+        DeviceInfo.getSerialNumber().then((valor) => {
+            this.dadosDispositivo.numero_serial = valor;
+        });
+        DeviceInfo.getDeviceName().then((valor) => {
+            this.dadosDispositivo.dispositivo = valor;
+        });
+        DeviceInfo.getDeviceToken().then((valor) => {
+            this.dadosDispositivo.token_dispositivo = valor;
+        });
+        DeviceInfo.getHardware().then((valor) => {
+            this.dadosDispositivo.hardware = valor;
+        });
+        DeviceInfo.getInstanceId().then((valor) => {
+            this.dadosDispositivo.id_instancia = valor;
+        });
+        DeviceInfo.getManufacturer().then((valor) => {
+            this.dadosDispositivo.fabricante = valor;
+        });
+
+        // DeviceInfo.getDisplay().then((valor) => {
+        //     let nomeFuncao = 'getDisplay';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`Display: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });	
+        // DeviceInfo.getFontScale().then((valor) => {
+        //     let nomeFuncao = 'getFontScale';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`FontScale: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+        // DeviceInfo.getHost().then((valor) => {
+        //     let nomeFuncao = 'getHost';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`Host: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+        // DeviceInfo.getMacAddress().then((valor) => {
+        //     let nomeFuncao = 'getMacAddress';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`MacAddress: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+        // DeviceInfo.getMaxMemory().then((valor) => {
+        //     let nomeFuncao = 'getMaxMemory';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`MaxMemory: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+        // DeviceInfo.getPowerState().then((valor) => {
+        //     let nomeFuncao = 'getPowerState';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`PowerState: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+        // DeviceInfo.getPreviewSdkInt().then((valor) => {
+        //     let nomeFuncao = 'getPreviewSdkInt';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`PreviewSdkInt: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });                
+        // DeviceInfo.getSecurityPatch().then((valor) => {
+        //     let nomeFuncao = 'getSecurityPatch';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`SecurityPatch: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+        // DeviceInfo.getSystemAvailableFeatures().then((valor) => {
+        //     let nomeFuncao = 'getSystemAvailableFeatures';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`SystemAvailableFeatures: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+        
+        // DeviceInfo.getTags().then((valor) => {
+        //     let nomeFuncao = 'getTags';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`Tags: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+        // DeviceInfo.getType().then((valor) => {
+        //     let nomeFuncao = 'getType';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`Type: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+        // DeviceInfo.getTotalDiskCapacity().then((valor) => {
+        //     let nomeFuncao = 'getTotalDiskCapacity';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`TotalDiskCapacity: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+        // DeviceInfo.getTotalMemory().then((valor) => {
+        //     let nomeFuncao = 'getTotalMemory';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`TotalMemory: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+        
+        // DeviceInfo.getUsedMemory().then((valor) => {
+        //     let nomeFuncao = 'getUsedMemory';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`UsedMemory: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+        // DeviceInfo.getUserAgent().then((valor) => {
+        //     let nomeFuncao = 'getUserAgent';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`UserAgent: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });        
+        // DeviceInfo.hasSystemFeature().then((valor) => {
+        //     let nomeFuncao = 'hasSystemFeature';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`hasSystemFeature: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+        // DeviceInfo.isAirplaneMode().then((valor) => {
+        //     let nomeFuncao = 'isAirplaneMode';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`isAirplaneMode: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+        // DeviceInfo.isBatteryCharging().then((valor) => {
+        //     let nomeFuncao = 'isBatteryCharging';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`isBatteryCharging: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+        // DeviceInfo.isEmulator().then((valor) => {
+        //     let nomeFuncao = 'isEmulator';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`isEmulator: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+        // DeviceInfo.isLandscape().then((valor) => {
+        //     let nomeFuncao = 'isLandscape';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`isLandscape: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+        // DeviceInfo.isLocationEnabled().then((valor) => {
+        //     let nomeFuncao = 'isLocationEnabled';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`isLocationEnabled: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+        // DeviceInfo.isHeadphonesConnected().then((valor) => {
+        //     let nomeFuncao = 'isHeadphonesConnected';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`isHeadphonesConnected: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+        // DeviceInfo.isPinOrFingerprintSet().then((valor) => {
+        //     let nomeFuncao = 'isPinOrFingerprintSet';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`isPinOrFingerprintSet: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+        
+        // DeviceInfo.supported32BitAbis().then((valor) => {
+        //     let nomeFuncao = 'supported32BitAbis';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`supported32BitAbis: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+        // DeviceInfo.supported64BitAbis().then((valor) => {
+        //     let nomeFuncao = 'supported64BitAbis';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`supported64BitAbis: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+        // DeviceInfo.supportedAbis().then((valor) => {
+        //     let nomeFuncao = 'supportedAbis';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`supportedAbis: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+        // DeviceInfo.syncUniqueId().then((valor) => {
+        //     let nomeFuncao = 'syncUniqueId';
+        //     this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        //     this.oRegistradorLog.registrar(`UniqueId: ${valor}`);
+
+        //     this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        // });
+    }
+
     _atribuirDadosObjeto(oObjetoReceber, oDadosAtribuir) {        
         for(let campo in oObjetoReceber) {
             oObjetoReceber[campo] = this._atribuir(campo, oDadosAtribuir);
@@ -284,8 +570,13 @@ export default class GerenciadorContextoApp {
     _transportarLogServidor() {
         console.log(`[trisafeapp] App ativo = ${this.appAtivo}`);
 
-        if(!this.appAtivo) {
+        if(!this.appAtivo && this.dadosApp.controle_app.app_ativo) {
+            
+            this.dadosApp.controle_app.app_ativo = false;
             this.oRegistradorLog.transportar();
+        } else {
+            
+            this.dadosApp.controle_app.app_ativo = true;
         }
     }
 }
