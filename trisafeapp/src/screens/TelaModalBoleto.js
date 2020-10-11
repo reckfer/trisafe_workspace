@@ -19,7 +19,7 @@ import Cabecalho from '../common/CabecalhoTela';
 import { styles, theme } from '../common/Estilos';
 import AreaRodape from '../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
-import Util, { inicializarContextoComum } from '../common/Util';
+import { inicializarContextoComum } from '../common/Configuracao';
 import Orientation from 'react-native-orientation';
 
 const NOME_COMPONENTE = 'TelaModalBoleto';
@@ -62,9 +62,12 @@ export default class TelaModalBoleto extends Component {
         try {
             let metodoURI = '/boletogerencianets/obter/';
 
-            let oDadosParametros = JSON.stringify(this.state);
+            let oDadosRequisicao = {
+                cliente: this.oDadosCliente,
+                contrato: this.oDadosContrato,
+            }
 
-            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarRetornoBoleto, true);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosRequisicao, this.tratarRetornoBoleto, true);
         } catch (oExcecao) {
             this.oUtil.tratarExcecao(oExcecao);
 
@@ -79,9 +82,11 @@ export default class TelaModalBoleto extends Component {
         try {
             let metodoURI = '/emailclientes/enviar_com_anexos/';
             
-            let oDadosParametros = JSON.stringify(this.state);
+            let oDadosRequisicao = {
+                contrato: this.oDadosContrato,
+            }
 
-            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarRetornoEmail);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosRequisicao, this.tratarRetornoEmail);
         } catch (oExcecao) {
             this.oUtil.tratarExcecao(oExcecao);
         }

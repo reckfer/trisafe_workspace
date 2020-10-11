@@ -22,6 +22,8 @@ class Credencial:
         self.chave_iter_serv = chave_servidor
         # token iter criptografado.
         self.token_iter = ''
+        # indica se um token novo foi obtido da Iter.
+        self.novo_token_iter = False
 
         # chave parcial da clicksign do cliente
         self.chave_clicksign_cli = chave_cliente
@@ -61,6 +63,7 @@ class Credencial:
                 token = token.encode()
 
             self.token_iter = cripto.encrypt(token)
+            self.novo_token_iter = True
         else:
             self.token_iter = token
     

@@ -19,6 +19,19 @@ export const DADOS_CLIENTE = {
     'id_signatario_contrato': ''
 };
 
+export const DADOS_VEICULO = {
+    'placa': '',
+    'apelido': '',
+    //'foto_doc': DADOS_FOTO,
+    "placa": '',
+    "modelo": '',
+    "cliente": DADOS_CLIENTE,
+    "marca": '',
+    "ano": '',
+};
+
+export const DADOS_VEICULOS = [DADOS_VEICULO];
+
 export const DADOS_PRODUTO = {
     'codigo': '',
     'nome': '',
@@ -47,6 +60,13 @@ export const DADOS_BOLETO = {
     'url_html': '',
 };
 
+export const DADOS_FOTO = {
+    'uri_local': '',
+    'uri_remoto': '',
+    'foto_base64': '',
+};
+
+// TODO: mudar este modelo para o mesmo do veiculo.
 export const DADOS_FOTOS = {
     'uri_local_cnh': '',
     'foto_cnh_base64': '',    
@@ -55,26 +75,27 @@ export const DADOS_FOTOS = {
 };
 
 export const DADOS_CONTROLE_APP = {
-    'app_ativo': true,
-    'em_producao': false,
-    'processando_requisicao': false,
-    'novo_cadastro': true,
-    'autenticado': false,
-    'abrir_camera': false,
-    'exibir_foto': true,
+    app_ativo: true,
+    em_producao: false,
+    processando_requisicao: false,
+    novo_cliente: true,
+    novo_veiculo: false,
+    autenticado: false,
+    abrir_camera: false,
+    exibir_foto: true,
 };
 
 export const DADOS_INSTRUCAO_USUARIO = {
-    'texto_instrucao': '',
+    texto_instrucao: '',
 };
 
 export const CHAVES = {
-    'chave_trisafe': 'jNFjYQWDbUZk1V9Y',    
-    'token_trisafe': '',
-    'chave_iter': 'bUZk1V9YjNFjYQWD',
-    'token_iter': '',
-    'chave_clicksign': '1V9YjbYQWDkUZNFj',    
-    'token_clicksign': ''
+    chave_trisafe: 'jNFjYQWDbUZk1V9Y',    
+    token_trisafe: '',
+    chave_iter: 'bUZk1V9YjNFjYQWD',
+    token_iter: '',
+    chave_clicksign: '1V9YjbYQWDkUZNFj',    
+    token_clicksign: ''
 };
 
 export const DADOS_DISPOSITIVO = {
@@ -102,9 +123,16 @@ export const ESTADO = {
     http_status: '0'
 }
 
+export const VEICULO_ATUAL = {
+    indice_lista: -1,
+    veiculo: DADOS_VEICULO
+}
+
 export const DADOS_APP_GERAL = {
     dados_app: {
         cliente: DADOS_CLIENTE,
+        veiculo_atual: VEICULO_ATUAL,
+        veiculos: DADOS_VEICULOS,
         contrato: DADOS_CONTRATO,
         produtos_contratados: DADOS_PRODUTOS_CONTRATADOS,
         boleto: DADOS_BOLETO,

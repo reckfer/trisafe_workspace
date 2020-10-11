@@ -5,6 +5,7 @@ import os
 from trisafeserverapp.settings import BASE_DIR
 from django.db import models
 from rest_framework import status
+from gerenciadorlog.models import GerenciadorLog
 from comum.retorno import Retorno
 from comum.credencial import Credencial
 from cliente.models import Cliente
@@ -15,7 +16,7 @@ from transacaogerencianet.models import TransacaoGerenciaNet
 from boletogerencianet.models import BoletoGerenciaNet
 from fpdf import FPDF
 
-class Contrato(models.Model):
+class Contrato(models.Model, GerenciadorLog):
     id_contrato = models.CharField(primary_key=True, max_length=30)
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, blank=False, null=False)
     produtos_contratados = models.ManyToManyField(Produto)
@@ -25,7 +26,6 @@ class Contrato(models.Model):
     ult_atualizacao = models.DateTimeField(blank=False, null=False, auto_now=True)
     chave_contrato_ext = models.CharField(max_length=100, blank=False, null=True)
     chave_boleto_ext = models.CharField(max_length=100, blank=False, null=True)
-    credencial = Credencial()
     url_pdf = None
     boleto = BoletoGerenciaNet()
 
@@ -37,7 +37,7 @@ class Contrato(models.Model):
             if (not retorno_cliente.estado.ok):
                 return retorno_cliente
             
-            m_produto = Produto()
+            m_produto = self.definir_contexto(Produto())
             retorno_produtos = m_produto.listar()
             
             if not retorno_produtos.estado.ok:
@@ -55,7 +55,7 @@ class Contrato(models.Model):
                 if retorno.estado.codMensagem != 'NaoCadastrado':
                     return retorno
                 else:
-                    m_contrato_clicksign = ContratoClicksign(self.credencial)
+                    m_contrato_clicksign = ContratoClicksign(self)
 
                     retorno = m_contrato_clicksign.incluir(retorno_cliente.dados)
 
@@ -81,24 +81,22 @@ class Contrato(models.Model):
                         # Atualiza com os produtos
                         self.produtos_contratados.add(*retorno_produtos.dados)
 
-            retorno = Retorno(True, 'Contrato gerado com sucesso. Selecione "Contratar" para aceitá-lo.')
+            retorno = Retorno(True, self, 'Contrato gerado com sucesso. Selecione "Contratar" para aceitá-lo.')
             retorno.dados = self
 
             return retorno
         except Exception as e:
                     
-            retorno = Retorno(False, 'A inclusão do contrato falhou.', None, None, e)
+            retorno = Retorno(False, self, 'A inclusão do contrato falhou.', None, None, e)
             return retorno
     
     def incluir_com_signatario(self):
-
         try:
             retorno_contrato = self.incluir()
             if not retorno_contrato:
                 return retorno_contrato
             
             m_contrato = retorno_contrato.dados
-            m_contrato.credencial = self.credencial
 
             if(m_contrato.aceito):
                 retorno_url = m_contrato.obter_url_contrato_pdf()
@@ -108,7 +106,7 @@ class Contrato(models.Model):
                 
                 m_contrato.url_pdf = retorno_url.dados
 
-                m_boleto = BoletoGerenciaNet()
+                m_boleto = self.definir_contexto(BoletoGerenciaNet())
                 retorno_boleto = m_boleto.obter(m_contrato)
                 
                 if(retorno_boleto.estado.ok):
@@ -122,7 +120,7 @@ class Contrato(models.Model):
             return retorno_contrato
         except Exception as e:
                     
-            retorno = Retorno(False, 'A inclusão do contrato falhou.', None, None, e)
+            retorno = Retorno(False, self, 'A inclusão do contrato falhou.', None, None, e)
             return retorno
     
     def incluir_signatario(self):
@@ -134,7 +132,7 @@ class Contrato(models.Model):
             elif retorno.estado.codMensagem != 'SignatarioNaoCadastrado':
                 return retorno
 
-            m_contrato_clicksign = ContratoClicksign(self.credencial)
+            m_contrato_clicksign = ContratoClicksign(self)
 
             retorno_chave_signatario = m_contrato_clicksign.incluir_signatario(self.cliente)
 
@@ -160,13 +158,13 @@ class Contrato(models.Model):
 
         except Exception as e:
                     
-            retorno = Retorno(False, 'A atualização do signatário do contrato falhou.', None, None, e)
+            retorno = Retorno(False, self, 'A atualização do signatário do contrato falhou.', None, None, e)
             return retorno
     
     def incluir_signatario_contrato (self):
         try:
             
-            m_contrato_clicksign = ContratoClicksign(self.credencial)
+            m_contrato_clicksign = ContratoClicksign(self)
 
             retorno_signatario = self.incluir_signatario()
 
@@ -206,7 +204,7 @@ class Contrato(models.Model):
             return retorno
         except Exception as e:
                     
-            retorno = Retorno(False, 'A atualização do signatário do contrato falhou.', None, None, e)
+            retorno = Retorno(False, self, 'A atualização do signatário do contrato falhou.', None, None, e)
             return retorno
 
     def obter_signatario(self):
@@ -219,16 +217,16 @@ class Contrato(models.Model):
             m_cliente = retorno.dados.cliente
 
             if(not (m_cliente.id_signatario_contrato and len(str(m_cliente.id_signatario_contrato).strip()) > 0)):
-                return Retorno(False, 'Signatario não cadastrado', 'SignatarioNaoCadastrado', 404)
+                return Retorno(False, self, 'Signatario não cadastrado', 'SignatarioNaoCadastrado', 404)
 
-            # m_contrato_clicksign = ContratoClicksign(self.credencial)
+            # m_contrato_clicksign = ContratoClicksign(self)
 
             # retorno_chave_signatario = m_contrato_clicksign.obter_signatario(m_cliente)
 
             return retorno
         except Exception as e:
                     
-            retorno = Retorno(False, 'A atualização do signatário do contrato falhou.', None, None, e)
+            retorno = Retorno(False, self, 'A atualização do signatário do contrato falhou.', None, None, e)
             return retorno
     # def incluir(self, chaves_produtos):
 
@@ -264,13 +262,13 @@ class Contrato(models.Model):
     #         # Atualiza com os produtos
     #         self.produtos_contratados.add(*retorno_produtos.dados)
 
-    #         retorno = Retorno(True, 'Contrato gerado com sucesso. Selecione "Contratar" para aceitá-lo.')
+    #         retorno = Retorno(True, self, 'Contrato gerado com sucesso. Selecione "Contratar" para aceitá-lo.')
     #         retorno.dados = self
 
     #         return retorno
     #     except Exception as e:
                     
-    #         retorno = Retorno(False, 'A inclusão do contrato falhou.', None, None, e)
+    #         retorno = Retorno(False, self, 'A inclusão do contrato falhou.', None, None, e)
     #         return retorno
     
     def alterar(self, chaves_produtos):
@@ -281,7 +279,7 @@ class Contrato(models.Model):
             if not retorno_cliente.estado.ok:
                 return retorno_cliente
 
-            m_produto = Produto()
+            m_produto = self.definir_contexto(Produto())
             retorno_produtos = m_produto.listar_especificos(chaves_produtos)
             
             if not retorno_produtos.estado.ok:
@@ -289,7 +287,7 @@ class Contrato(models.Model):
 
             d_dados_pedido = self.gerar_dados_pedido_transacao_gerencia_net(retorno_produtos.dados)
 
-            m_transacao_gerencia_net = TransacaoGerenciaNet()
+            m_transacao_gerencia_net = self.definir_contexto(TransacaoGerenciaNet())
 
             retorno_transacao = m_transacao_gerencia_net.incluir(d_dados_pedido)
 
@@ -306,13 +304,13 @@ class Contrato(models.Model):
             # Inclui na base
             self.save()
 
-            retorno = Retorno(True, 'Contrato gerado com sucesso. Selecione "Contratar" para aceitá-lo.')
+            retorno = Retorno(True, self, 'Contrato gerado com sucesso. Selecione "Contratar" para aceitá-lo.')
             retorno.dados = self
 
             return retorno
         except Exception as e:
                     
-            retorno = Retorno(False, 'A atualização do contrato falhou.', None, None, e)
+            retorno = Retorno(False, self, 'A atualização do contrato falhou.', None, None, e)
             return retorno
 
     def aceitar(self):
@@ -324,7 +322,7 @@ class Contrato(models.Model):
             
             m_contrato = retorno.dados
 
-            m_contrato_clicksign = ContratoClicksign(self.credencial)
+            m_contrato_clicksign = ContratoClicksign(self)
             retorno_contrato_clicksign = m_contrato_clicksign.obter(m_contrato.chave_contrato_ext)
             
             if not retorno_contrato_clicksign.estado.ok:
@@ -333,10 +331,10 @@ class Contrato(models.Model):
             d_contrato_clicksign = retorno_contrato_clicksign.dados
 
             if(d_contrato_clicksign['status'] == 'running'):
-                retorno = Retorno(False, 'O contrato deve ser assinado. Assine pelo aplicativo ou através do seu e-mail.\nObrigado.', 'ContratoNaoAssinado', 451)
+                retorno = Retorno(False, self, 'O contrato deve ser assinado. Assine pelo aplicativo ou através do seu e-mail.\nObrigado.', 'ContratoNaoAssinado', 451)
                 return retorno
             elif (d_contrato_clicksign['status'] == 'canceled'):
-                retorno = Retorno(False, 'O contrato foi cancelado. Atualize seu cadastro pelo aplicativo e gere novo contrato.\nObrigado.', 'ContratoCancelado', 451)
+                retorno = Retorno(False, self, 'O contrato foi cancelado. Atualize seu cadastro pelo aplicativo e gere novo contrato.\nObrigado.', 'ContratoCancelado', 451)
                 return retorno
 
             if(d_contrato_clicksign):
@@ -352,7 +350,7 @@ class Contrato(models.Model):
             m_produtos_contratados = m_contrato.produtos_contratados.all()
             d_dados_pedido = self.gerar_dados_pedido_transacao_gerencia_net(m_produtos_contratados)
 
-            m_transacao_gerencia_net = TransacaoGerenciaNet()
+            m_transacao_gerencia_net = self.definir_contexto(TransacaoGerenciaNet())
 
             retorno_transacao = m_transacao_gerencia_net.incluir(d_dados_pedido)
 
@@ -365,7 +363,7 @@ class Contrato(models.Model):
             # Atualiza na base
             m_contrato.save()
             
-            m_boleto = BoletoGerenciaNet()
+            m_boleto = self.definir_contexto(BoletoGerenciaNet())
             retorno_boleto = m_boleto.gerar(m_contrato)
 
             if not retorno_boleto.estado.ok:
@@ -376,29 +374,29 @@ class Contrato(models.Model):
             return retorno
         except Exception as e:
                     
-            retorno = Retorno(False, 'O aceite do contrato falhou.', None, None, e)
+            retorno = Retorno(False, self, 'O aceite do contrato falhou.', None, None, e)
             return retorno
     
     def obter(self):
         try:
-            retorno = Retorno(False, 'Contrato não localizado.')
+            retorno = Retorno(False, self, 'Contrato não localizado.')
             m_contratos = Contrato.objects.filter(id_contrato=self.id_contrato)
             
             if m_contratos:
                 m_contrato = m_contratos[0]
                 if m_contrato:
-                    retorno = Retorno(True)
-                    retorno.dados = m_contrato
+                    retorno = Retorno(True, self)
+                    retorno.dados = self.definir_contexto(m_contrato)
 
             return retorno
         except Exception as e:
                     
-            retorno = Retorno(False, 'A consulta do contrato falhou.', None, None, e)
+            retorno = Retorno(False, self, 'A consulta do contrato falhou.', None, None, e)
             return retorno
     
     def obter_url_contrato_pdf(self):
         try:
-            retorno = Retorno(False, 'Contrato não localizado.', 'NaoCadastrado')
+            retorno = Retorno(False, self, 'Contrato não localizado.', 'NaoCadastrado')
             
             m_contratos = Contrato.objects.filter(cliente__cpf=self.cliente.cpf)
             
@@ -406,19 +404,19 @@ class Contrato(models.Model):
                 m_contrato = m_contratos[0]
                 if m_contrato:
                     
-                    m_contrato_clicksign = ContratoClicksign(self.credencial)
+                    m_contrato_clicksign = ContratoClicksign(self)
                     retorno = m_contrato_clicksign.obter_url_contrato_pdf(m_contrato.chave_contrato_ext)
 
             return retorno
 
         except Exception as e:
                     
-            retorno = Retorno(False, 'A consulta do contrato falhou.', None, None, e)
+            retorno = Retorno(False, self, 'A consulta do contrato falhou.', None, None, e)
             return retorno
 
     # def obter_url_contrato_docx(self):
     #     try:
-    #         retorno = Retorno(False, 'Contrato não localizado.', 'NaoCadastrado')
+    #         retorno = Retorno(False, self, 'Contrato não localizado.', 'NaoCadastrado')
             
     #         m_contratos = Contrato.objects.filter(cliente__cpf=self.cliente.cpf)
             
@@ -426,34 +424,35 @@ class Contrato(models.Model):
     #             m_contrato = m_contratos[0]
     #             if m_contrato:
                     
-    #                 m_contrato_clicksign = ContratoClicksign(self.credencial)
+    #                 m_contrato_clicksign = ContratoClicksign(self)
     #                 retorno = m_contrato_clicksign.obter_url_contrato_docx(m_contrato.chave_contrato_ext)
 
     #         return retorno
 
     #     except Exception as e:
                     
-    #         retorno = Retorno(False, 'A consulta do contrato falhou.', None, None, e)
+    #         retorno = Retorno(False, self, 'A consulta do contrato falhou.', None, None, e)
     #         return retorno
     
     def obter_por_cliente(self):
         try:
-            retorno = Retorno(False, 'Contrato não localizado.', 'NaoCadastrado')
+            retorno = Retorno(False, self, 'Contrato não localizado.', 'NaoCadastrado')
             
             m_contratos = Contrato.objects.filter(cliente__cpf=self.cliente.cpf)
             
             if m_contratos:
                 m_contrato = m_contratos[0]
-                if m_contrato:
-                    m_contrato.cliente.credencial = self.cliente.credencial
-                    retorno = Retorno(True)
-                    retorno.dados = m_contrato
+                
+                if m_contrato:                    
+                    retorno = Retorno(True, self)
+                    retorno.dados = self.definir_contexto(m_contrato)
+                    self.definir_contexto(m_contrato.cliente)
 
             return retorno
 
         except Exception as e:
                     
-            retorno = Retorno(False, 'A consulta do contrato falhou.', None, None, e)
+            retorno = Retorno(False, self, 'A consulta do contrato falhou.', None, None, e)
             return retorno
 
     def calcular_valor_total(self, m_produtos):
@@ -507,7 +506,7 @@ class Contrato(models.Model):
                 self.atribuir_do_modelo(retorno_contrato.dados)
             
             if(not self.id_contrato or len(str(self.id_contrato)) <= 0):
-                return Retorno(False, 'Contrato não localizado para o cliente.', 'NaoCadastrado')
+                return Retorno(False, self, 'Contrato não localizado para o cliente.', 'NaoCadastrado')
             
             retorno_arquivo = self.montar_contrato()
             
@@ -518,7 +517,7 @@ class Contrato(models.Model):
 
         except Exception as e:
                     
-            retorno = Retorno(False, 'A geração do contrato falhou.', None, None, e)
+            retorno = Retorno(False, self, 'A geração do contrato falhou.', None, None, e)
             return retorno
     
     def montar_contrato(self):
@@ -564,13 +563,13 @@ class Contrato(models.Model):
                 "caminho_arquivo" : caminho_arquivo
             }
 
-            retorno = Retorno(True)
+            retorno = Retorno(True, self)
             retorno.dados = dados_retorno
 
             return retorno
         except Exception as e:
                     
-            retorno = Retorno(False, 'A geração do contrato falhou.', None, None, e)
+            retorno = Retorno(False, self, 'A geração do contrato falhou.', None, None, e)
             return retorno
 
     def excluir_contrato(self):
@@ -585,12 +584,12 @@ class Contrato(models.Model):
             if(not os.path.exists(caminho_diretorio)):
                 os.makedirs(caminho_diretorio)
 
-            retorno = Retorno(True)
+            retorno = Retorno(True, self)
             return retorno
 
         except Exception as e:
                     
-            retorno = Retorno(False, 'A exclusão do contrato falhou.', None, None, e)
+            retorno = Retorno(False, self, 'A exclusão do contrato falhou.', None, None, e)
             return retorno
 
     def atribuir_do_modelo(self, m_contrato):

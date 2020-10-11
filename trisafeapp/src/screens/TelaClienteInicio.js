@@ -59,10 +59,11 @@ export default class TelaClienteInicio extends Component {
     obterCliente() {
         try {
             let metodoURI = '/clientes/obter/';
-            
-            let oDadosParametros = JSON.stringify(this.state);
+            let oDadosRequisicao = {
+                cliente: this.oDadosCliente,
+            }
 
-            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarDadosCliente, true);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosRequisicao, this.tratarDadosCliente, true);
 
         } catch (oExcecao) {
             this.oUtil.tratarExcecao(oExcecao);
@@ -73,11 +74,11 @@ export default class TelaClienteInicio extends Component {
         let irPara = true;
         
         if(oEstado.cod_mensagem === 'NaoCadastrado') {
-            this.oDadosControleApp.novo_cadastro = true;
+            this.oDadosControleApp.novo_cliente = true;
             Alert.alert('Trisafe', 'Informe seus dados para realizar o cadastro.');
         } else {
             if(oEstado.ok){
-                this.oDadosControleApp.novo_cadastro = false;
+                this.oDadosControleApp.novo_cliente = false;
             } else {
                 irPara = false;
             }
@@ -88,8 +89,9 @@ export default class TelaClienteInicio extends Component {
                 Alert.alert('Trisafe', 'Atualize seus dados cadastrais.');
             }
         }
-        this.oGerenciadorContextoApp.atribuirDados('cliente', oDados, this);
-
+        if(oDados) {
+            this.oGerenciadorContextoApp.atribuirDados('cliente', oDados, this);
+        }
         if(irPara) {
             this.oNavegacao.navigate('Dados pessoais', this.state);
         }

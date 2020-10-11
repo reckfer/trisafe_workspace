@@ -30,7 +30,7 @@ export default class ComunicacaoHTTP {
 
         if (__DEV__) {
             protocol = 'http://';
-            domain = '192.168.0.104:8000';
+            domain = '192.168.0.110:8000';
         }
         return protocol + domain + metodo;
     };
@@ -40,6 +40,14 @@ export default class ComunicacaoHTTP {
 
         if(!oDados) {
             oDados = '{}';
+        } else {
+            if(!oDados.hasOwnProperty('chaves')) {
+                oDados.chaves = this.oDadosChaves;    
+            }
+            oDados.dados_dispositivo = this.oDadosDispositivo;
+            // if(!oDados.hasOwnProperty('dados_dispositivo')) {
+            //     oDados['dados_dispositivo'] = this.oDadosDispositivo;
+            // }
         }
 
         return {
@@ -51,11 +59,11 @@ export default class ComunicacaoHTTP {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             },
-            body: oDados,
+            body: JSON.stringify(oDados),
         }
     };
 
-    fazerRequisicaoHTTP(metodoURI, oDadosParametros, oFuncaoCallback, suprimirMsgServidor, ignorarCallbackSeErro) {
+    fazerRequisicaoHTTP(metodoURI, oDadosRequisicao, oFuncaoCallback, suprimirMsgServidor, ignorarCallbackSeErro) {
         let nomeFuncao = 'fazerRequisicaoHTTP';
 
         this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
@@ -69,10 +77,11 @@ export default class ComunicacaoHTTP {
         }
         
         let url = this.getURL(metodoURI);
-        
-        this.oRegistradorLog.registrar(`Realizando requisicao para ${url}, parametros = ${oDadosParametros}`);
+        let oParametrosHTTPS = this.getParametrosHTTPS(oDadosRequisicao);
 
-        fetch(url, this.getParametrosHTTPS(oDadosParametros))
+        this.oRegistradorLog.registrar(`Invocando URL ${url}, dados (body) = ${oParametrosHTTPS.body}`);
+
+        fetch(url, oParametrosHTTPS)
             .then(this.obterJsonResposta)
             .then((oJsonDados) => {
                 this.tratarRetornoServidor(oJsonDados, oFuncaoCallback, suprimirMsgServidor, ignorarCallbackSeErro);
@@ -84,7 +93,7 @@ export default class ComunicacaoHTTP {
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     };
 
-    fazerRequisicaoHTTPSemDadosRetorno(metodoURI, oDadosParametros, oFuncaoCallback, ignorarErro) {
+    fazerRequisicaoHTTPSemDadosRetorno(metodoURI, oDadosRequisicao, oFuncaoCallback, ignorarErro) {
         let nomeFuncao = 'fazerRequisicaoHTTPSemDadosRetorno';
 
         this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
@@ -93,7 +102,7 @@ export default class ComunicacaoHTTP {
         
         this.oRegistradorLog.registrar(`url = ${url}`);
         
-        fetch(url, this.getParametrosHTTPS(oDadosParametros)).then((oRespostaHTTP) => { 
+        fetch(url, this.getParametrosHTTPS(oDadosRequisicao)).then((oRespostaHTTP) => { 
                 this.obterJsonResposta(oRespostaHTTP, ignorarErro); 
             }).then(() => {
                     if(oFuncaoCallback) {
@@ -113,7 +122,6 @@ export default class ComunicacaoHTTP {
         let semErros = false;
         
         let metodoURI = '/gerenciadorlogs/registrar_do_cliente/';
-        let url = this.getURL(metodoURI);
         let oRegistrosLog = this.oRegistradorLog.registrosLog;
 
         if(this.oRegistradorLog.enviandoEmContingencia) {
@@ -136,12 +144,18 @@ export default class ComunicacaoHTTP {
         let oMensagensLog = {
             'registros_log' : oRegistrosLog,
         }
-        let oDadosParametros = JSON.stringify(oMensagensLog);
-        //let a = this.b.c;
-        fetch(url, this.getParametrosHTTPS(oDadosParametros)).then((oRespostaHTTP) => { 
+        
+        let url = this.getURL(metodoURI);
+        let oParametrosHTTPS = this.getParametrosHTTPS(oMensagensLog);
+
+        console.log('Enviando logs: ', oParametrosHTTPS.body);
+
+        fetch(url, oParametrosHTTPS)
+        .then((oRespostaHTTP) => { 
             
                 return this.obterJsonResposta(oRespostaHTTP, true);
-            }).then((oJsonRetorno) => {
+            })
+            .then((oJsonRetorno) => {
 
                 if(oJsonRetorno) {
                     let oEstado = oJsonRetorno.estado;
@@ -229,12 +243,15 @@ export default class ComunicacaoHTTP {
             
             oEstado = oJsonRetorno.estado;
             oDados = oJsonRetorno.dados;
+            let oDadosChaves = oJsonRetorno.chaves
+            if(oDadosChaves) {
 
-            if(oJsonRetorno.credencial.token_iter) {
-                this.oDadosChaves.token_iter = oJsonRetorno.credencial.token_iter;
-            }
-            if(oJsonRetorno.credencial.token_trisafe) {
-                this.oDadosChaves.token_trisafe = oJsonRetorno.credencial.token_trisafe;
+                if(oDadosChaves.token_trisafe) {
+                    this.oDadosChaves.token_trisafe = oDadosChaves.token_trisafe;
+                }
+                if(oDadosChaves.token_iter) {
+                    this.oDadosChaves.token_iter = oDadosChaves.token_iter;
+                }
             }
         } else {
             this.oRegistradorLog.registrar(`O servidor não retornou dados.`);

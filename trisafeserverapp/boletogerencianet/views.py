@@ -5,7 +5,6 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import mixins
 from boletogerencianet.models import BoletoGerenciaNet
-from gerenciadorlog.views import GerenciadorLogViewSet
 from autenticacaotrisafe.views import AutenticacaoTriSafeViewSet
 from rest_framework.renderers import JSONRenderer
 from comum.retorno import Retorno
@@ -28,8 +27,6 @@ class BoletoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissio
     # @action(detail=False, methods=['post'])
     # def gerar(self, request):
     #     try:
-    #         v_gerenciador_log = GerenciadorLogViewSet()
-    #         v_gerenciador_log.registrar_do_cliente(request)
 
     #         m_boleto = BoletoGerenciaNet()
             
@@ -41,15 +38,12 @@ class BoletoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissio
             
     #     except Exception as e:
                     
-    #         retorno = Retorno(False, 'A geração do boleto falhou.', None, None, e)
+    #         retorno = Retorno(False, self, 'A geração do boleto falhou.', None, None, e)
     #         return retorno.gerar_resposta_http()
     
     # @action(detail=False, methods=['post'])
     # def obter(self, request):
-    #     try:
-    #         v_gerenciador_log = GerenciadorLogViewSet()
-    #         v_gerenciador_log.registrar_do_cliente(request)
-            
+    #     try:            
     #         m_boleto = BoletoGerenciaNet()
             
     #         m_contrato = self.apropriar_dados_http(request)
@@ -60,7 +54,7 @@ class BoletoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissio
             
     #     except Exception as e:
                     
-    #         retorno = Retorno(False, 'A consulta do boleto falhou.', None, None, e)
+    #         retorno = Retorno(False, self, 'A consulta do boleto falhou.', None, None, e)
     #         return retorno.gerar_resposta_http()
     
     @classmethod
@@ -69,7 +63,7 @@ class BoletoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissio
         m_cliente = Cliente()
         m_contrato.cliente = m_cliente
 
-        d_dados_app = request.data['dados_app']        
+        d_dados_app = request.data
         d_contrato = d_dados_app['contrato']
         d_cliente = d_dados_app['cliente']
 

@@ -6,7 +6,6 @@ from rest_framework.response import Response
 from rest_framework import mixins
 from produto.models import Produto
 from cliente.models import Cliente
-from gerenciadorlog.views import GerenciadorLogViewSet
 from autenticacaotrisafe.views import AutenticacaoTriSafeViewSet
 from rest_framework.renderers import JSONRenderer
 from comum.retorno import Retorno
@@ -27,16 +26,13 @@ class ProdutoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
     @action(detail=False, methods=['post'])
     def listar(self, request):
         try:
-            v_gerenciador_log = GerenciadorLogViewSet()
-            v_gerenciador_log.registrar_do_cliente(request)
-            
-            m_produto = Produto()
+            m_produto = self.definir_contexto(Produto())
             
             retorno_produtos = m_produto.listar()
             return retorno_produtos.gerar_resposta_http()
         except Exception as e:
                     
-            retorno = Retorno(False, 'A consulta a produtos Trisafe falhou.', None, None, e)
+            retorno = Retorno(False, self, 'A consulta a produtos Trisafe falhou.', None, None, e)
             return retorno.gerar_resposta_http()
     
     @classmethod

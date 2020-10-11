@@ -6,9 +6,11 @@ from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from trisafeserverapp.settings import BASE_DIR
+
+from gerenciadorlog.models import GerenciadorLog
 from comum.retorno import Retorno
 
-class EmailCliente:
+class EmailCliente(GerenciadorLog):
     
     def enviar(self, m_contrato):
         port = 465  # For SSL
@@ -91,5 +93,5 @@ class EmailCliente:
             return retorno
         except Exception as e:
                      
-            retorno = Retorno(False, 'O envio de e-mail falhou.', None, None, e)
+            retorno = Retorno(False, self, 'O envio de e-mail falhou.', None, None, e)
             return retorno

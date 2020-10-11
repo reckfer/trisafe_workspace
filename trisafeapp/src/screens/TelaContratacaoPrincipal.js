@@ -58,10 +58,12 @@ export default class TelaModalContratoClicksign extends Component {
     incluirContrato() {
         try {
             let metodoURI = '/contratos/incluir_com_signatario/';
-
-            let oDadosParametros = JSON.stringify(this.state);
+            let oDadosRequisicao = {
+                cliente: this.oDadosCliente,
+                contrato: this.oDadosContrato,
+            }
             
-            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarIncluirContrato);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosRequisicao, this.tratarIncluirContrato);
         } catch (oExcecao) {
             this.oUtil.tratarExcecao(oExcecao);
         }

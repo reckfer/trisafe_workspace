@@ -18,7 +18,7 @@ import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
 import AreaRodape from './../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
-import Util, { inicializarContextoComum } from '../common/Util';
+import { inicializarContextoComum } from '../common/Configuracao';
 import Orientation from 'react-native-orientation';
 
 const NOME_COMPONENTE = 'TelaClienteConfirmacao';
@@ -50,13 +50,13 @@ export default class TelaClienteConfirmacao extends Component {
         try {
             let metodoURI = '/clientes/incluir/';
 
-            if(!this.oDadosControleApp.novo_cadastro) {
+            if(!this.oDadosControleApp.novo_cliente) {
                 metodoURI = '/clientes/alterar/';
             }
-            
-            let oDadosParametros = JSON.stringify(this.state);
-
-            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarDadosRetorno, true, false);
+            let oDadosRequisicao = {
+                cliente: this.oDadosCliente,
+            }
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosRequisicao, this.tratarDadosRetorno, true, false);
         } catch (oExcecao) {
             
             this.oUtil.tratarExcecao(oExcecao);
@@ -76,7 +76,7 @@ export default class TelaClienteConfirmacao extends Component {
     avancar() {
         Orientation.lockToLandscapeLeft();
         
-        this.oDadosControleApp.novo_cadastro = false;
+        this.oDadosControleApp.novo_cliente = false;
 
         this.oNavegacao.navigate('Foto CNH', this.state);
     }

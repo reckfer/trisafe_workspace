@@ -2,19 +2,22 @@ from decouple import config
 import requests
 import json
 from django.db import models
+
+from gerenciadorlog.models import GerenciadorLog
 from comum.retorno import Retorno
 from comum.credencial import Credencial
 
-class ClienteIter(models.Model):
+class ClienteIter(models.Model, GerenciadorLog):
     
-    def __init__(self, credencial_cliente):
-        self.credencial = None
+    def __init__(self, objeto_contexto):
         self.headers_iter = None
         self.retorno_autenticacao = None
 
-        self.__autenticarIter(credencial_cliente)
+        objeto_contexto.definir_contexto(self)
+        self.__autenticarIter()
 
     def obter(self, m_cliente):
+
         url = "https://cnxs-api.itertelemetria.com/v1/users/{0}".format(m_cliente.id_cliente_iter)
 
         if(not self.headers_iter):
@@ -35,6 +38,7 @@ class ClienteIter(models.Model):
         return retorno
     
     def obterPorDocumento(self, m_cliente):
+
         url = "https://cnxs-api.itertelemetria.com/v1/users/?by_document={0}".format(m_cliente.cpf)
                 
         if(not self.headers_iter):
@@ -51,6 +55,7 @@ class ClienteIter(models.Model):
         return retorno
         
     def incluir(self, m_cliente):
+
         url = "https://cnxs-api.itertelemetria.com/v1/users"
 
         d_cliente_iter = self.__montar_dic_cliente(m_cliente)
@@ -69,6 +74,7 @@ class ClienteIter(models.Model):
         return retorno
     
     def alterar(self, m_cliente):
+
         url = "https://cnxs-api.itertelemetria.com/v1/users/%s" % (m_cliente.id_cliente_iter)
         
         if(not self.headers_iter):
@@ -115,55 +121,58 @@ class ClienteIter(models.Model):
     def __tratarRespostaHTTP(self, respostaHTTP):
         
         if respostaHTTP.status_code < 200 or respostaHTTP.status_code > 300:
-            retorno = Retorno(False, 'Erro de comunicação com a Iter. %s' % respostaHTTP.text, 'ErroComunicacaoIter', respostaHTTP.status_code)
+            retorno = Retorno(False, self, 'Erro de comunicação com a Iter. %s' % respostaHTTP.text, 'ErroComunicacaoIter', respostaHTTP.status_code)
         else:
-            retorno = Retorno(True)
+            retorno = Retorno(True, self)
             dadosRetorno = respostaHTTP.json()
             
             if isinstance(dadosRetorno, list):
                 if len(dadosRetorno) > 0:
                     dadosRetorno = dadosRetorno[0]
-
-            if dadosRetorno:                
-                if 'token' in dadosRetorno:
-                    self.credencial.set_token_iter(dadosRetorno['token'])
                 else:
-                    retorno.dados = dadosRetorno
+                    dadosRetorno = None
+
+            if dadosRetorno:
+                retorno.dados = dadosRetorno
+
+                if 'token' in dadosRetorno:
+                    self.credencial_iter.set_token_iter(dadosRetorno['token'])
+                    retorno.credencial = self.credencial_iter
             else:
                 # nao localizado
-                retorno = Retorno(False, respostaHTTP.text, '', 404)
+                retorno = Retorno(False, self, respostaHTTP.text, '', 404)
 
-        if(self.credencial):
-            retorno.credencial = self.credencial
-            
+        self.registrar_retorno(retorno, 'Retorno da Iter.')
         return retorno
 
-    def __autenticarIter(self, credencial_cliente):
+    def __autenticarIter(self):
         self.headers_iter = None
-        chave_iter_cliente = credencial_cliente.chave_iter_cli
+        chave_iter_cliente = None
         chave_iter_servidor = config('CHAVE_ITER')
         token_iter = ''
 
-        if(credencial_cliente):
-            token_iter = credencial_cliente.token_iter
+        if(self.credencial_iter):
+            chave_iter_cliente = self.credencial_iter.chave_iter_cli
+            token_iter = self.credencial_iter.token_iter
         
-        # Cria uma credencial completa, com a chave parcial do servidor, 
-        # pois o parametro "credencial_cliente" vem soh com a chave parcial do cliente.
-        self.credencial = Credencial(chave_iter_cliente, chave_iter_servidor)
-        self.credencial.token_iter = token_iter
+        # Atribui as chaves, parcial do servidor e parcial do cliente para descriptografar/criptografar o token.
+        self.credencial_iter.chave_iter_cli = chave_iter_cliente
+        self.credencial_iter.chave_iter_serv = chave_iter_servidor
+        self.credencial_iter.token_iter = token_iter
+        
+        if token_iter and len(token_iter) > 0:
 
-        if self.credencial.token_iter and len(self.credencial.token_iter) > 0:
-            
-            retorno = Retorno(True)
-            retorno.credencial = self.credencial
+            retorno = Retorno(True, self)
+            retorno.credencial = self.credencial_iter
         else:
             arquivo_iter = open('.env_cred_iter', 'rb')
             
             cred_iter_cripto = arquivo_iter.read()
             if(cred_iter_cripto):
-                self.credencial.token_iter = cred_iter_cripto
+                # atribui usuario e senha criptografados para descriptografar com get_token_iter()
+                self.credencial_iter.token_iter = cred_iter_cripto
             
-            headers = {'Authorization': 'Basic %s' %self.credencial.get_token_iter()}
+            headers = {'Authorization': 'Basic %s' % self.credencial_iter.get_token_iter()}
             r = requests.get("http://cnxs-api.itertelemetria.com/v1/sign_in", headers=headers)
             
             retorno = self.__tratarRespostaHTTP(r)
@@ -171,8 +180,8 @@ class ClienteIter(models.Model):
         self.retorno_autenticacao = retorno
 
         if self.retorno_autenticacao.estado.ok:
-            self.credencial = retorno.credencial
-            token = self.credencial.get_token_iter()
+            # self.credencial = retorno.credencial
+            token = self.credencial_iter.get_token_iter()
             
             self.headers_iter = {'Authorization': 'Bearer %s' %token,
                     'Content-Type' : 'application/json' }

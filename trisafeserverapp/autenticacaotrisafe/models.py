@@ -5,6 +5,8 @@ from decouple import config
 from trisafeserverapp.settings import BASE_DIR
 from comum.credencial import Credencial
 from comum.retorno import Retorno
+
+from gerenciadorlog.models import GerenciadorLog
 from django.conf import settings
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User
@@ -22,30 +24,32 @@ from rest_framework.authtoken.models import Token
 
 ## Nao expor esta classe via URL.
 
-class AutenticacaoTriSafe():
-    def __init__(self, credencial_cliente):
+class AutenticacaoTriSafe(GerenciadorLog):
+    def __init__(self, objeto_contexto):
         self.autenticado = False
         self.credencial = None
         self.headers_iter = None
         self.retorno_autenticacao = None
-
-        self.__autenticarTrisafe(credencial_cliente)
+        
+        objeto_contexto.definir_contexto(self)
+        self.__autenticarTrisafe()
 
     #TODO: avaliar a possibilidade de fazer autenticacao por usuario, identificando pelo id do dispositivo.
-    def __autenticarTrisafe(self, credencial_cliente):
+    def __autenticarTrisafe(self):
         try:
-            retorno = Retorno(False, 'Autenticação do aplicativo falhou.', 'UsuarioSenhaInvalidos')
+            retorno = Retorno(False, self, 'Autenticação do aplicativo falhou.', 'UsuarioSenhaInvalidos')
             self.retorno_autenticacao = retorno
             self.autenticado = False
 
-            chave_trisafe_cliente = credencial_cliente.chave_trisafe_cli
+            chave_trisafe_cliente = None
             chave_trisafe_servidor = config('CHAVE_TRISAFE')
             token_trisafe = ''
             cred_trisafe_cripto_secund = ''
             
-            if(credencial_cliente):
-                token_trisafe = credencial_cliente.token_trisafe
-                cred_trisafe_cripto_secund = credencial_cliente.credencial_trisafe_cripto_secundaria
+            if(self.credencial_trisafe):
+                chave_trisafe_cliente = self.credencial_trisafe.chave_trisafe_cli
+                token_trisafe = self.credencial_trisafe.token_trisafe
+                cred_trisafe_cripto_secund = self.credencial_trisafe.credencial_trisafe_cripto_secundaria
             
             # Cria uma credencial completa, com a chave parcial do servidor, 
             # pois o parametro "credencial_cliente" vem soh com a chave parcial do cliente.
@@ -59,7 +63,7 @@ class AutenticacaoTriSafe():
                 
                 if(token and token.key):
                     self.autenticado = True
-                    retorno = Retorno(True)
+                    retorno = Retorno(True, self)
 
             elif cred_trisafe_cripto_secund:
                 self.credencial.token_trisafe = cred_trisafe_cripto_secund
@@ -79,7 +83,7 @@ class AutenticacaoTriSafe():
                         self.autenticado = m_usuario.check_password(senha)
 
                 if self.autenticado:
-                    retorno = Retorno(True)
+                    retorno = Retorno(True, self)
                     
                     # Obtem o token.
                     token = Token.objects.get(user=m_usuario)
@@ -88,14 +92,14 @@ class AutenticacaoTriSafe():
                         self.credencial.set_token_trisafe(token.key)
 
                         # Atribui credencial para retornar o token para ao cliente.
-                        retorno.credencial = self.credencial
+                        retorno.dados = self.credencial
                     else:
-                        retorno = Retorno(False, 'Não foi possível obter credencial de segurança do aplicativo. Contate o Administrador da Trisafe.', 'TokenNaoCadastrado')
+                        retorno = Retorno(False, self, 'Não foi possível obter credencial de segurança do aplicativo. Contate o Administrador da Trisafe.', 'TokenNaoCadastrado')
 
             self.retorno_autenticacao = retorno
         except Exception as e:
             
-            retorno = Retorno(False, 'Autenticação do aplicativo falhou.', None, None, e)
+            retorno = Retorno(False, self, 'Autenticação do aplicativo falhou.', None, None, e)
             self.retorno_autenticacao = retorno
 
 class ExceptionAutenticacaoTriSafe(Exception):

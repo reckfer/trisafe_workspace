@@ -68,17 +68,13 @@ export default class TelaModalVisualizaFotoCNH extends Component {
         try {
             let metodoURI = '/clientes/salvar_foto_cnh/';
 
-            let oParametrosFoto = {
-                dados_app: {
-                    cliente: this.oDadosApp.cliente,
-                    fotos: this.oDadosApp.fotos,
-                    chaves: this.oDadosApp.chaves,
-                }
+            let oDadosRequisicao = {
+                cliente: this.oDadosApp.cliente,
+                fotos: this.oDadosApp.fotos,
+                chaves: this.oDadosApp.chaves,
             }
 
-            let oDadosParametros = JSON.stringify(oParametrosFoto);
-
-            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarDadosRetorno, false, false);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosRequisicao, this.tratarDadosRetorno, false, false);
 
         } catch (oExcecao) {
 
@@ -101,7 +97,7 @@ export default class TelaModalVisualizaFotoCNH extends Component {
     avancar() {
         Orientation.unlockAllOrientations();
 
-        this.oNavegacao.navigate('Contratacao');
+        this.oNavegacao.navigate('Veiculo Inicio');
     }
     
     capturarNovamente() {

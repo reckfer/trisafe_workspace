@@ -8,7 +8,6 @@ from rest_framework.response import Response
 from rest_framework import mixins
 from emailcliente.models import EmailCliente
 from autenticacaotrisafe.views import AutenticacaoTriSafeViewSet
-from gerenciadorlog.views import GerenciadorLogViewSet
 from contrato.models import Contrato
 from rest_framework.renderers import JSONRenderer
 from comum.retorno import Retorno
@@ -30,13 +29,11 @@ class EmailClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, per
     @action(detail=False, methods=['post'])
     def enviar_com_anexos(self, request):
         try:
-            v_gerenciador_log = GerenciadorLogViewSet()
-            v_gerenciador_log.registrar_do_cliente(request)
-            
-            m_email_cliente = EmailCliente()
+            m_email_cliente = self.definir_contexto(EmailCliente())
             
             m_contrato = EmailClienteViewSet.apropriar_dados_http(request)
-            
+            self.definir_contexto(m_contrato)
+
             retorno = m_email_cliente.enviar_com_anexos(m_contrato)
             
             return retorno.gerar_resposta_http()
@@ -49,7 +46,7 @@ class EmailClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, per
     def apropriar_dados_http(cls, request):
         m_contrato = Contrato()
         
-        d_dados_app = request.data['dados_app']
+        d_dados_app = request.data
         d_contrato = d_dados_app['contrato']
         m_contrato.id_contrato = d_contrato['id_contrato']
 

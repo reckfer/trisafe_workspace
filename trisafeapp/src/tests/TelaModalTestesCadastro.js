@@ -41,7 +41,7 @@ export default class TelaModalTestesCadastro extends Component {
         this.irParaTesteDownloadContrato = this.irParaTesteDownloadContrato.bind(this);
         this.irParaTesteDownloadBoleto = this.irParaTesteDownloadBoleto.bind(this);
         this.irParaTesteIncluirSignatario = this.irParaTesteIncluirSignatario.bind(this);
-        this.irParaTesteAssinarContrato = this.irParaTesteAssinarContrato.bind(this);
+        this.irParaTesteVeiculos = this.irParaTesteVeiculos.bind(this);
         this.irParaTesteFotoCNH = this.irParaTesteFotoCNH.bind(this);
         this.irParaTesteFotoDocVeiculo = this.irParaTesteFotoDocVeiculo.bind(this);
         this.obterUltimoCliente = this.obterUltimoCliente.bind(this);        
@@ -87,6 +87,14 @@ export default class TelaModalTestesCadastro extends Component {
         this.oNavegacao.navigate('Fluxo Cadastro Cliente', { screen: 'Contratacao' });
     }
 
+    irParaTesteVeiculos() {
+        this.oNavegacao.navigate('Fluxo Cadastro Cliente', { screen: 'Veiculo Inicio' });    
+    }
+
+    irParaTesteDownloadBoleto(){
+
+    }
+
     irParaTesteFotoCNH() {
         // this.oNavegacao.navigate('Fluxo Cadastro Cliente', { screen: 'Foto CNH' });
         this.oNavegacao.navigate('Visualizacao Foto CNH');
@@ -102,9 +110,11 @@ export default class TelaModalTestesCadastro extends Component {
         try {
             let metodoURI = '/clientes/obter_ultimo/';
             
-            let oDadosParametros = JSON.stringify(this.state);
+            let oDadosRequisicao = {
+                cliente: this.oDadosCliente,
+            }
 
-            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarDadosRetorno);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosRequisicao, this.tratarDadosRetorno);
 
         } catch (oExcecao) {
             this.oUtil.tratarExcecao(oExcecao);
@@ -122,9 +132,11 @@ export default class TelaModalTestesCadastro extends Component {
         try {
             let metodoURI = '/contratos/obter_por_cliente/';
             
-            let oDadosParametros = JSON.stringify(this.state);
+            let oDadosRequisicao = {
+                contrato: this.oDadosContrato
+            }
 
-            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarDadosRetornoContrato);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosRequisicao, this.tratarDadosRetornoContrato);
 
         } catch (oExcecao) {
             this.oUtil.tratarExcecao(oExcecao);
@@ -167,9 +179,11 @@ export default class TelaModalTestesCadastro extends Component {
         try {
             let metodoURI = '/contratos/obter_url_contrato_docx/';
             
-            let oDadosParametros = JSON.stringify(this.state);
+            let oDadosRequisicao = {
+                contrato: this.oDadosContrato
+            }
 
-            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarObterURLContrato);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosRequisicao, this.tratarObterURLContrato);
 
         } catch (oExcecao) {
             this.oUtil.tratarExcecao(oExcecao);
@@ -220,9 +234,11 @@ export default class TelaModalTestesCadastro extends Component {
         try {
             let metodoURI = '/contratos/incluir_signatario_contrato/';
             
-            let oDadosParametros = JSON.stringify(this.state);
+            let oDadosRequisicao = {
+                contrato: this.oDadosContrato
+            }
 
-            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarIncluirSignatario);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosRequisicao, this.tratarIncluirSignatario);
 
         } catch (oExcecao) {
             this.oUtil.tratarExcecao(oExcecao);
@@ -231,14 +247,6 @@ export default class TelaModalTestesCadastro extends Component {
 
     tratarIncluirSignatario(oDados, oEstado) {
         
-    }
-
-    irParaTesteAssinarContrato() {
-
-    }
-
-    irParaTesteDownloadBoleto(){
-
     }
 
     voltar() {
@@ -252,7 +260,7 @@ export default class TelaModalTestesCadastro extends Component {
     botaoDownloadContrato = () => <Button title="Download Contrato" onPress={this.irParaTesteDownloadContrato} ></Button>
     botaoDownloadBoleto = () => <Button title="Download Boleto" onPress={this.irParaTesteDownloadBoleto} ></Button>
     botaoIncluirSignatario = () => <Button title="Testar Incluir Signatario" onPress={this.irParaTesteIncluirSignatario} ></Button>
-    botaoAssinarContrato = () => <Button title="Testar Assinar Contrato" onPress={this.irParaTesteAssinarContrato} ></Button>
+    botaoCadastroVeiculos = () => <Button title="Testar Contrato Veiculos" onPress={this.irParaTesteVeiculos} ></Button>
     botaoFotoCNH = () => <Button title="Testar Foto CNH" onPress={this.irParaTesteFotoCNH} ></Button>
     botaoFotoDocVeiculo = () => <Button title="Testar Foto Doc" onPress={this.irParaTesteFotoDocVeiculo} ></Button>
     botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;
@@ -268,7 +276,7 @@ export default class TelaModalTestesCadastro extends Component {
             { element: this.botaoDownloadContrato }, { element: this.botaoDownloadBoleto } 
         ];
         let botoesTestes4 = [ 
-            { element: this.botaoIncluirSignatario }, { element: this.botaoAssinarContrato } 
+            { element: this.botaoIncluirSignatario }, { element: this.botaoCadastroVeiculos } 
         ];
         let botoesTestes5 = [ 
             { element: this.botaoFotoCNH }, { element: this.botaoFotoDocVeiculo } 

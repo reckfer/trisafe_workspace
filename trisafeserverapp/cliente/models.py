@@ -6,11 +6,11 @@ from django.db import models
 from rest_framework import status
 from clienteiter.models import ClienteIter
 from trisafeserverapp.settings import BASE_DIR
+from gerenciadorlog.models import GerenciadorLog
 from comum.retorno import Retorno
-from comum.credencial import Credencial
 import os
 
-class Cliente(models.Model):
+class Cliente(models.Model, GerenciadorLog):
     id_cliente_iter = models.IntegerField(primary_key=True)
     nome = models.CharField(max_length=70, null=False)
     nome_usuario = models.CharField(max_length=20, blank=False, null=True)
@@ -29,7 +29,6 @@ class Cliente(models.Model):
     dt_hr_inclusao = models.DateTimeField(blank=False, null=False, auto_now_add=True)
     ult_atualizacao = models.DateTimeField(blank=False, null=False, auto_now=True)
     id_signatario_contrato = models.CharField(max_length=100, null=True)
-    credencial = Credencial()
     
     def obter(self):
         try:
@@ -38,7 +37,7 @@ class Cliente(models.Model):
             if not retorno.estado.ok:
                 return retorno
 
-            retorno = Retorno(False, 'Cliente não cadastrado', 'NaoCadastrado', 406)
+            retorno = Retorno(False, self, 'Cliente não cadastrado', 'NaoCadastrado', 406)
             
             # Valida se o cliente já está cadastrado.
             lista_clientes = Cliente.objects.filter(cpf=self.cpf)
@@ -47,13 +46,12 @@ class Cliente(models.Model):
                 m_cliente = lista_clientes[0]
 
                 if m_cliente:
+                    self.definir_contexto(m_cliente)
+                    retorno = Retorno(True, self)
                     
-                    retorno = Retorno(True)
-                    
-                    if(self.credencial.chave_iter_cli and len(self.credencial.chave_iter_cli) > 0):
-                        m_cliente_iter = ClienteIter(self.credencial)
+                    if(self.credencial_iter.chave_iter_cli and len(self.credencial_iter.chave_iter_cli) > 0):
                         # Obtem o cadastro na Iter.
-                        retorno = m_cliente_iter.obter(m_cliente)
+                        retorno = self.o_cliente_iter.obter(m_cliente)
                         
                         if not retorno.estado.ok:
                             return retorno
@@ -61,25 +59,24 @@ class Cliente(models.Model):
                         m_cliente.converter_de_cliente_iter(retorno.json())
                         m_cliente.nome_usuario = m_cliente.nome_usuario
                     
-                    retorno.dados = m_cliente
+                    retorno.dados = self.definir_contexto(m_cliente)
             
             return retorno
         except Exception as e:
                      
-            retorno = Retorno(False, 'A consulta dos dados cadastrais falhou.', None, None, e)
+            retorno = Retorno(False, self, 'A consulta dos dados cadastrais falhou.', None, None, e)
             return retorno
 
     def obter_ultimo(self):
         try:
-            retorno = Retorno(False)
+            retorno = Retorno(False, self)
             # Valida se o cliente já está cadastrado.
             lista_clientes = Cliente.objects.filter()
             if lista_clientes:
                 m_cliente = lista_clientes[lista_clientes.count()-1]
-                if m_cliente:
-                    m_cliente_iter = ClienteIter(self.credencial)
+                if m_cliente:                    
                     # Obtem o cadastro na Iter.
-                    retorno = m_cliente_iter.obter(m_cliente)
+                    retorno = self.o_cliente_iter.obter(m_cliente)
                     
                     if not retorno.estado.ok:
                         return retorno
@@ -87,12 +84,12 @@ class Cliente(models.Model):
                     m_cliente.converter_de_cliente_iter(retorno.json())
                     m_cliente.nome_usuario = m_cliente.nome_usuario
                     
-                    retorno.dados = m_cliente
+                    retorno.dados = self.definir_contexto(m_cliente)
             
             return retorno
         except Exception as e:
                     
-            retorno = Retorno(False, 'A consulta dos dados cadastrais falhou.', None, None, e)
+            retorno = Retorno(False, self, 'A consulta dos dados cadastrais falhou.', None, None, e)
             return retorno
                 
     def incluir(self):
@@ -106,30 +103,26 @@ class Cliente(models.Model):
             retorno = Cliente.obter(self)
     
             if retorno.estado.excecao or (len(retorno.estado.codMensagem) > 0 and retorno.estado.codMensagem != 'NaoCadastrado'):
-                return Retorno(False, 
-                                'Erro ao validar cadastro. %s' % (retorno.estado.mensagem), 
+                return Retorno(False, self, 'Erro ao validar cadastro. %s' % (retorno.estado.mensagem), 
                                 retorno.estado.codMensagem, 
                                 retorno.estado.excecao)
             
             # Inclusao na Iter.
-            m_cliente_iter = ClienteIter(self.credencial)
-            retorno = m_cliente_iter.obter(self)
+            retorno = self.o_cliente_iter.obter(self)
             
             if not retorno.estado.ok and (retorno.estado.excecao or retorno.estado.httpStatus != 404):
-                return Retorno(False, 
-                                'Erro ao validar cadastro na Iter. %s' % (retorno.estado.mensagem), 
+                return Retorno(False, self, 'Erro ao validar cadastro na Iter. %s' % (retorno.estado.mensagem), 
                                 retorno.estado.codMensagem, 
                                 retorno.estado.excecao)
 
             # salva na base da Iter.
             elif retorno.estado.httpStatus == 404:
-                retorno = m_cliente_iter.incluir(self)
+                retorno = self.o_cliente_iter.incluir(self)
             else:
-                retorno = m_cliente_iter.alterar(self)
+                retorno = self.o_cliente_iter.alterar(self)
             
             if not retorno.estado.ok:
-                return Retorno(False, 
-                                'Erro ao efetivar cadastro na Iter. %s' % (retorno.estado.mensagem), 
+                return Retorno(False, self, 'Erro ao efetivar cadastro na Iter. %s' % (retorno.estado.mensagem), 
                                 retorno.estado.codMensagem, 
                                 retorno.estado.excecao)
 
@@ -139,13 +132,13 @@ class Cliente(models.Model):
             # salva na base da Trisafe
             self.save()
 
-            retorno = Retorno(True, 'Cadastro realizado com sucesso.', '', 200, None, retorno.credencial)
+            retorno = Retorno(True, self, 'Cadastro realizado com sucesso.', '', 200, None)
             retorno.dados = self
 
             return retorno
         except Exception as e:
                     
-            retorno = Retorno(False, 'A inclusão dos dados cadastrais falhou.', None, None, e)
+            retorno = Retorno(False, self, 'A inclusão dos dados cadastrais falhou.', None, None, e)
             return retorno
     
     def alterar(self):
@@ -163,12 +156,11 @@ class Cliente(models.Model):
             
             m_cliente = retorno.dados
             
-            if(self.credencial.chave_iter_cli and len(self.credencial.chave_iter_cli) > 0):
+            if(self.credencial_iter.chave_iter_cli and len(self.credencial_iter.chave_iter_cli) > 0):
                 self.id_cliente_iter = m_cliente.id_cliente_iter
 
                 # Alteracao na Iter.
-                m_cliente_iter = ClienteIter(self.credencial)
-                retorno = m_cliente_iter.alterar(self)
+                retorno = self.o_cliente_iter.alterar(self)
                 
                 if not retorno.estado.ok:
                     return retorno
@@ -178,13 +170,13 @@ class Cliente(models.Model):
             m_cliente.id_signatario_contrato = self.id_signatario_contrato
             m_cliente.save()
             
-            retorno = Retorno(True, 'Cadastro atualizado com sucesso.', '', 200, None, retorno.credencial)
+            retorno = Retorno(True, self, 'Cadastro atualizado com sucesso.', '', 200, None)
             retorno.dados = m_cliente
 
             return retorno
         except Exception as e:
                     
-            retorno = Retorno(False, 'A atualização dos dados cadastrais falhou.', None, None, e)
+            retorno = Retorno(False, self, 'A atualização dos dados cadastrais falhou.', None, None, e)
             return retorno
 
     def salvar_foto_cnh(self, foto_cnh_base64):
@@ -205,12 +197,12 @@ class Cliente(models.Model):
             file.write(foto_cnh)
             file.close()
 
-            retorno = Retorno(True, 'CNH recebida com sucesso.', 200, None)
+            retorno = Retorno(True, self, 'CNH recebida com sucesso.', 200, None)
 
             return retorno
         except Exception as e:
                     
-            retorno = Retorno(False, 'A inclusão da foto da CNH falhou.', None, None, e)
+            retorno = Retorno(False, self, 'A inclusão da foto da CNH falhou.', None, None, e)
             return retorno
     
     def converter_de_cliente_iter(self, d_cliente_iter):
@@ -233,9 +225,9 @@ class Cliente(models.Model):
 
     def validar_dados_obrigatorios_chaves(self):
         if len(str(self.cpf).strip()) <= 0 and len(str(self.email).strip()) <= 0:
-            return Retorno(False, "Informe o CPF e/ou E-Mail.", 406)
+            return Retorno(False, self, "Informe o CPF e/ou E-Mail.", 406)
 
-        return Retorno(True)
+        return Retorno(True, self)
     
     def validar_dados_obrigatorios(self):
         
@@ -245,8 +237,8 @@ class Cliente(models.Model):
             return retorno
 
         if len(str(self.nome).strip()) <= 0:
-            return Retorno(False, "Informe o nome.", 406)
-        return Retorno(True)
+            return Retorno(False, self, "Informe o nome.", 406)
+        return Retorno(True, self)
     
     def json(self):
         return self.__criar_json__()
@@ -267,7 +259,7 @@ class Cliente(models.Model):
             "uf": self.uf,
             "telefone": self.telefone,
             "email": self.email,
-            'id_signatario_contrato': self.id_signatario_contrato
+            'id_signatario_contrato': self.id_signatario_contrato,
             }
         return ret
 

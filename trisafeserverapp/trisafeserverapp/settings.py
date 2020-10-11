@@ -25,7 +25,7 @@ SECRET_KEY = '4coujo21&xdamy+in7!lwakm%@u*-%jz_ou4qgbqe1)zktrkqz'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["192.168.43.84", "192.168.0.104", "192.168.0.104", "localhost"]
+ALLOWED_HOSTS = ["192.168.43.84", "192.168.0.110", "192.168.0.110", "localhost"]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'cliente',
     'clienteiter',
+    'veiculo',
     'produto',
     'contrato',
     'contratoclicksign',
@@ -97,7 +98,7 @@ LOGGING = {
     'disable_existing_loggers': True,
     'formatters': {
         'verbose': {
-            'format': '{levelname} {asctime} [pid: {process:d}] [tid: {thread:d}] [{pathname} : {funcName}(): {lineno}]  >  {message}',
+            'format': '{levelname} {asctime} [pid: {process:d}] [tid: {thread:d}] [{pathname} : {funcName}(): {lineno}] {message}',
             'style': '{',
         },
         'simple': {

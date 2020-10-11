@@ -18,6 +18,7 @@ from django.urls import path
 from django.contrib import admin
 from django.conf.urls import url
 from cliente.views import ClienteViewSet
+from veiculo.views import VeiculoViewSet
 from produto.views import ProdutoViewSet
 from boletogerencianet.views import BoletoViewSet
 from contrato.views import ContratoViewSet
@@ -35,6 +36,10 @@ router.register(r'clientes/incluir/', ClienteViewSet)
 router.register(r'clientes/alterar/', ClienteViewSet)
 router.register(r'clientes/obter/', ClienteViewSet)
 router.register(r'clientes/obter_ultimo/', ClienteViewSet)
+router.register(r'veiculos', VeiculoViewSet)
+router.register(r'veiculos/incluir/', VeiculoViewSet)
+router.register(r'veiculos/obter/', VeiculoViewSet)
+router.register(r'veiculos/listar_por_cliente/', VeiculoViewSet)
 router.register(r'produtos', ProdutoViewSet)
 router.register(r'produtos/listar', ProdutoViewSet)
 router.register(r'produtos/contratar', ProdutoViewSet)

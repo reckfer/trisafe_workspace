@@ -12,13 +12,12 @@ import {
     View,
     Text, Dimensions
 } from 'react-native';
-import ComunicacaoHTTP from '../common/ComunicacaoHTTP';
 import { Button } from 'react-native-elements';
 import Cabecalho from '../common/CabecalhoTela';
 import { styles } from '../common/Estilos';
 import AreaRodape from '../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
-import Util, { inicializarContextoComum } from '../common/Util';
+import { inicializarContextoComum } from '../common/Configuracao';
 import Orientation from 'react-native-orientation';
 import WebView from 'react-native-webview';
 import Pdf from 'react-native-pdf';
@@ -55,9 +54,12 @@ export default class TelaModalContratoClicksign extends Component {
         try {
             let metodoURI = '/contratos/incluir_com_signatario/';
 
-            let oDadosParametros = JSON.stringify(this.state);
+            let oDadosRequisicao = {
+                cliente: this.oDadosCliente,
+                contrato: this.oDadosContrato,
+            }
             
-            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarIncluirContrato);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosRequisicao, this.tratarIncluirContrato);
         } catch (oExcecao) {
             this.oUtil.tratarExcecao(oExcecao);
         }
@@ -125,9 +127,12 @@ export default class TelaModalContratoClicksign extends Component {
         try {
             let metodoURI = '/contratos/aceitar/';
             
-            let oDadosParametros = JSON.stringify(this.state);
+            let oDadosRequisicao = {
+                cliente: this.oDadosCliente,
+                contrato: this.oDadosContrato,
+            }
 
-            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.tratarDadosRetorno);
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosRequisicao, this.tratarDadosRetorno);
 
         } catch (oExcecao) {
             this.oUtil.tratarExcecao(oExcecao);

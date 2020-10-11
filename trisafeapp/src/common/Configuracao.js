@@ -47,16 +47,14 @@ export default class Configuracao {
 
                 let metodoURI = '/autenticacoestrisafe/autenticar_cliente/';
                 
-                let oDadosChaves = {
+                let oDadosRequisicao = {
                     // Clona o objeto de chaves, para não manter a credencial_secundaria (atribuida abaixo) na instancia original do objeto.
-                    'chaves' : clonarObjeto(this.oDadosChaves)
+                    chaves: clonarObjeto(this.oDadosChaves),
                 }
                 // Credencial secundaria.
-                oDadosChaves.chaves.credencial_secundaria = 'gAAAAABfQRrm33-jDVGFyH0c2pbFeAjh2oCjwq4xtdhMvDUES2v-9MJiBQjgbrjjQvHL468V-KT1MUDD_JEAODLS1KJaW_sNb5PZb0Xp00Ow3VknOcYnP1zlyjXbGU8IR3-jeqmDosXk-C35XkRePBrQeMwQ9jtJXQ==';
-
-                let oDadosParametros = JSON.stringify(oDadosChaves);
-
-                this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosParametros, this.apropriarToken, false, false);
+                oDadosRequisicao.chaves.credencial_secundaria = 'gAAAAABfQRrm33-jDVGFyH0c2pbFeAjh2oCjwq4xtdhMvDUES2v-9MJiBQjgbrjjQvHL468V-KT1MUDD_JEAODLS1KJaW_sNb5PZb0Xp00Ow3VknOcYnP1zlyjXbGU8IR3-jeqmDosXk-C35XkRePBrQeMwQ9jtJXQ==';
+                
+                this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosRequisicao, this.apropriarToken, false, false);
             }
         } catch (oExcecao) {
             this.oUtil.tratarExcecao(oExcecao);
@@ -65,7 +63,14 @@ export default class Configuracao {
 
     apropriarToken(oDados, oEstado) {
         this.oDadosInstrucao.texto_instrucao = 'A autenticação com o servidor falhou.';
-
+        
+        console.log('dados_token: ', oDados);
+        
+        if(oDados) {
+            if(oDados.token_trisafe) {
+                this.oDadosChaves.token_trisafe = oDados.token_trisafe;
+            }
+        }
         if(oEstado && oEstado.ok && 
             this.oDadosChaves && 
             this.oDadosChaves.token_trisafe && 

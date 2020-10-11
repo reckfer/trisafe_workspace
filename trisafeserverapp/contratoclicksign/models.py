@@ -1,5 +1,7 @@
 from decouple import config
 from django.db import models
+
+from gerenciadorlog.models import GerenciadorLog
 from comum.retorno import Retorno
 from comum.credencial import Credencial
 from datetime import date
@@ -9,16 +11,16 @@ import logging
 
 logger_servidor_app_fluxo = logging.getLogger('servidor.app.fluxo')
 
-class ContratoClicksign(models.Model):
+class ContratoClicksign(models.Model, GerenciadorLog):
     
-    def __init__(self, credencial_cliente):
-        self.credencial = None
+    def __init__(self, objeto_contexto):
         self.headers_clicksign = None
         self.querystring_access_token = None
         self.retorno_autenticacao = None
         self.chave_template_contrato = None
 
-        self.__autenticar_clicksign(credencial_cliente)
+        objeto_contexto.definir_contexto(self)
+        self.__autenticar_clicksign()
 
     def obter(self, chave_doc):
 
@@ -43,7 +45,7 @@ class ContratoClicksign(models.Model):
         if 'document' in d_dados_doc:
             retorno.dados = d_dados_doc['document']
         else:
-            retorno = Retorno(False, 'Não foi possível obter o documento do contrato. Os dados retornaram vazios', '', 404)
+            retorno = Retorno(False, self, 'Não foi possível obter o documento do contrato. Os dados retornaram vazios', '', 404)
 
         return retorno
     
@@ -71,10 +73,10 @@ class ContratoClicksign(models.Model):
                         tem_url = True
 
         if tem_url:
-            retorno = Retorno(True)
+            retorno = Retorno(True, self)
             retorno.dados = url
         else:
-            retorno = Retorno(False, 'Não foi possível obter o documento do contrato. Os dados retornaram vazios', '', 404)
+            retorno = Retorno(False, self, 'Não foi possível obter o documento do contrato. Os dados retornaram vazios', '', 404)
 
         return retorno
 
@@ -102,10 +104,10 @@ class ContratoClicksign(models.Model):
     #                     tem_url = True
 
     #     if tem_url:
-    #         retorno = Retorno(True)
+    #         retorno = Retorno(True, self)
     #         retorno.dados = url
     #     else:
-    #         retorno = Retorno(False, 'Não foi possível obter o documento do contrato. Os dados retornaram vazios', '', 404)
+    #         retorno = Retorno(False, self, 'Não foi possível obter o documento do contrato. Os dados retornaram vazios', '', 404)
 
     #     return retorno
 
@@ -153,10 +155,10 @@ class ContratoClicksign(models.Model):
                         tem_chave = True
 
         if tem_chave:
-            retorno = Retorno(True)
+            retorno = Retorno(True, self)
             retorno.dados = chave_signatario
         else:
-            retorno = Retorno(False, 'Não foi possível obter o documento do contrato. Os dados retornaram vazios', '', 404)
+            retorno = Retorno(False, self, 'Não foi possível obter o documento do contrato. Os dados retornaram vazios', '', 404)
 
         return retorno
     
@@ -190,10 +192,10 @@ class ContratoClicksign(models.Model):
                         tem_chave = True
 
         if tem_chave:
-            retorno = Retorno(True, '', 'SignatarioCadastrado')
+            retorno = Retorno(True, self, '', 'SignatarioCadastrado')
             retorno.dados = chave_requisicao_assinatura
         else:
-            retorno = Retorno(False, 'Não foi possível obter o documento do contrato. Os dados retornaram vazios', '', 404)
+            retorno = Retorno(False, self, 'Não foi possível obter o documento do contrato. Os dados retornaram vazios', '', 404)
 
         return retorno
     
@@ -227,10 +229,10 @@ class ContratoClicksign(models.Model):
         #                 tem_chave = True
 
         # if tem_chave:
-        #     retorno = Retorno(True)
+        #     retorno = Retorno(True, self)
         #     retorno.dados = chave_requisicao_assinatura
         # else:
-        #     retorno = Retorno(False, 'Não foi possível obter o documento do contrato. Os dados retornaram vazios', '', 404)
+        #     retorno = Retorno(False, self, 'Não foi possível obter o documento do contrato. Os dados retornaram vazios', '', 404)
 
         return retorno
     
@@ -259,10 +261,10 @@ class ContratoClicksign(models.Model):
                         tem_chave = True
 
         if tem_chave:
-            retorno = Retorno(True)
+            retorno = Retorno(True, self)
             retorno.dados = chave_signatario
         else:
-            retorno = Retorno(False, 'Não foi possível obter o documento do contrato. Os dados retornaram vazios', '', 404)
+            retorno = Retorno(False, self, 'Não foi possível obter o documento do contrato. Os dados retornaram vazios', '', 404)
 
         return retorno
     
@@ -374,20 +376,15 @@ class ContratoClicksign(models.Model):
     
     def __tratarRespostaHTTP(self, respostaHTTP):
         
-        json_dados = self.__obterJsonBodyHTTP(respostaHTTP.text)
-        
         if respostaHTTP.status_code < 200 or respostaHTTP.status_code > 300:
             
-            logger_servidor_app_fluxo.error('RespostaHTTP Clicksign Erro: %s' % respostaHTTP.text)
+            mensagem_erro = self.__extrairMensagemErro(respostaHTTP.text)
 
-            mensagem_erro = self.__extrairMensagemErro(json_dados)
-
-            retorno = Retorno(False, 'Erro de comunicação com a Clicksign. %s' % mensagem_erro, 'ErroComunicacaoClicksign', respostaHTTP.status_code)
+            retorno = Retorno(False, self, 'Erro de comunicacao com a Clicksign. %s' % mensagem_erro, 'ErroComunicacaoClicksign', respostaHTTP.status_code)
         else:
             dadosRetorno = respostaHTTP.text
-            logger_servidor_app_fluxo.info('RespostaHTTP Clicksign Sucesso: %s' % dadosRetorno)
-
-            retorno = Retorno(True)
+            
+            retorno = Retorno(True, self)
             
             if(dadosRetorno):
                 dadosRetorno = respostaHTTP.json()
@@ -398,13 +395,15 @@ class ContratoClicksign(models.Model):
                 # nao localizado
                 retorno = Retorno(False, respostaHTTP.text, '', 404)
 
+        self.registrar_retorno(retorno, 'Retorno da Clicksign.')
         return retorno
 
-    def __extrairMensagemErro(self, d_dados_retorno):
+    def __extrairMensagemErro(self, dados_retorno_http):
         texto_erro = ''
-
-        if('errors' in d_dados_retorno):            
-            d_erros = d_dados_retorno['errors']
+        json_dados = self.__obterJsonBodyHTTP(dados_retorno_http)
+        
+        if('errors' in json_dados):            
+            d_erros = json_dados['errors']
             
             if isinstance(d_erros, list):
                 if len(d_erros) > 0:
@@ -415,54 +414,52 @@ class ContratoClicksign(models.Model):
                         texto_erro = d_mensagem['message']
                     else:
                         texto_erro = d_mensagem
+            else:
+                texto_erro = json.dumps(json_dados)
 
         return texto_erro
 
     def __obterJsonBodyHTTP(self, texto):
-        json_texto = texto
+        json_dados = texto
 
-        if(texto and len(texto) > 0):
+        if(texto and isinstance(texto, str) and len(texto) > 0):
             try:
-                json_texto = json.loads(texto)
+                json_dados = json.loads(texto)
 
             except Exception:
+                json_dados = {}
                 pass
 
-        return json_texto
+        return json_dados
 
-    def __autenticar_clicksign(self, credencial_cliente):
+    def __autenticar_clicksign(self):
         self.headers_clicksign = None
-        chave_clicksign_cliente = credencial_cliente.chave_clicksign_cli
+        chave_clicksign_cliente = ''
         chave_clicksign_servidor = config('CHAVE_CLICKSIGN')
         token_clicksign = ''
 
-        if(credencial_cliente):
-            token_clicksign = credencial_cliente.token_clicksign
+        if(self.credencial_clicksign):
+            chave_clicksign_cliente = self.credencial_clicksign.chave_clicksign_cli
+            token_clicksign = self.credencial_clicksign.token_clicksign
         
         # Cria uma credencial completa, com a chave parcial do servidor, 
-        # pois o parametro "credencial_cliente" vem soh com a chave parcial do cliente.
-        self.credencial = Credencial(chave_clicksign_cliente, chave_clicksign_servidor)
-        self.credencial.token_clicksign = token_clicksign
+        # pois o atributo "self.credencial_clicksign" vem soh com a chave parcial do cliente.
+        self.credencial_clicksign = Credencial(chave_clicksign_cliente, chave_clicksign_servidor)
+        self.credencial_clicksign.token_clicksign = token_clicksign
 
-        retorno = Retorno(True)
+        retorno = Retorno(True, self)
         
-        if self.credencial.token_clicksign and len(self.credencial.token_clicksign) > 0:
-            
-            retorno.credencial = self.credencial
-            
-        else:
+        if not self.credencial_clicksign.token_clicksign or len(self.credencial_clicksign.token_clicksign) <= 0:
             # Le o token criptografado do arquivo e atribui para a credencial.
             arquivo_iter = open('.env_access_clicksign', 'rb')
             
             token_clicksign = arquivo_iter.read()
 
             if(token_clicksign):
-                self.credencial.token_clicksign = token_clicksign
+                self.credencial_clicksign.token_clicksign = token_clicksign
 
-        
-
-        retorno.credencial = self.credencial
-        token = self.credencial.get_token_clicksign()
+        retorno.dados = self.credencial_clicksign
+        token = self.credencial_clicksign.get_token_clicksign()
         
         self.headers_clicksign = {
             'Accept' : 'application/json',

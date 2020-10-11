@@ -84,6 +84,9 @@ export default class GerenciadorContextoApp {
         oComponente.oDadosApp = this.dadosApp;
         oComponente.oDadosControleApp = this.dadosControleApp;
         oComponente.oDadosInstrucao = this.instrucaoUsuarioApp;
+        oComponente.oDadosCliente = this.dadosApp.cliente;
+        oComponente.oDadosVeiculoAtual = this.dadosApp.veiculo_atual;
+        oComponente.oDadosVeiculos = this.dadosApp.veiculos;
         oComponente.oDadosContrato = this.dadosApp.contrato;
         oComponente.oDadosChaves = this.dadosApp.chaves;
         oComponente.oDadosDispositivo = this.dadosApp.dados_dispositivo;

@@ -155,8 +155,6 @@ export default class RegistradorLog {
 
     transportar() {
         try {
-
-            // let a = this.a.c;
             if(!this.enviando && !this.indEnviandoEmContingencia && this.oRegistrosLogs.length > 0) {
                 this.enviando = true;
 

@@ -4,6 +4,8 @@ import traceback
 from datetime import date
 from django.db import models
 from rest_framework import status
+
+from gerenciadorlog.models import GerenciadorLog
 from comum.retorno import Retorno
 from gerencianet import Gerencianet
 
@@ -13,7 +15,7 @@ credentials = {
     'sandbox': True
 }
 
-class TransacaoGerenciaNet(models.Model):
+class TransacaoGerenciaNet(models.Model, GerenciadorLog):
     
     def __init__(self):
         self.id = None
@@ -34,7 +36,7 @@ class TransacaoGerenciaNet(models.Model):
 
         except Exception as e:
                     
-            retorno = Retorno(False, 'A inclusão de transação para boleto falhou.', None, None, e)
+            retorno = Retorno(False, self, 'A inclusão de transação para boleto falhou.', None, None, e)
             return retorno
 
     def converter_de_gerencia_net(self, d_dados_charge):
@@ -49,7 +51,7 @@ class TransacaoGerenciaNet(models.Model):
         return self.__criar_json__()
     
     def tratar_retorno_gerencia_net(self, d_charge):
-        retorno = Retorno(True)
+        retorno = Retorno(True, self)
 
         if d_charge:
             if 'error_description' in d_charge:
@@ -60,7 +62,7 @@ class TransacaoGerenciaNet(models.Model):
                     msg_erro = d_error['message']
 
                 if(d_error):
-                    retorno = Retorno(False, msg_erro, d_charge['error'])
+                    retorno = Retorno(False, self, msg_erro, d_charge['error'])
                     return retorno
                     
             elif 'data' in d_charge:
@@ -68,10 +70,10 @@ class TransacaoGerenciaNet(models.Model):
                 if d_dados_charge:
                     self.converter_de_gerencia_net(d_dados_charge)
                 else:
-                    retorno = Retorno(False, 'Os dados de geração do boleto foram retornados vazios.')
+                    retorno = Retorno(False, self, 'Os dados de geração do boleto foram retornados vazios.')
 
         else:
-            retorno = Retorno(False, 'O objeto retornado na geração do boleto está vazio.')
+            retorno = Retorno(False, self, 'O objeto retornado na geração do boleto está vazio.')
 
         return retorno
         

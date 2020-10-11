@@ -5,10 +5,10 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import mixins
 from cliente.models import Cliente
-from gerenciadorlog.views import GerenciadorLogViewSet
 from rest_framework.renderers import JSONRenderer
 from comum.retorno import Retorno
 from comum.credencial import Credencial
+from clienteiter.models import ClienteIter
 from autenticacaotrisafe.views import AutenticacaoTriSafeViewSet
 import json
 import traceback
@@ -23,151 +23,109 @@ class ClienteSerializer(serializers.HyperlinkedModelSerializer):
 class ClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissions.BasePermission):
     queryset = Cliente.objects.all()
     serializer_class = ClienteSerializer
-
-    # def initialize_request(self, request, *args, **kwargs):
-        
-    #     r = super().initialize_request(request, *args, **kwargs)
-    #     return r
     
+    def inicializar_contexto(self, request):
+        super().inicializar_contexto(request)
+        
+        self.m_cliente = Cliente()
+        self.definir_contexto(self.m_cliente)
+        self.m_cliente.o_cliente_iter = ClienteIter(self.m_cliente)
+
     @action(detail=False, methods=['post'])
     def obter(self, request):
         try:
-            v_gerenciador_log = GerenciadorLogViewSet()
-            v_gerenciador_log.registrar_do_cliente(request)
-
-            m_cliente = ClienteViewSet.apropriar_dados_http_chave(request)
-            m_cliente.credencial = ClienteViewSet.apropriar_credenciais_iter_http(request)
-
-            retorno_cliente = m_cliente.obter()
+            self.apropriar_dados_http_chave(request.data)
+            
+            retorno_cliente = self.m_cliente.obter()
             return retorno_cliente.gerar_resposta_http()
             
         except Exception as e:
                     
-            retorno = Retorno(False, 'A consulta dos dados cadastrais falhou.', None, None, e)
+            retorno = Retorno(False, self, 'A consulta dos dados cadastrais falhou.', None, None, e)
             return retorno.gerar_resposta_http()
     
     @action(detail=False, methods=['post'])
     def obter_ultimo(self, request):
         try:
-            v_gerenciador_log = GerenciadorLogViewSet()
-            v_gerenciador_log.registrar_do_cliente(request)
+            self.apropriar_dados_http(request.data)
 
-            m_cliente = ClienteViewSet.apropriar_dados_http(request)
-            m_cliente.credencial = ClienteViewSet.apropriar_credenciais_iter_http(request)
-
-            retorno_cliente = m_cliente.obter_ultimo()
+            retorno_cliente = self.m_cliente.obter_ultimo()
             
             return retorno_cliente.gerar_resposta_http()
 
         except Exception as e:
                     
-            retorno = Retorno(False, 'A consulta dos dados cadastrais falhou.', None, None, e)
+            retorno = Retorno(False, self, 'A consulta dos dados cadastrais falhou.', None, None, e)
             return retorno.gerar_resposta_http()
 
     @action(detail=False, methods=['post'])
     def incluir(self, request):
         try:
-            v_gerenciador_log = GerenciadorLogViewSet()
-            v_gerenciador_log.registrar_do_cliente(request)
+            self.apropriar_dados_http(request.data)
             
-            m_cliente = ClienteViewSet.apropriar_dados_http(request)
-            m_cliente.credencial = ClienteViewSet.apropriar_credenciais_iter_http(request)
-            
-            retorno = m_cliente.incluir()
+            retorno = self.m_cliente.incluir()
 
             return retorno.gerar_resposta_http()
 
         except Exception as e:
                     
-            retorno = Retorno(False, 'A inclusão dos dados cadastrais falhou.', None, None, e)
+            retorno = Retorno(False, self, 'A inclusão dos dados cadastrais falhou.', None, None, e)
             return retorno.gerar_resposta_http()
 
     @action(detail=False, methods=['post'])
     def alterar(self, request):
         try:
-            v_gerenciador_log = GerenciadorLogViewSet()
-            v_gerenciador_log.registrar_do_cliente(request)
+            self.apropriar_dados_http(request.data)
             
-            m_cliente = ClienteViewSet.apropriar_dados_http(request)
-            m_cliente.credencial = ClienteViewSet.apropriar_credenciais_iter_http(request)
-            
-            retorno = m_cliente.alterar()
+            retorno = self.m_cliente.alterar()
 
             return retorno.gerar_resposta_http()
 
         except Exception as e:
                     
-            retorno = Retorno(False, 'A atualização dos dados cadastrais falhou.', None, None, e)
+            retorno = Retorno(False, self, 'A atualização dos dados cadastrais falhou.', None, None, e)
             return retorno.gerar_resposta_http()
 
     @action(detail=False, methods=['post'])
     def salvar_foto_cnh(self, request):
         try:
-            v_gerenciador_log = GerenciadorLogViewSet()
-            v_gerenciador_log.registrar_do_cliente(request)
+            self.apropriar_dados_http_chave(request.data)
 
-            m_cliente = ClienteViewSet.apropriar_dados_http_chave(request)
-            foto_cnh_base64 = ClienteViewSet.apropriar_dados_http_foto_cnh(request)
-
-            retorno_cliente = m_cliente.salvar_foto_cnh(foto_cnh_base64)
+            foto_cnh_base64 = self.apropriar_dados_http_foto_cnh(request.data)
+            retorno_cliente = self.m_cliente.salvar_foto_cnh(foto_cnh_base64)
             
             return retorno_cliente.gerar_resposta_http()
         except Exception as e:
                     
-            retorno = Retorno(False, 'A inclusão da foto CNH falhou.', None, None, e)
+            retorno = Retorno(False, self, 'A inclusão da foto CNH falhou.', None, None, e)
             return retorno.gerar_resposta_http()
 
-    @classmethod
-    def apropriar_dados_http_chave(cls, request):
-        m_cliente = Cliente()
+    def apropriar_dados_http_chave(self, d_dados_requisicao):
         
-        d_dados_app = request.data['dados_app']
-        d_cliente = d_dados_app['cliente']
-        m_cliente.cpf = d_cliente['cpf']
-        m_cliente.email = d_cliente['email']
-    
-        return m_cliente
+        d_cliente = d_dados_requisicao['cliente']
 
-    @classmethod
-    def apropriar_dados_http(cls, request):
-        m_cliente = ClienteViewSet.apropriar_dados_http_chave(request)
-        
-        d_dados_app = request.data['dados_app']
-        d_cliente = d_dados_app['cliente']
-        m_cliente.nome = d_cliente['nome']
-        m_cliente.nome_usuario = d_cliente['nome_usuario']
-        m_cliente.rua = d_cliente['rua']
-        m_cliente.telefone = d_cliente['telefone']
-        m_cliente.numero = d_cliente['numero']
-        m_cliente.bairro = d_cliente['bairro']
-        m_cliente.cidade = d_cliente['cidade']
-        m_cliente.complemento = d_cliente['complemento']
-        m_cliente.cep = d_cliente['cep']
-        m_cliente.uf = d_cliente['uf']
-        return m_cliente
+        self.m_cliente.cpf = d_cliente['cpf']
+        self.m_cliente.email = d_cliente['email']
     
-    @classmethod
-    def apropriar_credenciais_iter_http(cls, request):
-        chave_iter = ''
-        token_iter = ''
+    def apropriar_dados_http(self, d_dados_requisicao):
         
-        d_dados_app = request.data['dados_app']
-        if 'chaves' in d_dados_app:
-            d_chaves = d_dados_app['chaves']
-            chave_iter = d_chaves['chave_iter']
-            token_iter = d_chaves['token_iter']
-
-        credencial = Credencial(chave_iter, '')
-        credencial.token_iter = token_iter
-
-        return credencial
-    
-    @classmethod
-    def apropriar_dados_http_foto_cnh(cls, request):
-        m_cliente = Cliente()
+        self.apropriar_dados_http_chave(d_dados_requisicao)
         
-        d_dados_app = request.data['dados_app']
-        d_fotos = d_dados_app['fotos']
+        d_cliente = d_dados_requisicao['cliente']
+        self.m_cliente.nome = d_cliente['nome']
+        self.m_cliente.nome_usuario = d_cliente['nome_usuario']
+        self.m_cliente.rua = d_cliente['rua']
+        self.m_cliente.telefone = d_cliente['telefone']
+        self.m_cliente.numero = d_cliente['numero']
+        self.m_cliente.bairro = d_cliente['bairro']
+        self.m_cliente.cidade = d_cliente['cidade']
+        self.m_cliente.complemento = d_cliente['complemento']
+        self.m_cliente.cep = d_cliente['cep']
+        self.m_cliente.uf = d_cliente['uf']
+        
+    def apropriar_dados_http_foto_cnh(self, d_dados_requisicao):
+        
+        d_fotos = d_dados_requisicao['fotos']
         foto_cnh_base64 = d_fotos['foto_cnh_base64']
     
         return foto_cnh_base64

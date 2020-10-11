@@ -6,9 +6,10 @@ from django.http.response import HttpResponse
 from rest_framework import routers, serializers, viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework import mixins
-from gerenciadorlog.models import GerenciadorLog
 from contrato.models import Contrato
 from rest_framework.renderers import JSONRenderer
+
+from gerenciadorlog.models import GerenciadorLog
 from comum.retorno import Retorno
 import json
 import traceback
@@ -21,62 +22,47 @@ class GerenciadorLogSerializer(serializers.HyperlinkedModelSerializer):
         model = GerenciadorLog
         fields = ()
 
-# Get an instance of a logger
-logger_servidor_app_fluxo = logging.getLogger('servidor.app.fluxo')
-
 # ViewSets define the view behavior.
-class GerenciadorLogViewSet(viewsets.ModelViewSet, permissions.BasePermission):
+class GerenciadorLogViewSet(viewsets.ModelViewSet, permissions.BasePermission, GerenciadorLog):
     queryset = Contrato.objects.all() # Adequar esta queryset
     serializer_class = GerenciadorLogSerializer
     
+    # Sobrescreve para fazer autenticacao com a Trisafe.
+    def initial(self, request, *args, **kwargs):
+        init = super().initial(request, *args, **kwargs)
+      
+        self.inicializar_contexto(request)
+        
+        return init
+
+    # Sobrescreve para capturar erros de autenticacao com a Trisafe.
+    def handle_exception(self, exc):
+
+        mensagem = ''
+        if exc and len(exc.args) > 0:
+            mensagem = exc.args[0]
+        
+        response = super().handle_exception(exc)
+
+        retorno = Retorno(False, self, mensagem, '', response.status_code, exc)
+
+        return retorno.gerar_resposta_http()
+
     @action(detail=False, methods=['post'])
     def registrar_do_cliente(self, request):
         try:
-            logger_servidor_app_fluxo.debug('iniciou')
+            retorno = Retorno(True, self)
 
-            retorno = Retorno(True)
             if 'registros_log' in request.data:
-                m_gerenciador_log = GerenciadorLog()
-                
                 d_registros_log = request.data['registros_log']
             
-                if(len(d_registros_log) > 0):
-
-                    d_registro_inicial = [{
-                        'data_hora' : '',
-                        'mensagem_log' : ''
-                    },
-                    {
-                        'data_hora' : '',
-                        'mensagem_log' : '++++++++ REGISTROS DO CLIENTE - INICIO +++++++'
-                    },
-                    {
-                        'data_hora' : '',
-                        'mensagem_log' : ''
-                    }]
-                    retorno = m_gerenciador_log.registrar(d_registro_inicial)
-                    
-                    retorno = m_gerenciador_log.registrar(d_registros_log)
-                    
-                    d_registro_final = [{
-                        'data_hora' : '',
-                        'mensagem_log' : ''
-                    },
-                    {
-                        'data_hora' : '',
-                        'mensagem_log' : '-------- REGISTROS DO CLIENTE - FIM --------'
-                    },
-                    {
-                        'data_hora' : '',
-                        'mensagem_log' : ''
-                    }]
-                    retorno = m_gerenciador_log.registrar(d_registro_final)
+            m_gerenciador_log = self.definir_contexto(GerenciadorLog())
+        
+            retorno = m_gerenciador_log.registrar_do_cliente(d_registros_log)
             
-            logger_servidor_app_fluxo.debug('finalizou')
-
             return retorno.gerar_resposta_http()
             
         except Exception as e:
                     
-            retorno = Retorno(False, 'O registro de log do cliente falhou.', None, None, e)
+            retorno = Retorno(False, self, 'O registro de log do cliente falhou.', None, None, e)
             return retorno.gerar_resposta_http()
