@@ -125,7 +125,7 @@ class ClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
         
     def apropriar_dados_http_foto_cnh(self, d_dados_requisicao):
         
-        d_fotos = d_dados_requisicao['fotos']
+        d_fotos = d_dados_requisicao['foto']
         foto_cnh_base64 = d_fotos['foto_cnh_base64']
     
         return foto_cnh_base64

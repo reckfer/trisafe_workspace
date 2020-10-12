@@ -5,9 +5,9 @@ import base64
 from django.db import models
 from rest_framework import status
 from clienteiter.models import ClienteIter
-from trisafeserverapp.settings import BASE_DIR
 from gerenciadorlog.models import GerenciadorLog
 from comum.retorno import Retorno
+from trisafeserverapp.settings import BASE_DIR
 import os
 
 class Cliente(models.Model, GerenciadorLog):

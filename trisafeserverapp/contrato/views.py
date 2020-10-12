@@ -213,13 +213,13 @@ class ContratoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permiss
         m_contrato = self.definir_contexto(Contrato())
         m_contrato.id_contrato = d_contrato['id_contrato']
 
-        m_cliente = self.extrair_cliente_dados_http(d_contrato)
+        m_cliente = self.apropriar_cliente_dados_http(d_contrato)
         
         m_contrato.cliente = m_cliente
 
         return m_contrato
     
-    def extrair_cliente_dados_http(self, d_contrato):
+    def apropriar_cliente_dados_http(self, d_contrato):
         m_cliente = self.definir_contexto(Cliente())
 
         d_cliente = d_contrato['cliente']

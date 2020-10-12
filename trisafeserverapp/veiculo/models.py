@@ -1,11 +1,17 @@
 import json
 import sys
 import traceback
+import base64
+import PIL
+from PIL import Image
+from django.core.files.storage import FileSystemStorage
 from django.db import models
 from rest_framework import status
 from cliente.models import Cliente
 from gerenciadorlog.models import GerenciadorLog
 from comum.retorno import Retorno
+from trisafeserverapp.settings import BASE_DIR
+import os
 
 class Veiculo(models.Model, GerenciadorLog):
 
@@ -21,13 +27,13 @@ class Veiculo(models.Model, GerenciadorLog):
     
     def incluir(self):
         try:
-            retorno = self.validar_dados_obrigatorios(self)
+            retorno = self.validar_dados_obrigatorios()
             
             if not retorno.estado.ok:
                 return retorno
 
             # Valida se o veiculo já está cadastrado.
-            retorno = self.obter(self)
+            retorno = self.obter()
 
             if retorno.estado.codMensagem != 'NaoCadastrado':
                 return retorno
@@ -35,6 +41,33 @@ class Veiculo(models.Model, GerenciadorLog):
             self.save()
             
             retorno = Retorno(True, self, 'Cadastro realizado com sucesso.', 200)
+            retorno.dados = self
+
+            return retorno
+        except Exception as e:
+                    
+            retorno = Retorno(False, self, 'A inclusão dos dados cadastrais do veículo falhou.', None, None, e)
+            return retorno
+        
+    def alterar(self):
+        try:
+            retorno = self.validar_dados_obrigatorios()
+            
+            if not retorno.estado.ok:
+                return retorno
+
+            # Valida se o veiculo já está cadastrado.
+            retorno = self.obter()
+
+            if not retorno.estado.ok:
+                return retorno
+
+            vaiculo_cadastrado = retorno.dados
+            self.cliente = vaiculo_cadastrado.cliente
+            self.dt_hr_inclusao = vaiculo_cadastrado.dt_hr_inclusao
+            self.save()
+            
+            retorno = Retorno(True, self, 'Cadastro atualizado com sucesso.', 200)
             retorno.dados = self
 
             return retorno
@@ -83,6 +116,51 @@ class Veiculo(models.Model, GerenciadorLog):
             retorno = Retorno(False, self, 'A consulta aos veículos do cliente falhou.', None, None, e)
             return retorno
     
+    def salvar_foto_doc(self, foto_doc_base64):
+        try:
+            # Valida se o veiculo já está cadastrado.
+            retorno = self.obter()
+
+            if not retorno.estado.ok:
+                return retorno
+            
+            self.cliente = retorno.dados.cliente
+            
+            nome_arquivo = "foto_doc_%s.jpg" % self.cliente.cpf
+
+            # caminho_arquivo = os.path.join(BASE_DIR, self.foto_doc.upload_to, nome_arquivo)
+            # if(os.path.exists(caminho_arquivo)):
+            #     os.remove(caminho_arquivo)
+            
+            # caminho_diretorio = os.path.join(BASE_DIR, self.foto_doc.upload_to)
+            # if(not os.path.exists(caminho_diretorio)):
+            #     os.makedirs(caminho_diretorio)
+            
+            foto_doc = base64.b64decode(foto_doc_base64)
+
+            # file = open(caminho_arquivo, 'wb')
+            # file.write(foto_cnh)
+            # file.close()
+            Image.new('w', len(foto_doc_base64))
+            fs = FileSystemStorage(location='data/fotos_docs_veiculos')
+            arquivo = fs.open(nome_arquivo, 'wb')
+            arquivo.file.write(foto_doc)
+            arquivo.file.close()
+            #fs.save(nome_arquivo, arquivo)
+
+            self.foto_doc = models.ImageField(storage=fs)
+            self.save()
+            
+            fs.close()
+
+            retorno = Retorno(True, self, 'CNH recebida com sucesso.', 200, None)
+
+            return retorno
+        except Exception as e:
+                    
+            retorno = Retorno(False, self, 'A inclusão da foto da CNH falhou.', None, None, e)
+            return retorno
+
     def validar_dados_obrigatorios_chaves(self):
         if not self.placa or len(str(self.placa).strip()) <= 0 :
             return Retorno(False, self, "Informe a placa do veículo.", 406)
@@ -91,7 +169,7 @@ class Veiculo(models.Model, GerenciadorLog):
     
     def validar_dados_obrigatorios(self):
         
-        retorno = self.validar_dados_obrigatorios_chaves(self)
+        retorno = self.validar_dados_obrigatorios_chaves()
         
         if not retorno.estado.ok:
             return retorno
@@ -105,15 +183,24 @@ class Veiculo(models.Model, GerenciadorLog):
         return self.__criar_json__()
     
     def __criar_json__(self):
+        url_foto = ''
+        
+        try:
+            url_foto = self.foto_doc.url
+        except Exception:
+            pass
+
         ret = {
                 "placa": self.placa,
                 "modelo": self.modelo,
                 "marca": self.marca,
                 "ano": self.ano,
                 "apelido": self.apelido,
-                "uri_foto_doc": self.foto_doc.url,
+                "foto_doc": {
+                    'url': url_foto,
+                    'foto_base64': '',
+                },
                 "cliente": self.cliente.json(),
-                #"dt_hr_inclusao": self.dt_hr_inclusao
             }
         return ret
 

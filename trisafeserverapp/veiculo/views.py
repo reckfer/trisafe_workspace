@@ -44,6 +44,20 @@ class VeiculoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
                     
             retorno = Retorno(False, self, 'A inclusão dos dados do veículo falhou.', None, None, e)
             return retorno.gerar_resposta_http()
+
+    @action(detail=False, methods=['post'])
+    def alterar(self, request):
+        try:
+            self.apropriar_dados_http(request.data)
+            
+            retorno = self.m_veiculo.alterar()
+
+            return retorno.gerar_resposta_http()
+
+        except Exception as e:
+                    
+            retorno = Retorno(False, self, 'A atualização dos dados do veículo falhou.', None, None, e)
+            return retorno.gerar_resposta_http()
     
     @action(detail=False, methods=['post'])
     def obter(self, request):
@@ -72,17 +86,41 @@ class VeiculoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
             retorno = Retorno(False, self, 'A consulta a veículos cadastrados do Cliente falhou.', None, None, e)
             return retorno.gerar_resposta_http()
     
+    @action(detail=False, methods=['post'])
+    def salvar_foto_doc(self, request):
+        try:
+            self.apropriar_dados_http(request.data)
+            foto_doc_base64 = self.extrair_dados_http_foto_doc(request.data)
+            
+            retorno = self.m_veiculo.salvar_foto_doc(foto_doc_base64)
+            
+            return retorno.gerar_resposta_http()
+            
+        except Exception as e:
+                    
+            retorno = Retorno(False, self, 'A consulta a veículos cadastrados do Cliente falhou.', None, None, e)
+            return retorno.gerar_resposta_http()
+    
     def apropriar_dados_http(self, d_dados_requisicao):
 
         d_veiculo = d_dados_requisicao['veiculo']
         
         self.m_veiculo.placa = d_veiculo['placa']
+        self.m_veiculo.modelo = d_veiculo['modelo']
+        self.m_veiculo.marca = d_veiculo['marca']
+        self.m_veiculo.ano = d_veiculo['ano']
         self.m_veiculo.apelido = d_veiculo['apelido']
 
-        self.extrair_cliente_dados_http(d_veiculo)
+        self.apropriar_cliente_dados_http(d_veiculo)
         
         self.m_veiculo.cliente = self.m_cliente
     
-    def extrair_cliente_dados_http(self, d_veiculo):
+    def apropriar_cliente_dados_http(self, d_veiculo):
         d_cliente = d_veiculo['cliente']
         self.m_cliente.cpf = d_cliente['cpf']
+    
+    def extrair_dados_http_foto_doc(self, d_dados_requisicao):
+        d_veiculo = d_dados_requisicao['veiculo']
+        d_foto_doc = d_veiculo['foto_doc']
+        
+        return d_foto_doc['foto_base64']    
