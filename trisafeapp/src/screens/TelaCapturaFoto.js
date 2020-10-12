@@ -18,14 +18,14 @@ import { RNCamera } from 'react-native-camera';
 import Orientation from 'react-native-orientation';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { clonarObjeto, DADOS_FOTOS } from '../contexts/DadosAppGeral';
+import { clonarObjeto } from '../contexts/DadosAppGeral';
 import { StackActions } from '@react-navigation/native';
 import Svg, { Rect } from 'react-native-svg';
 
-const NOME_COMPONENTE = 'TelaCapturaFotoCNH';
-const INSTRUCAO_INICIAL = 'Posicione a CNH no retângulo e tire uma foto.';
+const NOME_COMPONENTE = 'TelaCapturaFoto';
+const INSTRUCAO_INICIAL = 'Posicione o documento no retângulo e tire uma foto.';
 
-export default class TelaCapturaFotoCNH extends PureComponent {
+export default class TelaCapturaFoto extends PureComponent {
     
     constructor(props, contexto) {
         super();
@@ -85,17 +85,19 @@ export default class TelaCapturaFotoCNH extends PureComponent {
                 
                 console.log('Foto tirada: ', data.uri);
 
-                let dadosFotos = clonarObjeto(DADOS_FOTOS);
-                dadosFotos.uri_local_cnh = data.uri;
-                dadosFotos.foto_cnh_base64 = data.base64;
-                
-                this.oDadosApp.fotos = dadosFotos;
+                // let dadosFotos = clonarObjeto(DADOS_FOTOS);
+                // dadosFotos.uri_local_cnh = data.uri;
+                // dadosFotos.foto_cnh_base64 = data.base64;
+                // this.oDadosApp.foto = dadosFotos;
+
+                this.oDadosFoto.caminho_local = data.uri;
+                this.oDadosFoto.foto_base64 = data.base64;
 
                 const pop = StackActions.pop(1);
 
                 console.log('Removendo tela camera...', JSON.stringify(pop));
                 this.oNavegacao.dispatch(pop);
-                this.oNavegacao.navigate('Visualizacao Foto CNH');
+                this.oNavegacao.navigate('Visualizacao Foto');
             }).catch((oExcecao) => {
                 this.oUtil.tratarExcecao(oExcecao);
             });
@@ -167,4 +169,4 @@ export default class TelaCapturaFotoCNH extends PureComponent {
     }
 }
 
-TelaCapturaFotoCNH.contextType = ContextoApp;
+TelaCapturaFoto.contextType = ContextoApp;

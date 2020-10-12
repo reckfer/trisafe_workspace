@@ -88,6 +88,7 @@ export default class GerenciadorContextoApp {
         oComponente.oDadosVeiculoAtual = this.dadosApp.veiculo_atual;
         oComponente.oDadosVeiculos = this.dadosApp.veiculos;
         oComponente.oDadosContrato = this.dadosApp.contrato;
+        oComponente.oDadosFoto = this.dadosApp.foto;
         oComponente.oDadosChaves = this.dadosApp.chaves;
         oComponente.oDadosDispositivo = this.dadosApp.dados_dispositivo;
 
@@ -103,7 +104,6 @@ export default class GerenciadorContextoApp {
         }
 
         if(oTela && this.oDadosReferencia) {
-            console.log('Atualizando estado tela.');
             oTela.setState(this.oDadosReferencia);
         }
     };

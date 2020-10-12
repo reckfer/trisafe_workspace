@@ -1,7 +1,5 @@
 'use strict';
 import React from 'react';
-//import * as React from 'react';
-//import { View, Text } from 'react-native';
 import { NavigationContainer, StackActions } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -10,15 +8,15 @@ import TelaModalTestesCadastro from '../tests/TelaModalTestesCadastro';
 import TelaClienteDadosPessoais from '../screens/TelaClienteDadosPessoais';
 import TelaClienteEndereco from '../screens/TelaClienteEndereco';
 import TelaClienteConfirmacao from '../screens/TelaClienteConfirmacao';
-import TelaCapturaFotoCNH from '../screens/TelaCapturaFotoCNH';
+import TelaCapturaFoto from '../screens/TelaCapturaFoto';
 import TelaModalBoleto from '../screens/TelaModalBoleto';
 import TelaMenuInicio from '../screens/TelaMenuInicio';
 import { ContextoAppProvider } from '../contexts/ContextoApp';
-import TelaModalVisualizaFotoCNH from '../screens/TelaModalVisualizaFotoCNH';
-import TelaModalContratoClicksign from '../screens/TelaModalContratoClicksign';
+import TelaModalVisualizaFoto from '../screens/TelaModalVisualizaFoto';
 import TelaVeiculoInicio from '../screens/TelaVeiculoInicio';
 import TelaVeiculoCadastro from '../screens/TelaVeiculoCadastro';
 import TelaContratacaoPrincipal from '../screens/TelaContratacaoPrincipal';
+import TelaModalContratoClicksign from '../screens/TelaModalContratoClicksign';
 
 const fluxoRaiz = createDrawerNavigator();
 const fluxoModais = createStackNavigator();
@@ -31,7 +29,7 @@ function FluxoCadastro() {
         <fluxoCadastro.Screen name="Dados pessoais" component={TelaClienteDadosPessoais} />
         <fluxoCadastro.Screen name="Endereco" component={TelaClienteEndereco} />
         <fluxoCadastro.Screen name="Confirmação dos dados" component={TelaClienteConfirmacao} />
-        <fluxoCadastro.Screen name="Foto CNH" component={TelaCapturaFotoCNH} />
+        <fluxoCadastro.Screen name="Captura Foto" component={TelaCapturaFoto} />
         <fluxoCadastro.Screen name="Veiculo Inicio" component={TelaVeiculoInicio} />
         <fluxoCadastro.Screen name="Veiculo Cadastro" component={TelaVeiculoCadastro} />
         <fluxoCadastro.Screen name="Contratacao" component={TelaContratacaoPrincipal} />
@@ -42,7 +40,7 @@ function FluxoCadastro() {
 function FluxoModais() {
   return (
     <fluxoModais.Navigator headerMode='none' initialRouteName='Testes Cadastro'>
-        <fluxoModais.Screen name="Visualizacao Foto CNH" component={TelaModalVisualizaFotoCNH} />
+        <fluxoModais.Screen name="Visualizacao Foto" component={TelaModalVisualizaFoto} />
         <fluxoModais.Screen name="Contrato Clicksign" component={TelaModalContratoClicksign} />
         <fluxoModais.Screen name="Boleto Gerencianet" component={TelaModalBoleto} />
         <fluxoModais.Screen name="Fluxo Cadastro Cliente" component={FluxoCadastro} />

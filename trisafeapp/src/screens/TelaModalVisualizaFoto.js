@@ -16,23 +16,23 @@ import { ContextoApp } from '../contexts/ContextoApp';
 import { inicializarContextoComum } from '../common/Configuracao';
 import { styles } from '../common/Estilos';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { clonarObjeto, DADOS_FOTOS } from '../contexts/DadosAppGeral';
+import { clonarObjeto, DADOS_FOTO } from '../contexts/DadosAppGeral';
 import { StackActions } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Orientation from 'react-native-orientation';
 
-const NOME_COMPONENTE = 'TelaModalVisualizaFotoCNH';
+const NOME_COMPONENTE = 'TelaModalVisualizaFoto';
 const INSTRUCAO_INICIAL = 'A foto ficou nítida?';
 
-export default class TelaModalVisualizaFotoCNH extends Component {
+export default class TelaModalVisualizaFoto extends Component {
     
     constructor(props, contexto) {
         super();
         
         inicializarContextoComum(props, contexto, this, INSTRUCAO_INICIAL);
 
-        this.enviarFotoCNHServidor = this.enviarFotoCNHServidor.bind(this);
+        this.salvar = this.salvar.bind(this);
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
         this.capturarNovamente = this.capturarNovamente.bind(this);
         this.registrarEventoFoco = this.registrarEventoFoco.bind(this);
@@ -64,15 +64,24 @@ export default class TelaModalVisualizaFotoCNH extends Component {
         });
     }
 
-    enviarFotoCNHServidor() {
+    salvar() {
         try {
             let metodoURI = '/clientes/salvar_foto_cnh/';
-
             let oDadosRequisicao = {
-                cliente: this.oDadosApp.cliente,
-                fotos: this.oDadosApp.fotos,
-                chaves: this.oDadosApp.chaves,
+                cliente: this.oDadosCliente
             }
+
+            if(this.oDadosControleApp.cadastrando_veiculo) {
+                metodoURI = '/veiculos/salvar_foto_doc/';
+
+                oDadosRequisicao = {
+                    veiculo: this.oDadosVeiculoAtual,
+                }
+                oDadosRequisicao.veiculo.cliente = this.oDadosCliente;
+            }
+            
+            this.oDadosControleApp.novo_cliente = false;
+            this.oDadosControleApp.novo_veiculo = false;
 
             this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosRequisicao, this.tratarDadosRetorno, false, false);
 
@@ -83,7 +92,7 @@ export default class TelaModalVisualizaFotoCNH extends Component {
     }
 
     tratarDadosRetorno(oDados, oEstado) {
-        this.oDadosApp.fotos = clonarObjeto(DADOS_FOTOS);
+        this.oDadosApp.foto = clonarObjeto(DADOS_FOTO);
 
         let oFuncaoMensagem = () => {};
         
@@ -96,8 +105,12 @@ export default class TelaModalVisualizaFotoCNH extends Component {
 
     avancar() {
         Orientation.unlockAllOrientations();
+        let proximaTela = 'Contratacao';
 
-        this.oNavegacao.navigate('Veiculo Inicio');
+        if(this.oDadosControleApp.novo_veiculo) {
+            proximaTela = 'Veiculo Inicio';
+        }
+        this.oNavegacao.navigate(proximaTela);
     }
     
     capturarNovamente() {
@@ -106,16 +119,15 @@ export default class TelaModalVisualizaFotoCNH extends Component {
     }
 
     voltar() {
-        this.oDadosApp.fotos = clonarObjeto(DADOS_FOTOS);
+        //this.oDadosApp.foto = clonarObjeto(DADOS_FOTO);
         const pop = StackActions.pop(1);
                 
         console.log('Removendo tela imagem CNH...', JSON.stringify(pop));
         this.oNavegacao.dispatch(pop);
 
-        const push = StackActions.push('Fluxo Cadastro Cliente', { screen: 'Foto CNH' });
+        const push = StackActions.push('Fluxo Cadastro Cliente', { screen: 'Captura Foto' });
 
         this.oNavegacao.dispatch(push);
-        // this.oNavegacao.goBack();
     }
 
     botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;
@@ -123,7 +135,7 @@ export default class TelaModalVisualizaFotoCNH extends Component {
     
     render() {
         
-        if(this.oDadosApp.fotos.foto_cnh_base64) {
+        if(this.oDadosFoto.foto_base64) {
 
             console.log('Vai renderizar foto tirada...');
             //let estiloAreaFoto = clonarObjeto(styles.areaCliente);
@@ -158,7 +170,7 @@ export default class TelaModalVisualizaFotoCNH extends Component {
             return(
                 <SafeAreaView style={styles.areaCliente}>
                     <View style={estiloAreaFoto}>
-                        <ImageBackground source={ { uri: `data:image/png;base64,${this.oDadosApp.fotos.foto_cnh_base64}` }} 
+                        <ImageBackground source={ { uri: `data:image/png;base64,${this.oDadosFoto.foto_base64}` }} 
                             style={estiloFoto}>
                             <View style={{flex:1, flexDirection:'column', justifyContent:'space-between'}}>
                                 <View style={{flex:.2, backgroundColor:'black', opacity: .7, flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
@@ -166,7 +178,7 @@ export default class TelaModalVisualizaFotoCNH extends Component {
                                         <Icon name="arrow-left" size={30} color="white" style={{margin:10}}/>
                                         <Text style={{color:'white', fontSize:16}}>Tirar outra</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity onPress={this.enviarFotoCNHServidor} style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
+                                    <TouchableOpacity onPress={this.salvar} style={{ flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
                                         <Text style={{color:'white', fontSize:16}}>Está nítida</Text>
                                         <Icon name="arrow-right" size={30} color="white" style={{margin:10}} />
                                     </TouchableOpacity> 
@@ -197,4 +209,4 @@ export default class TelaModalVisualizaFotoCNH extends Component {
         }
     }
 }
-TelaModalVisualizaFotoCNH.contextType = ContextoApp;
+TelaModalVisualizaFoto.contextType = ContextoApp;

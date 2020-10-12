@@ -14,6 +14,13 @@ import DeviceInfo from 'react-native-device-info';
 import Util from './Util';
 import BackgroundFetch from 'react-native-background-fetch';
 import GerenciadorContextoApp from '../contexts/GerenciadorContextoApp';
+import TelaClienteInicio from '../screens/TelaClienteInicio';
+import TelaClienteDadosPessoais from '../screens/TelaClienteDadosPessoais';
+import TelaClienteEndereco from '../screens/TelaClienteEndereco';
+import TelaClienteConfirmacao from '../screens/TelaClienteConfirmacao';
+import TelaVeiculoInicio from '../screens/TelaVeiculoInicio';
+import TelaVeiculoCadastro from '../screens/TelaVeiculoCadastro';
+import TelaContratacaoPrincipal from '../screens/TelaContratacaoPrincipal';
 
 const NOME_COMPONENTE = 'Configuracao';
 
@@ -208,6 +215,28 @@ export function inicializarContextoComum(propsGeral, contextoGeral, oComponente,
             oComponente.oConfiguracao = new Configuracao(oGerenciador, oComponente);
         }
         oComponente.oUtil = new Util(oGerenciador);
+        
+        if(oComponente instanceof TelaClienteInicio) {
+            oComponente.oDadosControleApp.cadastrando_cliente = true;
+            oComponente.oDadosControleApp.cadastrando_veiculo = false;
+        } else if(oComponente instanceof TelaClienteDadosPessoais) {
+            oComponente.oDadosControleApp.cadastrando_cliente = true;
+            oComponente.oDadosControleApp.cadastrando_veiculo = false;
+        } else if(oComponente instanceof TelaClienteEndereco) {
+            oComponente.oDadosControleApp.cadastrando_cliente = true;
+            oComponente.oDadosControleApp.cadastrando_veiculo = false;
+        } else if(oComponente instanceof TelaClienteConfirmacao) {
+            oComponente.oDadosControleApp.cadastrando_cliente = true;
+            oComponente.oDadosControleApp.cadastrando_veiculo = false;
+        } else if(oComponente instanceof TelaVeiculoInicio) {
+            oComponente.oDadosControleApp.cadastrando_veiculo = true;
+            oComponente.oDadosControleApp.cadastrando_cliente = false;
+        } else if(oComponente instanceof TelaVeiculoCadastro) {
+            oComponente.oDadosControleApp.cadastrando_veiculo = true;
+            oComponente.oDadosControleApp.cadastrando_cliente = false;
+        } else if(oComponente instanceof TelaContratacaoPrincipal) {
+
+        }
     }
 }
 

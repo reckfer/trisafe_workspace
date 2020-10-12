@@ -88,7 +88,7 @@ export default class TelaModalTestesCadastro extends Component {
     }
 
     irParaTesteVeiculos() {
-        this.oNavegacao.navigate('Fluxo Cadastro Cliente', { screen: 'Veiculo Inicio' });    
+        this.oNavegacao.navigate('Fluxo Cadastro Cliente', { screen: 'Veiculo Inicio' });
     }
 
     irParaTesteDownloadBoleto(){
@@ -96,14 +96,19 @@ export default class TelaModalTestesCadastro extends Component {
     }
 
     irParaTesteFotoCNH() {
-        // this.oNavegacao.navigate('Fluxo Cadastro Cliente', { screen: 'Foto CNH' });
-        this.oNavegacao.navigate('Visualizacao Foto CNH');
+        this.oDadosControleApp.novo_cliente = true;
+        this.oDadosFoto = this.oDadosCliente.foto_cnh;
+        //this.oNavegacao.navigate('Fluxo Cadastro Cliente', { screen: 'Captura Foto' });
+        this.oNavegacao.navigate('Visualizacao Foto');
         
     }
 
     irParaTesteFotoDocVeiculo() {
         
-        //this.oNavegacao.navigate('Foto CNH', this.state);
+        this.oDadosControleApp.novo_veiculo = true;
+        this.oDadosFoto = this.oDadosVeiculoAtual.foto_doc;
+        //this.oNavegacao.navigate('Fluxo Cadastro Cliente', { screen: 'Captura Foto' });
+        this.oNavegacao.navigate('Visualizacao Foto');
     }
 
     obterUltimoCliente() {
@@ -260,8 +265,8 @@ export default class TelaModalTestesCadastro extends Component {
     botaoDownloadContrato = () => <Button title="Download Contrato" onPress={this.irParaTesteDownloadContrato} ></Button>
     botaoDownloadBoleto = () => <Button title="Download Boleto" onPress={this.irParaTesteDownloadBoleto} ></Button>
     botaoIncluirSignatario = () => <Button title="Testar Incluir Signatario" onPress={this.irParaTesteIncluirSignatario} ></Button>
-    botaoCadastroVeiculos = () => <Button title="Testar Contrato Veiculos" onPress={this.irParaTesteVeiculos} ></Button>
-    botaoFotoCNH = () => <Button title="Testar Foto CNH" onPress={this.irParaTesteFotoCNH} ></Button>
+    botaoCadastroVeiculos = () => <Button title="Testar Cadastro Veiculos" onPress={this.irParaTesteVeiculos} ></Button>
+    botaoFotoCNH = () => <Button title="Testar Captura Foto CNH" onPress={this.irParaTesteFotoCNH} ></Button>
     botaoFotoDocVeiculo = () => <Button title="Testar Foto Doc" onPress={this.irParaTesteFotoDocVeiculo} ></Button>
     botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;
     

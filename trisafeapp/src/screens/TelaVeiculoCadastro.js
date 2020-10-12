@@ -18,6 +18,7 @@ import { styles, theme } from '../common/Estilos';
 import AreaRodape from '../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
 import Orientation from 'react-native-orientation';
+import { StackActions } from '@react-navigation/native';
 import { inicializarContextoComum } from '../common/Configuracao';
 
 const NOME_COMPONENTE = 'TelaVeiculoCadastro';
@@ -32,8 +33,10 @@ export default class TelaVeiculoCadastro extends Component {
         
         this.obter = this.obter.bind(this);
         this.tratarDadosVeiculo = this.tratarDadosVeiculo.bind(this);
-        this.avancar = this.avancar.bind(this);
+        this.salvar = this.salvar.bind(this);
+        this.tratarRetornoAtualizacao = this.tratarRetornoAtualizacao.bind(this);
         this.voltar = this.voltar.bind(this);
+        this.irParaFotoDoc = this.irParaFotoDoc.bind(this);
     }
 
     componentDidMount() {
@@ -51,7 +54,10 @@ export default class TelaVeiculoCadastro extends Component {
     }
 
     obter() {
-        try {
+        let nomeFuncao = 'obter';
+        try {        
+            this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
             let metodoURI = '/veiculos/obter/';
             let oDadosRequisicao = {
                 veiculo: this.oDadosVeiculoAtual,
@@ -59,7 +65,8 @@ export default class TelaVeiculoCadastro extends Component {
             oDadosRequisicao.veiculo.cliente = this.oDadosCliente;
 
             this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosRequisicao, this.tratarDadosVeiculo);
-
+            
+            this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
         } catch (oExcecao) {
             this.oUtil.tratarExcecao(oExcecao);
         }
@@ -77,18 +84,94 @@ export default class TelaVeiculoCadastro extends Component {
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
 
-    avancar() {
-        // Vai direto pra contratacao.
-        this.oNavegacao.navigate('Contratacao');
+    salvar() {
+        let nomeFuncao = 'salvar';
+        try {        
+            this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+            let metodoURI = '/veiculos/alterar/';
+            
+            if(this.oDadosControleApp.novo_veiculo) {
+                metodoURI = '/veiculos/incluir/';
+            }
+            let oDadosRequisicao = {
+                veiculo: this.oDadosVeiculoAtual,
+            }
+            oDadosRequisicao.veiculo.cliente = this.oDadosCliente;
+
+            this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosRequisicao, this.tratarRetornoAtualizacao, true);
+
+            this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        } catch (oExcecao) {
+            this.oUtil.tratarExcecao(oExcecao);
+        }
+    }
+
+    tratarRetornoAtualizacao(oDados, oEstado) {
+        let nomeFuncao = 'tratarRetornoAtualizacao';
+
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        if (oEstado.mensagem && oEstado.mensagem.trim()) {
+            let mensagem = oEstado.mensagem;
+            
+            if(this.oDadosControleApp.novo_veiculo) {
+                
+                this.irParaFotoDoc();
+            } else if(this.oDadosVeiculoAtual.foto_doc.url) {
+                
+                // Verifica se tem foto e pede confirmacao para atualizar.
+                mensagem += '\n\nDeseja atualizar a foto do documento do veículo?';
+
+                Alert.alert(
+                    'TriSafe',
+                    mensagem,
+                    [
+                        {
+                            text: 'Sim',
+                            style: 'default',
+                            onPress: this.irParaFotoDoc
+                        },
+                        {
+                            text: 'Agora Não',
+                            style: 'cancel',
+                            onPress: this.voltar
+                        },
+                    ]
+                );
+
+            } else {
+                this.oUtil.exibirMensagemUsuario(mensagem, this.irParaFotoDoc);
+            }
+        }
+        if(oEstado.ok) {
+
+            this.voltar();
+        }
+        
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+    }
+
+    irParaFotoDoc() {
+        
+        this.oDadosApp.foto = this.oDadosVeiculoAtual.foto_doc;
+        this.oDadosFoto = this.oDadosApp.foto;
+        
+        this.oNavegacao.navigate('Visualizacao Foto');
     }
 
     voltar() {
-        this.oNavegacao.goBack();
+        const pop = StackActions.pop(1);                
+        console.log('Removendo tela veiculo cadastro...', JSON.stringify(pop));
+        this.oNavegacao.dispatch(pop);
+
+        const push = StackActions.push('Fluxo Cadastro Cliente', { screen: 'Veiculo Inicio' });
+        this.oNavegacao.dispatch(push);
     }
 
     render() {
         let botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>
-        let botaoAvancar = () => <Button title="Avançar" onPress={this.avancar} ></Button>
+        let botaoAvancar = () => <Button title="Confirmar" onPress={this.salvar} ></Button>
         
         let botoesTela = [ { element: botaoVoltar }, { element: botaoAvancar } ];
 
@@ -118,11 +201,11 @@ export class AreaDados extends Component {
                 <ScrollView>
                     <ThemeProvider theme={theme}>
                         <View>
-                            <Input placeholder="Informe sua Placa" label="Placa" value={oDadosVeiculo.placa} onChangeText={(valor) => { oDadosVeiculo.rua = valor; this.setState(this.oDadosApp)}}></Input>
-                            <Input placeholder="Informe o modelo do Veículo" label="Modelo" value={oDadosVeiculo.modelo} onChangeText={(valor) => { oDadosVeiculo.numero = valor; this.setState(this.oDadosApp)}}></Input>
-                            <Input placeholder="Informe a marca do Veículo" label="Marca" value={oDadosVeiculo.marca} onChangeText={(valor) => { oDadosVeiculo.numero = valor; this.setState(this.oDadosApp)}}></Input>
-                            <Input placeholder="Informe o ano do Veículo" label="Ano" value={oDadosVeiculo.ano} onChangeText={(valor) => { oDadosVeiculo.numero = valor; this.setState(this.oDadosApp)}}></Input>
-                            <Input placeholder="Informe o apelido do Veículo" label="Apelido" value={oDadosVeiculo.apelido} onChangeText={(valor) => { oDadosVeiculo.numero = valor; this.setState(this.oDadosApp)}}></Input>
+                            <Input placeholder="Informe sua Placa" label="Placa" value={oDadosVeiculo.placa} onChangeText={(valor) => { oDadosVeiculo.placa = valor; this.setState(this.oDadosApp)}}></Input>
+                            <Input placeholder="Informe o modelo do Veículo" label="Modelo" value={oDadosVeiculo.modelo} onChangeText={(valor) => { oDadosVeiculo.modelo = valor; this.setState(this.oDadosApp)}}></Input>
+                            <Input placeholder="Informe a marca do Veículo" label="Marca" value={oDadosVeiculo.marca} onChangeText={(valor) => { oDadosVeiculo.marca = valor; this.setState(this.oDadosApp)}}></Input>
+                            <Input placeholder="Informe o ano do Veículo" label="Ano" value={oDadosVeiculo.ano} onChangeText={(valor) => { oDadosVeiculo.ano = valor; this.setState(this.oDadosApp)}}></Input>
+                            <Input placeholder="Informe o apelido do Veículo" label="Apelido" value={oDadosVeiculo.apelido} onChangeText={(valor) => { oDadosVeiculo.apelido = valor; this.setState(this.oDadosApp)}}></Input>
                         </View>
                     </ThemeProvider>
                 </ScrollView>

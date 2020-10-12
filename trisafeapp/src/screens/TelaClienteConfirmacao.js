@@ -12,7 +12,6 @@ import {
     Alert,
     View
 } from 'react-native';
-import ComunicacaoHTTP from './../common/ComunicacaoHTTP';
 import { ThemeProvider, Input, Button } from 'react-native-elements';
 import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
@@ -76,9 +75,9 @@ export default class TelaClienteConfirmacao extends Component {
     avancar() {
         Orientation.lockToLandscapeLeft();
         
-        this.oDadosControleApp.novo_cliente = false;
-
-        this.oNavegacao.navigate('Foto CNH', this.state);
+        this.oDadosApp.foto = this.oDadosCliente.foto_cnh;
+        this.oDadosFoto = this.oDadosApp.foto;
+        this.oNavegacao.navigate('Captura Foto');
     }
      
     voltar() {

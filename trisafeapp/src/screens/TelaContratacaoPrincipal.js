@@ -24,10 +24,10 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import RNFetchBlob from 'rn-fetch-blob';
 import { StackActions } from '@react-navigation/native';
 
-const NOME_COMPONENTE = 'TelaModalContratoClicksign';
+const NOME_COMPONENTE = 'TelaContratacaoPrincipal';
 const INSTRUCAO_INICIAL = 'Contrato de serviço de rastreamento.';
 
-export default class TelaModalContratoClicksign extends Component {
+export default class TelaContratacaoPrincipal extends Component {
 	
     constructor(props, contexto) {
         super();
@@ -131,7 +131,7 @@ export default class TelaModalContratoClicksign extends Component {
         );
     }
 }
-TelaModalContratoClicksign.contextType = ContextoApp;
+TelaContratacaoPrincipal.contextType = ContextoApp;
 
 export class AreaDados extends Component {
 

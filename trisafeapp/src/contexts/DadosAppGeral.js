@@ -1,4 +1,9 @@
 'use strict';
+export const DADOS_FOTO = {
+    'caminho_local': '',
+    'url': '',
+    'foto_base64': '',
+};
 
 export const DADOS_CLIENTE = {
     'id_cliente_iter': '',
@@ -16,13 +21,14 @@ export const DADOS_CLIENTE = {
     'bairro': '',
     'cep': '',
     'uf': '',
-    'id_signatario_contrato': ''
+    'id_signatario_contrato': '',
+    'foto_cnh': clonarObjeto(DADOS_FOTO),
 };
 
 export const DADOS_VEICULO = {
     'placa': '',
     'apelido': '',
-    //'foto_doc': DADOS_FOTO,
+    'foto_doc': clonarObjeto(DADOS_FOTO),
     "placa": '',
     "modelo": '',
     "cliente": DADOS_CLIENTE,
@@ -60,26 +66,22 @@ export const DADOS_BOLETO = {
     'url_html': '',
 };
 
-export const DADOS_FOTO = {
-    'uri_local': '',
-    'uri_remoto': '',
-    'foto_base64': '',
-};
-
-// TODO: mudar este modelo para o mesmo do veiculo.
-export const DADOS_FOTOS = {
-    'uri_local_cnh': '',
-    'foto_cnh_base64': '',    
-    'uri_local_doc_veiculo': '',
-    'foto_doc_veiculo': '',
-};
+// // TODO: mudar este modelo para o mesmo do veiculo.
+// export const DADOS_FOTOS = {
+//     'uri_local_cnh': '',
+//     'foto_cnh_base64': '',    
+//     'uri_local_doc_veiculo': '',
+//     'foto_doc_veiculo': '',
+// };
 
 export const DADOS_CONTROLE_APP = {
     app_ativo: true,
     em_producao: false,
     processando_requisicao: false,
-    novo_cliente: true,
+    novo_cliente: false,
     novo_veiculo: false,
+    cadastrando_cliente: false,
+    cadastrando_veiculo: false,
     autenticado: false,
     abrir_camera: false,
     exibir_foto: true,
@@ -123,26 +125,25 @@ export const ESTADO = {
     http_status: '0'
 }
 
-export const VEICULO_ATUAL = {
-    indice_lista: -1,
-    veiculo: DADOS_VEICULO
-}
+// export const VEICULO_ATUAL = {
+//     indice_lista: -1,
+//     veiculo: DADOS_VEICULO
+// }
 
 export const DADOS_APP_GERAL = {
     dados_app: {
         cliente: DADOS_CLIENTE,
-        veiculo_atual: VEICULO_ATUAL,
+        veiculo_atual: DADOS_VEICULO,
         veiculos: DADOS_VEICULOS,
         contrato: DADOS_CONTRATO,
         produtos_contratados: DADOS_PRODUTOS_CONTRATADOS,
         boleto: DADOS_BOLETO,
         controle_app: DADOS_CONTROLE_APP,
         instrucao_usuario: DADOS_INSTRUCAO_USUARIO,
-        fotos: DADOS_FOTOS,
+        foto: DADOS_FOTO,
         chaves: CHAVES,
         dados_dispositivo: DADOS_DISPOSITIVO,
     },
-    //registros_log: null,
 };
 
 export function clonarObjeto(obj) {
