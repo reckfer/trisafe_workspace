@@ -85,6 +85,12 @@ export const DADOS_CONTROLE_APP = {
     autenticado: false,
     abrir_camera: false,
     exibir_foto: true,
+    exibir_modal: false,
+    config_modal: {
+        exibir_modal : false,
+        mensagem : '',
+        botoes : []
+    }
 };
 
 export const DADOS_INSTRUCAO_USUARIO = {

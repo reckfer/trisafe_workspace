@@ -114,39 +114,42 @@ export default class TelaVeiculoCadastro extends Component {
 
         if (oEstado.mensagem && oEstado.mensagem.trim()) {
             let mensagem = oEstado.mensagem;
-            
-            if(this.oDadosControleApp.novo_veiculo) {
-                
-                this.irParaFotoDoc();
-            } else if(this.oDadosVeiculoAtual.foto_doc.url) {
-                
-                // Verifica se tem foto e pede confirmacao para atualizar.
-                mensagem += '\n\nDeseja atualizar a foto do documento do veículo?';
 
-                Alert.alert(
-                    'TriSafe',
-                    mensagem,
-                    [
-                        {
-                            text: 'Sim',
-                            style: 'default',
-                            onPress: this.irParaFotoDoc
-                        },
-                        {
-                            text: 'Agora Não',
-                            style: 'cancel',
-                            onPress: this.voltar
-                        },
-                    ]
-                );
+            if(!oEstado.ok) {
 
+                this.oUtil.exibirMensagemUsuario(mensagem, this.voltar);
             } else {
-                this.oUtil.exibirMensagemUsuario(mensagem, this.irParaFotoDoc);
-            }
-        }
-        if(oEstado.ok) {
+            
+                if(this.oDadosControleApp.novo_veiculo) {
+                    mensagem += '\n\nAgora a câmera será aberta para tirar uma foto do documento do veículo.';
 
-            this.voltar();
+                    this.oUtil.exibirMensagemUsuario(mensagem, this.irParaFotoDoc);                    
+                } else if(this.oDadosVeiculoAtual.foto_doc.url) {
+                    
+                    // Verifica se tem foto e pede confirmacao para atualizar.
+                    mensagem += '\n\nDeseja atualizar a foto do documento do veículo?';
+
+                    Alert.alert(
+                        'TriSafe',
+                        mensagem,
+                        [
+                            {
+                                text: 'Sim',
+                                style: 'default',
+                                onPress: this.irParaFotoDoc
+                            },
+                            {
+                                text: 'Agora Não',
+                                style: 'cancel',
+                                onPress: this.voltar
+                            },
+                        ]
+                    );
+
+                } else {
+                    this.oUtil.exibirMensagemUsuario(mensagem, this.irParaFotoDoc);
+                }
+            }
         }
         
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);

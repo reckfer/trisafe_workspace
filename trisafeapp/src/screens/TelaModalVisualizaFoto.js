@@ -80,9 +80,6 @@ export default class TelaModalVisualizaFoto extends Component {
                 oDadosRequisicao.veiculo.cliente = this.oDadosCliente;
             }
             
-            this.oDadosControleApp.novo_cliente = false;
-            this.oDadosControleApp.novo_veiculo = false;
-
             this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosRequisicao, this.tratarDadosRetorno, false, false);
 
         } catch (oExcecao) {
@@ -99,7 +96,7 @@ export default class TelaModalVisualizaFoto extends Component {
         if(oEstado.ok) {
             oFuncaoMensagem = this.avancar;
         }
-
+        
         this.oUtil.exibirMensagemUsuario(oEstado.mensagem, oFuncaoMensagem);
     }
 
@@ -110,6 +107,9 @@ export default class TelaModalVisualizaFoto extends Component {
         if(this.oDadosControleApp.novo_veiculo) {
             proximaTela = 'Veiculo Inicio';
         }
+        this.oDadosControleApp.novo_cliente = false;
+        this.oDadosControleApp.novo_veiculo = false;
+        
         this.oNavegacao.navigate(proximaTela);
     }
     

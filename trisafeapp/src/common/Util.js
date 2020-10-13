@@ -1,5 +1,8 @@
 'use strict';
-import { Alert } from "react-native";
+import { Component } from "react";
+import { Alert, View, Text } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const NOME_COMPONENTE = 'Util';
 
@@ -36,6 +39,23 @@ export default class Util {
             );
         }
     }
+
+    // exibirMensagemModal (mensagem, oFuncaoAlerta) {
+    //     if (mensagem && mensagem.trim()){
+
+    //         Alert.alert(
+    //             'TriSafe',
+    //             mensagem,
+    //             [
+    //                 {
+    //                     text: 'OK',
+    //                     style: 'default',
+    //                     onPress: oFuncaoAlerta
+    //                 },
+    //             ]
+    //         );
+    //     }
+    // }
 
     tratarExcecao(oExcecao) {
         let nomeFuncao = 'tratarExcecao';
