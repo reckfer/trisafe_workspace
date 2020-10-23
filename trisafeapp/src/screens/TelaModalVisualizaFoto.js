@@ -31,6 +31,7 @@ export default class TelaModalVisualizaFoto extends Component {
         super();
         
         inicializarContextoComum(props, contexto, this, INSTRUCAO_INICIAL);
+        this.oDadosControleApp.tela_na_horizontal = true;
 
         this.salvar = this.salvar.bind(this);
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
@@ -97,7 +98,7 @@ export default class TelaModalVisualizaFoto extends Component {
             oFuncaoMensagem = this.avancar;
         }
         
-        this.oUtil.exibirMensagemUsuario(oEstado.mensagem, oFuncaoMensagem);
+        this.oUtil.exibirMensagem(oEstado.mensagem, true, oFuncaoMensagem);
     }
 
     avancar() {
@@ -110,7 +111,14 @@ export default class TelaModalVisualizaFoto extends Component {
         this.oDadosControleApp.novo_cliente = false;
         this.oDadosControleApp.novo_veiculo = false;
         
-        this.oNavegacao.navigate(proximaTela);
+        const pop = StackActions.pop(1);
+
+        console.log('Removendo tela de visualizacao de foto...', JSON.stringify(pop));
+        this.oNavegacao.dispatch(pop);
+
+        console.log('Navegando para a tela...', proximaTela);
+
+        this.oNavegacao.navigate('Cadastro', { screen: proximaTela });
     }
     
     capturarNovamente() {
@@ -119,19 +127,17 @@ export default class TelaModalVisualizaFoto extends Component {
     }
 
     voltar() {
-        //this.oDadosApp.foto = clonarObjeto(DADOS_FOTO);
         const pop = StackActions.pop(1);
                 
-        console.log('Removendo tela imagem CNH...', JSON.stringify(pop));
+        console.log('Removendo tela visualizacao de imagem...', JSON.stringify(pop));
         this.oNavegacao.dispatch(pop);
 
-        const push = StackActions.push('Fluxo Cadastro Cliente', { screen: 'Captura Foto' });
+        const push = StackActions.push('Cadastro', { screen: 'Captura Foto' });
 
         this.oNavegacao.dispatch(push);
     }
 
     botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;
-    botaoIncluirContrato = () => <Button title="Avançar" onPress={this.incluirContrato} loading={this.oDadosControleApp.processando_requisicao} ></Button>;
     
     render() {
         
@@ -192,7 +198,6 @@ export default class TelaModalVisualizaFoto extends Component {
                                     </View>
                                 </View>
                                 <View style={{flex:.1, flexDirection:'column',  backgroundColor:'black', opacity: .7}}>
-                                    
                                 </View>
                             </View>
                         </ImageBackground>

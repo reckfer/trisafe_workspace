@@ -8,7 +8,6 @@
 
 import React, { Component } from 'react';
 import {
-    Alert,
     View,
     Text
 } from 'react-native';
@@ -98,12 +97,11 @@ export default class TelaContratacaoPrincipal extends Component {
                     console.log('Removendo tela atual...', JSON.stringify(pop));
                     this.oNavegacao.dispatch(pop);
 
-                    this.oNavegacao.navigate('Fluxo Modais', { screen: 'Contrato Clicksign' });
+                    this.oNavegacao.navigate('Modais', { screen: 'Contrato Clicksign' });
                 } else {
 
                     this.oRegistradorLog.registrar('Não foi possível obter o link do contrato.');
-
-                    Alert.alert('TriSafe', 'Não foi possível obter o link do contrato. Enviamos uma cópia por e-mail. Por favor, verifique seu e-mail');
+                    this.oUtil.exibirMensagem('Não foi possível obter o link do contrato. Enviamos uma cópia por e-mail. Por favor, verifique seu e-mail', true);
                 }
             }
         }
@@ -209,7 +207,8 @@ export class AreaDados extends Component {
 
             RNFetchBlob.fs.cp(caminhoLocal, caminhoArquivoDestino).then((resultado) => {
                 console.log('Arquivo movido: ', resultado);
-                Alert.alert('TriSafe', `Seu contrato salvo. Verifique na pasta Downloads o arquivo ${nomeArquivo}.`);
+                
+                this.oUtil.exibirMensagem(`Seu contrato salvo. Verifique na pasta Downloads o arquivo ${nomeArquivo}.`, true);
             }).catch((oExcecao) => {
                 this.oUtil.tratarExcecao(oExcecao);
             });
@@ -249,7 +248,7 @@ export class AreaDados extends Component {
 
             RNFetchBlob.fs.cp(caminhoLocal, caminhoArquivoDestino).then((resultado) => {
                 console.log('Arquivo movido: ', resultado);
-                Alert.alert('TriSafe', `Seu contrato salvo. Verifique na pasta Downloads o arquivo ${nomeArquivo}.`);
+                this.oUtil.exibirMensagem(`Seu contrato foi salvo no dispositivo. Verifique na pasta Downloads o arquivo ${nomeArquivo}.`, true);
             }).catch((oExcecao) => {
                 this.oUtil.tratarExcecao(oExcecao);
             });
@@ -280,7 +279,7 @@ export class AreaDados extends Component {
             >
                 <View  style={{flexDirection:'row', alignItems:'center', alignSelf:'stretch', justifyContent:'space-evenly' }}>
                     {this.montarIcone('download', 'Baixar', () => {this.oConfiguracao.solicitarPermissaoArmazenamento(this.baixarContrato);}, () => {}, true)}
-                    {this.montarIcone('file-o', 'Visualizar', () => {oNavegacao.navigate('Fluxo Modais', { screen: 'Contrato Clicksign' });}, () => {}, true)}
+                    {this.montarIcone('file-o', 'Visualizar', () => {oNavegacao.navigate('Modais', { screen: 'Contrato Clicksign' });}, () => {}, true)}
                 </View>
             </Card>
             <Card key={2} 
@@ -289,7 +288,7 @@ export class AreaDados extends Component {
             >
                 <View  style={{flexDirection:'row', alignItems:'center', alignSelf:'stretch', justifyContent:'space-evenly' }}>
                     {this.montarIcone('download', 'Baixar', () => {this.oConfiguracao.solicitarPermissaoArmazenamento(this.baixarBoleto);}, () => {}, true)}
-                    {this.montarIcone('file-o', 'Visualizar', () => {oNavegacao.navigate('Fluxo Modais', { screen: 'Boleto Gerencianet' });}, () => {}, true)}
+                    {this.montarIcone('file-o', 'Visualizar', () => {oNavegacao.navigate('Modais', { screen: 'Boleto Gerencianet' });}, () => {}, true)}
                 </View>
             </Card>
         </View>
@@ -297,7 +296,7 @@ export class AreaDados extends Component {
     
     return (
         <View style={styles.areaDadosCliente}>
-            {areaContrato}
+            {areaContrato}            
         </View>
     );}
 }

@@ -9,11 +9,9 @@
 import React, { Component } from 'react';
 import {
     Dimensions,
-    Alert,
     View
 } from 'react-native';
-import ComunicacaoHTTP from '../common/ComunicacaoHTTP';
-import { ThemeProvider, Button } from 'react-native-elements';
+import { Button } from 'react-native-elements';
 import Pdf from 'react-native-pdf';
 import Cabecalho from '../common/CabecalhoTela';
 import { styles, theme } from '../common/Estilos';

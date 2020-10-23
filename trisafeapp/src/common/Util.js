@@ -1,8 +1,5 @@
 'use strict';
-import { Component } from "react";
-import { Alert, View, Text } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import Icon from 'react-native-vector-icons/FontAwesome';
+import { clonarObjeto, DADOS_BOTAO, DADOS_MENSAGEM_MODAL } from "../contexts/DadosAppGeral";
 
 const NOME_COMPONENTE = 'Util';
 
@@ -19,43 +16,58 @@ export default class Util {
             this.oDadosChaves = this.oDadosApp.chaves;
         }
 
-        this.exibirMensagemUsuario = this.exibirMensagemUsuario.bind(this);
+        this.definirBotaoMensagem = this.definirBotaoMensagem.bind(this);
+        this.exibirMensagem = this.exibirMensagem.bind(this);
         this.tratarExcecao = this.tratarExcecao.bind(this);
     }
 
-    exibirMensagemUsuario (mensagem, oFuncaoAlerta) {
-        if (mensagem && mensagem.trim()){
+    definirBotaoMensagem (textoBotao, oFuncaoAcao) {
+        
+        let oBotoesModal = this.oDadosControleApp.config_modal.botoes;
+        let oBotao = clonarObjeto(DADOS_BOTAO);
+        
+        oBotao.texto = textoBotao;
+        oBotao.funcao = oFuncaoAcao;
 
-            Alert.alert(
-                'TriSafe',
-                mensagem,
-                [
-                    {
-                        text: 'OK',
-                        style: 'default',
-                        onPress: oFuncaoAlerta
-                    },
-                ]
-            );
-        }
+        oBotoesModal.push(oBotao);
     }
 
-    // exibirMensagemModal (mensagem, oFuncaoAlerta) {
-    //     if (mensagem && mensagem.trim()){
+    exibirMensagem(textoMensagem, indAlerta, oFuncaoAlerta) {
+        let nomeFuncao = 'exibirMensagem';
 
-    //         Alert.alert(
-    //             'TriSafe',
-    //             mensagem,
-    //             [
-    //                 {
-    //                     text: 'OK',
-    //                     style: 'default',
-    //                     onPress: oFuncaoAlerta
-    //                 },
-    //             ]
-    //         );
-    //     }
-    // }
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+        
+        if(textoMensagem && textoMensagem.trim()) {
+            if(indAlerta) {
+
+                let oBotao = clonarObjeto(DADOS_BOTAO);
+            
+                oBotao.texto = 'OK';
+                oBotao.funcao = oFuncaoAlerta;
+
+                this.oDadosControleApp.config_modal.botoes.push(oBotao);
+            }
+
+            this.oDadosControleApp.config_modal.mensagem = textoMensagem;
+            this.oDadosControleApp.config_modal.exibir_modal = true;
+        } else {
+            this.oDadosControleApp.config_modal = clonarObjeto(DADOS_MENSAGEM_MODAL);    
+        }
+        this.oGerenciadorContextoApp.atualizarMensagemModal();
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+    }
+
+    fecharMensagem() {
+        let nomeFuncao = 'fecharMensagem';
+
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        this.oDadosControleApp.config_modal.mensagem = '';
+        this.oDadosControleApp.config_modal.exibir_modal = false;
+
+        this.oGerenciadorContextoApp.atualizarMensagemModal();
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+    }
 
     tratarExcecao(oExcecao) {
         let nomeFuncao = 'tratarExcecao';
@@ -76,7 +88,7 @@ export default class Util {
         mensagem = `Algo deu errado. ${mensagem}`;
         this.oRegistradorLog.registrar(`${mensagem}. Stack: ${stack}`);
 
-        this.exibirMensagemUsuario(mensagem, () => {});
+        this.exibirMensagem(mensagem, true);
 
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
@@ -97,7 +109,7 @@ export default class Util {
                 stack = oExcecao.stack;
             }
         }
-        mensagem = `Algo deu errado ao enviar los para o servidor. ${mensagem}`;
+        mensagem = `Algo deu errado ao enviar logs para o servidor. ${mensagem}`;
         this.oRegistradorLog.registrar(`${mensagem}. Stack: ${stack}`);
 
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);

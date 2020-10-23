@@ -17,6 +17,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import AreaRodape from '../common/AreaRodape';
 import Orientation from 'react-native-orientation';
 import { inicializarContextoComum } from '../common/Configuracao';
+import MensagemModal from '../common/MensagemModal';
 
 const NOME_COMPONENTE = 'TelaMenuInicio';
 const INSTRUCAO_INICIAL = 'Bem vindo a Trisafe.';
@@ -57,13 +58,12 @@ export default class TelaMenuInicio extends Component {
     }
     
     irParaMeusDados() {
-        this.oNavegacao.navigate('Fluxo Cadastro Cliente', this.state);
+        this.oNavegacao.navigate('Cadastro', this.state);
     }
 
     irParaMeusVeiculos() {
         
         this.oGerenciadorContextoApp.atualizarEstadoTela(this);
-        // this.oNavegacao.navigate('Veículo Inicio', this.state);
     }
 
     render() {
@@ -77,6 +77,7 @@ export default class TelaMenuInicio extends Component {
                 <Cabecalho titulo='' navigation={this.oNavegacao}/>
                 <AreaDados botoes={botoesTela}/>
                 <AreaRodape />
+                <MensagemModal />
             </View>
         )
     }

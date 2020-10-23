@@ -2,6 +2,7 @@ import json
 import sys
 import traceback
 import base64
+from django.core.files.base import ContentFile
 from django.db import models
 from rest_framework import status
 from clienteiter.models import ClienteIter
@@ -29,6 +30,7 @@ class Cliente(models.Model, GerenciadorLog):
     dt_hr_inclusao = models.DateTimeField(blank=False, null=False, auto_now_add=True)
     ult_atualizacao = models.DateTimeField(blank=False, null=False, auto_now=True)
     id_signatario_contrato = models.CharField(max_length=100, null=True)
+    foto_cnh = models.ImageField(upload_to='data/fotos_cnh', null=True)
     
     def obter(self):
         try:
@@ -50,8 +52,9 @@ class Cliente(models.Model, GerenciadorLog):
                     retorno = Retorno(True, self)
                     
                     if(self.credencial_iter.chave_iter_cli and len(self.credencial_iter.chave_iter_cli) > 0):
+                        o_cliente_iter = ClienteIter(self)
                         # Obtem o cadastro na Iter.
-                        retorno = self.o_cliente_iter.obter(m_cliente)
+                        retorno = o_cliente_iter.obter(m_cliente)
                         
                         if not retorno.estado.ok:
                             return retorno
@@ -74,9 +77,10 @@ class Cliente(models.Model, GerenciadorLog):
             lista_clientes = Cliente.objects.filter()
             if lista_clientes:
                 m_cliente = lista_clientes[lista_clientes.count()-1]
-                if m_cliente:                    
+                if m_cliente:
+                    o_cliente_iter = ClienteIter(self)
                     # Obtem o cadastro na Iter.
-                    retorno = self.o_cliente_iter.obter(m_cliente)
+                    retorno = o_cliente_iter.obter(m_cliente)
                     
                     if not retorno.estado.ok:
                         return retorno
@@ -107,8 +111,9 @@ class Cliente(models.Model, GerenciadorLog):
                                 retorno.estado.codMensagem, 
                                 retorno.estado.excecao)
             
+            o_cliente_iter = ClienteIter(self)
             # Inclusao na Iter.
-            retorno = self.o_cliente_iter.obter(self)
+            retorno = o_cliente_iter.obter(self)
             
             if not retorno.estado.ok and (retorno.estado.excecao or retorno.estado.httpStatus != 404):
                 return Retorno(False, self, 'Erro ao validar cadastro na Iter. %s' % (retorno.estado.mensagem), 
@@ -117,9 +122,9 @@ class Cliente(models.Model, GerenciadorLog):
 
             # salva na base da Iter.
             elif retorno.estado.httpStatus == 404:
-                retorno = self.o_cliente_iter.incluir(self)
+                retorno = o_cliente_iter.incluir(self)
             else:
-                retorno = self.o_cliente_iter.alterar(self)
+                retorno = o_cliente_iter.alterar(self)
             
             if not retorno.estado.ok:
                 return Retorno(False, self, 'Erro ao efetivar cadastro na Iter. %s' % (retorno.estado.mensagem), 
@@ -159,8 +164,9 @@ class Cliente(models.Model, GerenciadorLog):
             if(self.credencial_iter.chave_iter_cli and len(self.credencial_iter.chave_iter_cli) > 0):
                 self.id_cliente_iter = m_cliente.id_cliente_iter
 
+                o_cliente_iter = ClienteIter(self)
                 # Alteracao na Iter.
-                retorno = self.o_cliente_iter.alterar(self)
+                retorno = o_cliente_iter.alterar(self)
                 
                 if not retorno.estado.ok:
                     return retorno
@@ -181,23 +187,22 @@ class Cliente(models.Model, GerenciadorLog):
 
     def salvar_foto_cnh(self, foto_cnh_base64):
         try:
+            # Valida se o cliente está cadastrado.
+            retorno = self.obter()
+
+            if not retorno.estado.ok:
+                return retorno
+            
+            m_cliente = retorno.dados
+            
             nome_arquivo = "foto_cnh_%s.jpg" % self.cpf
 
-            caminho_arquivo = os.path.join(BASE_DIR, "data", "fotos_cnh", nome_arquivo)
-            if(os.path.exists(caminho_arquivo)):
-                os.remove(caminho_arquivo)
-            
-            caminho_diretorio = os.path.join(BASE_DIR, "data", "fotos_cnh")
-            if(not os.path.exists(caminho_diretorio)):
-                os.makedirs(caminho_diretorio)
-            
             foto_cnh = base64.b64decode(foto_cnh_base64)
 
-            file = open(caminho_arquivo, 'wb')
-            file.write(foto_cnh)
-            file.close()
+            m_cliente.foto_cnh.save(nome_arquivo, ContentFile(foto_cnh))
+            m_cliente.save()
 
-            retorno = Retorno(True, self, 'CNH recebida com sucesso.', 200, None)
+            retorno = Retorno(True, self, 'Foto da CNH recebida com sucesso.', 200, None)
 
             return retorno
         except Exception as e:

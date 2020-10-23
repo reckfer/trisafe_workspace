@@ -9,10 +9,8 @@
 import React, { Component } from 'react';
 import {
     ScrollView,
-    Alert,
     View,
 } from 'react-native';
-import ComunicacaoHTTP from './../common/ComunicacaoHTTP';
 import { ThemeProvider, Input, Button } from 'react-native-elements';
 import Cabecalho from './../common/CabecalhoTela';
 import { styles, theme } from './../common/Estilos';
@@ -37,8 +35,11 @@ export default class TelaClienteDadosPessoais extends Component {
 
     componentDidMount() {
         let nomeFuncao = 'componentDidMount';
-        
+
         this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        this.oDadosControleApp.cadastrando_cliente = true;
+        this.oDadosControleApp.cadastrando_veiculo = false;
         
         Orientation.unlockAllOrientations();
 

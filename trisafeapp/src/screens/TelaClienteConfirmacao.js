@@ -9,7 +9,6 @@
 import React, { Component } from 'react';
 import {
     ScrollView,
-    Alert,
     View
 } from 'react-native';
 import { ThemeProvider, Input, Button } from 'react-native-elements';
@@ -41,6 +40,9 @@ export default class TelaClienteConfirmacao extends Component {
         
         this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
         
+        this.oDadosControleApp.cadastrando_cliente = true;
+        this.oDadosControleApp.cadastrando_veiculo = false;
+
         Orientation.unlockAllOrientations();
 
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
@@ -69,15 +71,14 @@ export default class TelaClienteConfirmacao extends Component {
             oFuncaoMensagem = this.avancar;
         }
 
-        this.oUtil.exibirMensagemUsuario(oEstado.mensagem, oFuncaoMensagem);
+        this.oUtil.exibirMensagem(oEstado.mensagem, true, oFuncaoMensagem);        
     }
 
     avancar() {
-        Orientation.lockToLandscapeLeft();
-        
         this.oDadosApp.foto = this.oDadosCliente.foto_cnh;
         this.oDadosFoto = this.oDadosApp.foto;
         this.oNavegacao.navigate('Captura Foto');
+        
     }
      
     voltar() {

@@ -7,9 +7,8 @@
  */
 
 import React, { Component } from 'react';
-import { ThemeProvider, Input, Button, ButtonGroup } from 'react-native-elements';
+import { ThemeProvider, Button} from 'react-native-elements';
 import {
-    Alert,
     FlatList,
     Text,
     View,
@@ -23,8 +22,6 @@ import AreaRodape from '../common/AreaRodape';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TouchableHighlight, TouchableOpacity } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import Util from '../common/Util';
-import MensagemModal from '../common/MensagemModal';
 
 const NOME_COMPONENTE = 'TelaVeiculoInicio';
 const INSTRUCAO_INICIAL = '';
@@ -38,6 +35,7 @@ export default class TelaVeiculoInicio extends Component {
 
         this.listarVeiculosCliente = this.listarVeiculosCliente.bind(this);
         this.tratarDadosVeiculosCliente = this.tratarDadosVeiculosCliente.bind(this);
+        this.irParaCadastro = this.irParaCadastro.bind(this);
         this.avancar = this.avancar.bind(this);
         this.voltar = this.voltar.bind(this);
     }
@@ -47,6 +45,9 @@ export default class TelaVeiculoInicio extends Component {
         
         this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
         
+        this.oDadosControleApp.cadastrando_veiculo = true;
+        this.oDadosControleApp.cadastrando_cliente = false;
+
         this.listarVeiculosCliente();
 
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
@@ -85,15 +86,15 @@ export default class TelaVeiculoInicio extends Component {
             if(oEstado.cod_mensagem === 'NaoCadastrado') {
                 
                 this.oDadosControleApp.novo_veiculo = true;
-                mensagem += '\n\nAdicione um veículo para rastreamento.';
+                mensagem = 'Cadastre um ou mais veículos para rastreamento.';
 
-                this.oUtil.exibirMensagemUsuario(mensagem, this.avancar);
+                this.oUtil.exibirMensagem(mensagem, true, this.irParaCadastro());
             } else {
-                this.oUtil.exibirMensagemUsuario(mensagem, () => {});
+                this.oUtil.exibirMensagem(mensagem, true);
             }
         } else {
                
-            this.oUtil.exibirMensagemUsuario(mensagem, () => {});
+            this.oUtil.exibirMensagem(mensagem, true);
 
             if(oDados) {
                 this.oGerenciadorContextoApp.atribuirDados('veiculos', oDados, this);
@@ -101,6 +102,10 @@ export default class TelaVeiculoInicio extends Component {
         }
      
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+    }
+
+    irParaCadastro() {
+        this.oNavegacao.navigate('Veiculo Cadastro');
     }
 
     avancar() {
@@ -167,32 +172,11 @@ export class AreaDados extends Component {
         this.oNavegacao.navigate('Veiculo Cadastro');
     }
     solicitarExclusao(indice) {
-        this.oDadosControleApp.config_modal = {
-            exibir_modal : true,
-            mensagem : 'Deseja excluir este veículo?',
-            botoes : [
-                {
-                    texto: 'OK',
-                    funcao: () => { this.excluir(indice) }
-                }
-            ]
-        }
-        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
-        // Alert.alert(
-        //     'TriSafe',
-        //     'Deseja excluir este veículo?',
-        //     [
-        //         {
-        //             text: 'Sim',
-        //             style: 'default',
-        //             onPress: () => { this.excluir(indice) }
-        //         },
-        //         {
-        //             text: 'Não',
-        //             style: 'cancel'
-        //         },
-        //     ]
-        // );
+        this.oUtil.definirBotaoMensagem('OK', () => this.excluir(indice));
+        this.oUtil.definirBotaoMensagem('Não');
+        let oVeiculo = this.oDadosVeiculos[indice];
+
+        this.oUtil.exibirMensagem(`Tem certeza que desaja excluir o veículo ${oVeiculo.modelo}, placa ${oVeiculo.placa}?`);
     }
     excluir(indiceLista) {
         let nomeFuncao = 'excluir';
@@ -286,7 +270,7 @@ export class AreaDados extends Component {
             </View>
         );
         
-        if(this.oDadosVeiculos && this.oDadosVeiculos.length > 0) {
+        if(this.oDadosVeiculos && this.oDadosVeiculos.length > 0 && this.oDadosVeiculos[0].placa) {
             let listaVeiculos = this.oDadosVeiculos.slice(0);
             
             areaVeiculos = (
@@ -318,8 +302,6 @@ export class AreaDados extends Component {
                             {this.montarIcone('car', 'Adicionar', this.adicionar, () => {}, true)}
                         </View>
                         {areaVeiculos}
-                        
-                        <MensagemModal />
                     </SafeAreaView>
                 </ThemeProvider>
             </View>

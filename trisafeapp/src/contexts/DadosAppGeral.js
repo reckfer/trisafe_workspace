@@ -66,13 +66,16 @@ export const DADOS_BOLETO = {
     'url_html': '',
 };
 
-// // TODO: mudar este modelo para o mesmo do veiculo.
-// export const DADOS_FOTOS = {
-//     'uri_local_cnh': '',
-//     'foto_cnh_base64': '',    
-//     'uri_local_doc_veiculo': '',
-//     'foto_doc_veiculo': '',
-// };
+export const DADOS_MENSAGEM_MODAL = {
+    exibir_modal : false,
+    mensagem : '',
+    botoes : []
+}
+
+export const DADOS_BOTAO = {
+    texto: '',
+    funcao: null
+}
 
 export const DADOS_CONTROLE_APP = {
     app_ativo: true,
@@ -86,11 +89,8 @@ export const DADOS_CONTROLE_APP = {
     abrir_camera: false,
     exibir_foto: true,
     exibir_modal: false,
-    config_modal: {
-        exibir_modal : false,
-        mensagem : '',
-        botoes : []
-    }
+    config_modal: DADOS_MENSAGEM_MODAL,
+    tela_na_horizontal: false
 };
 
 export const DADOS_INSTRUCAO_USUARIO = {

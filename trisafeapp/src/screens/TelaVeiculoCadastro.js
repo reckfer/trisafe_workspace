@@ -9,7 +9,6 @@
 import React, { Component } from 'react';
 import {
     ScrollView,
-    Alert,
     View,
 } from 'react-native';
 import { ThemeProvider, Input, Button } from 'react-native-elements';
@@ -20,6 +19,7 @@ import { ContextoApp } from '../contexts/ContextoApp';
 import Orientation from 'react-native-orientation';
 import { StackActions } from '@react-navigation/native';
 import { inicializarContextoComum } from '../common/Configuracao';
+import Util from '../common/Util';
 
 const NOME_COMPONENTE = 'TelaVeiculoCadastro';
 const INSTRUCAO_INICIAL = 'Informe os dados do seu veículo.';
@@ -44,6 +44,9 @@ export default class TelaVeiculoCadastro extends Component {
         
         this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
         
+        this.oDadosControleApp.cadastrando_veiculo = true;
+        this.oDadosControleApp.cadastrando_cliente = false;
+
         if(!this.oDadosControleApp.novo_veiculo && !this.oDadosVeiculoAtual.placa) {
             this.obter();
         }
@@ -117,37 +120,24 @@ export default class TelaVeiculoCadastro extends Component {
 
             if(!oEstado.ok) {
 
-                this.oUtil.exibirMensagemUsuario(mensagem, this.voltar);
+                this.oUtil.exibirMensagem(mensagem, true, this.voltar);
             } else {
             
                 if(this.oDadosControleApp.novo_veiculo) {
                     mensagem += '\n\nAgora a câmera será aberta para tirar uma foto do documento do veículo.';
 
-                    this.oUtil.exibirMensagemUsuario(mensagem, this.irParaFotoDoc);                    
+                    this.oUtil.exibirMensagem(mensagem, true, this.irParaFotoDoc);                    
                 } else if(this.oDadosVeiculoAtual.foto_doc.url) {
                     
                     // Verifica se tem foto e pede confirmacao para atualizar.
                     mensagem += '\n\nDeseja atualizar a foto do documento do veículo?';
-
-                    Alert.alert(
-                        'TriSafe',
-                        mensagem,
-                        [
-                            {
-                                text: 'Sim',
-                                style: 'default',
-                                onPress: this.irParaFotoDoc
-                            },
-                            {
-                                text: 'Agora Não',
-                                style: 'cancel',
-                                onPress: this.voltar
-                            },
-                        ]
-                    );
-
+                    
+                    this.oUtil.definirBotaoMensagem('Sim', this.irParaFotoDoc);
+                    this.oUtil.definirBotaoMensagem('Agora Não', this.voltar);
+                    this.oUtil.exibirMensagem(mensagem);
+                    
                 } else {
-                    this.oUtil.exibirMensagemUsuario(mensagem, this.irParaFotoDoc);
+                    this.oUtil.exibirMensagem(mensagem, true, this.irParaFotoDoc);
                 }
             }
         }
@@ -164,12 +154,13 @@ export default class TelaVeiculoCadastro extends Component {
     }
 
     voltar() {
-        const pop = StackActions.pop(1);                
-        console.log('Removendo tela veiculo cadastro...', JSON.stringify(pop));
-        this.oNavegacao.dispatch(pop);
+        // const pop = StackActions.pop(1);                
+        // console.log('Removendo tela veiculo cadastro...', JSON.stringify(pop));
+        // this.oNavegacao.dispatch(pop);
 
-        const push = StackActions.push('Fluxo Cadastro Cliente', { screen: 'Veiculo Inicio' });
-        this.oNavegacao.dispatch(push);
+        // const push = StackActions.push('Cadastro', { screen: 'Veiculo Inicio' });
+        // this.oNavegacao.dispatch(push);
+        this.oNavegacao.goBack();
     }
 
     render() {

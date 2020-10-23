@@ -8,7 +8,6 @@
 
 import React, { Component } from 'react';
 import {
-    Alert,
     View,
     Text, Dimensions
 } from 'react-native';
@@ -45,7 +44,7 @@ export default class TelaModalContratoClicksign extends Component {
 
         this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
         
-        Orientation.unlockAllOrientations();
+        // Orientation.unlockAllOrientations();
 
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
@@ -91,8 +90,7 @@ export default class TelaModalContratoClicksign extends Component {
             if(!oDadosContrato.url_doc) {
                 
                 this.oRegistradorLog.registrar('Não foi possível obter o link do contrato.');
-
-                Alert.alert('TriSafe', 'Não foi possível obter o link do contrato. Enviamos uma cópia por e-mail. Por favor, verifique seu e-mail');
+                this.oUtil.exibirMensagem('Não foi possível obter o link do contrato. Enviamos uma cópia por e-mail. Por favor, verifique seu e-mail', true);
             }
 
             this.oGerenciadorContextoApp.atualizarEstadoTela(this);
@@ -153,7 +151,7 @@ export default class TelaModalContratoClicksign extends Component {
             console.log('Removendo tela contrato clicksign...', JSON.stringify(pop));
             this.oNavegacao.dispatch(pop);
 
-            const push = StackActions.push('Fluxo Cadastro Cliente', { screen: 'Contratacao' });
+            const push = StackActions.push('Cadastro', { screen: 'Contratacao' });
 
             this.oNavegacao.dispatch(push);
         }

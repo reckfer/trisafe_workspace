@@ -29,8 +29,7 @@ class ClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
         
         self.m_cliente = Cliente()
         self.definir_contexto(self.m_cliente)
-        self.m_cliente.o_cliente_iter = ClienteIter(self.m_cliente)
-
+        
     @action(detail=False, methods=['post'])
     def obter(self, request):
         try:
@@ -124,8 +123,7 @@ class ClienteViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
         self.m_cliente.uf = d_cliente['uf']
         
     def apropriar_dados_http_foto_cnh(self, d_dados_requisicao):
+        d_veiculo = d_dados_requisicao['cliente']
+        d_foto_cnh = d_veiculo['foto_cnh']
         
-        d_fotos = d_dados_requisicao['foto']
-        foto_cnh_base64 = d_fotos['foto_cnh_base64']
-    
-        return foto_cnh_base64
+        return d_foto_cnh['foto_base64']    

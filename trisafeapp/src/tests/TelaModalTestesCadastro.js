@@ -10,7 +10,6 @@ import React, { Component } from 'react';
 import { ThemeProvider, Input, Button, Card, ButtonGroup} from 'react-native-elements';
 import {
     ScrollView,
-    Alert,
     View
 } from 'react-native';
 import Cabecalho from '../common/CabecalhoTela';
@@ -74,21 +73,21 @@ export default class TelaModalTestesCadastro extends Component {
     }
 
     irParaTesteCadastroIter() {
-        this.oNavegacao.navigate('Fluxo Cadastro Cliente', { screen: 'Cadastro' });
+        this.oNavegacao.navigate('Cadastro', { screen: 'Cadastro' });
 
     }
 
     irParaTesteBoletoGerenciaNet() {
-        this.oNavegacao.navigate('Fluxo Cadastro Cliente', { screen: 'Boleto' });
+        this.oNavegacao.navigate('Cadastro', { screen: 'Boleto' });
 
     }
 
     irParaTesteContratoPDF() {
-        this.oNavegacao.navigate('Fluxo Cadastro Cliente', { screen: 'Contratacao' });
+        this.oNavegacao.navigate('Cadastro', { screen: 'Contratacao' });
     }
 
     irParaTesteVeiculos() {
-        this.oNavegacao.navigate('Fluxo Cadastro Cliente', { screen: 'Veiculo Inicio' });
+        this.oNavegacao.navigate('Cadastro', { screen: 'Veiculo Inicio' });
     }
 
     irParaTesteDownloadBoleto(){
@@ -98,7 +97,7 @@ export default class TelaModalTestesCadastro extends Component {
     irParaTesteFotoCNH() {
         this.oDadosControleApp.novo_cliente = true;
         this.oDadosFoto = this.oDadosCliente.foto_cnh;
-        //this.oNavegacao.navigate('Fluxo Cadastro Cliente', { screen: 'Captura Foto' });
+        //this.oNavegacao.navigate('Cadastro', { screen: 'Captura Foto' });
         this.oNavegacao.navigate('Visualizacao Foto');
         
     }
@@ -107,7 +106,7 @@ export default class TelaModalTestesCadastro extends Component {
         
         this.oDadosControleApp.novo_veiculo = true;
         this.oDadosFoto = this.oDadosVeiculoAtual.foto_doc;
-        //this.oNavegacao.navigate('Fluxo Cadastro Cliente', { screen: 'Captura Foto' });
+        //this.oNavegacao.navigate('Cadastro', { screen: 'Captura Foto' });
         this.oNavegacao.navigate('Visualizacao Foto');
     }
 
@@ -221,7 +220,7 @@ export default class TelaModalTestesCadastro extends Component {
 
                 RNFetchBlob.fs.cp(res.path(), caminhoArquivoDestino).then((resultado) => {
                     console.log('Arquivo movido: ', resultado);
-                    Alert.alert('TriSafe', `Seu contrato salvo. Verifique na pasta Downloads o arquivo ${nomeArquivo}.`);
+                    this.oUtil.exibirMensagem(`Seu contrato salvo foi salvo no dispositivo. Verifique na pasta Downloads o arquivo ${nomeArquivo}.`, true);
                 }).catch((oExcecao) => {
                     this.oUtil.tratarExcecao(oExcecao);
                 });

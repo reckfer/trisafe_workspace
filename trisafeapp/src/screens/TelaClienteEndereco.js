@@ -9,7 +9,6 @@
 import React, { Component } from 'react';
 import {
     ScrollView,
-    Alert,
     View,
 } from 'react-native';
 import { ThemeProvider, Input, Button } from 'react-native-elements';
@@ -39,6 +38,9 @@ export default class TelaClienteEndereco extends Component {
         
         this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
         
+        this.oDadosControleApp.cadastrando_cliente = true;
+        this.oDadosControleApp.cadastrando_veiculo = false;
+
         Orientation.unlockAllOrientations();
 
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);

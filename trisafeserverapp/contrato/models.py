@@ -93,7 +93,7 @@ class Contrato(models.Model, GerenciadorLog):
     def incluir_com_signatario(self):
         try:
             retorno_contrato = self.incluir()
-            if not retorno_contrato:
+            if not retorno_contrato.estado.ok:
                 return retorno_contrato
             
             m_contrato = retorno_contrato.dados

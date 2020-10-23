@@ -10,7 +10,6 @@ import React, { Component } from 'react';
 import { ThemeProvider, Input, Button } from 'react-native-elements';
 import {
     ScrollView,
-    Alert,
     View,
 } from 'react-native';
 import Cabecalho from '../common/CabecalhoTela';
@@ -40,6 +39,9 @@ export default class TelaClienteInicio extends Component {
         let nomeFuncao = 'componentDidMount';
         
         this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+        
+        this.oDadosControleApp.cadastrando_cliente = true;
+        this.oDadosControleApp.cadastrando_veiculo = false;
         
         Orientation.unlockAllOrientations();
 
@@ -75,7 +77,8 @@ export default class TelaClienteInicio extends Component {
         
         if(oEstado.cod_mensagem === 'NaoCadastrado') {
             this.oDadosControleApp.novo_cliente = true;
-            Alert.alert('Trisafe', 'Informe seus dados para realizar o cadastro.');
+            
+            this.oUtil.exibirMensagem('Informe seus dados para realizar o cadastro.', true);
         } else {
             if(oEstado.ok){
                 this.oDadosControleApp.novo_cliente = false;
@@ -84,9 +87,10 @@ export default class TelaClienteInicio extends Component {
             }
 
             if (oEstado.mensagem && oEstado.mensagem.trim()) {
-                Alert.alert('Trisafe', oEstado.mensagem);
+                
+                this.oUtil.exibirMensagem(oEstado.mensagem, true);
             } else {
-                Alert.alert('Trisafe', 'Atualize seus dados cadastrais.');
+                this.oUtil.exibirMensagem('Atualize seus dados cadastrais.', true);
             }
         }
         if(oDados) {
@@ -98,7 +102,7 @@ export default class TelaClienteInicio extends Component {
     }
 
     irParaTestesRapidos() {
-        this.oNavegacao.navigate('Fluxo Modais', { screen: 'Testes Cadastro' });
+        this.oNavegacao.navigate('Modais', { screen: 'Testes Cadastro' });
     }
 
     botaoIniciar = () => <Button title="Iniciar" onPress={this.obterCliente} loading={this.oDadosControleApp.processando_requisicao}></Button>;

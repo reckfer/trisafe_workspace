@@ -11,11 +11,12 @@ import {
     Modal,
     StyleSheet,
     View,
-    Text
+    Text,
+    ActivityIndicator,
+    TouchableHighlight
 } from 'react-native';
-import { TouchableHighlight } from 'react-native-gesture-handler';
 import { ContextoApp } from '../contexts/ContextoApp';
-//import { styles } from './Estilos';
+import { clonarObjeto, DADOS_MENSAGEM_MODAL } from '../contexts/DadosAppGeral';
 import { inicializarContextoComum } from './Configuracao';
 
 export default class MensagemModal extends Component {
@@ -24,8 +25,11 @@ export default class MensagemModal extends Component {
         super();
         
         inicializarContextoComum(props, contexto, this);
+        this.oGerenciadorContextoApp.componenteMensagemModal = this;
+        this.oDadosControleApp.config_modal = clonarObjeto(DADOS_MENSAGEM_MODAL);
 
         this.montarBotoes = this.montarBotoes.bind(this);
+        this.realizarAcaoBotao = this.realizarAcaoBotao.bind(this);
         this.fechar = this.fechar.bind(this);
     }
 
@@ -34,20 +38,17 @@ export default class MensagemModal extends Component {
         let oListaBotoes = this.oDadosControleApp.config_modal.botoes;
         let oConfigBotao;
 
-        if(oListaBotoes && oListaBotoes.length > 0) {
+        if(this.oDadosControleApp.config_modal.exibir_modal && oListaBotoes && oListaBotoes.length > 0) {
         
             for(let i = 0; i < oListaBotoes.length; i++) {
         
                 oConfigBotao = oListaBotoes[i];
-                
+
                 oElementosBotoes.push(
                     <TouchableHighlight key={i}
-                      style={{ backgroundColor: "#2196F3" }}
+                      style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
                       onPress={() => {
-                          if(oConfigBotao.funcao) {
-                            oConfigBotao.funcao()
-                          }
-                          this.fechar();
+                        this.realizarAcaoBotao(oListaBotoes[i]);
                       }}
                     >
                         <Text style={styles.textStyle}>{oConfigBotao.texto}</Text>
@@ -59,33 +60,61 @@ export default class MensagemModal extends Component {
     }
 
     fechar() {
-        this.oDadosControleApp.config_modal.exibir_modal = false;
-        this.oGerenciadorContextoApp.atualiarEstadoTela();
+        this.oDadosControleApp.config_modal = clonarObjeto(DADOS_MENSAGEM_MODAL);
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
+    }
+
+    realizarAcaoBotao(oConfigBotao) {
+      
+        if(oConfigBotao.funcao) {
+          oConfigBotao.funcao();
+        }
+        this.fechar();      
+    }
+
+    controlarIndicadorAtividade(indExibir) {
+      if(indExibir) {
+        return(<ActivityIndicator color='#2196F3' size='large' style={{marginBottom: 20}}/>)
+      }
+      return(<View></View>)
     }
 
     render() {
-        //this.oDadosControleApp.config_modal.exibir_modal = false;
+        let indExibirIndicador = false;
+        let exibir = false;
+        let mensagem = '';
+        let margemHorizontal = 40;
+
+        if(this.oDadosControleApp) {
+          indExibirIndicador = !(this.oDadosControleApp.config_modal.botoes.length > 0);
+          exibir = this.oDadosControleApp.config_modal.exibir_modal;
+          mensagem = this.oDadosControleApp.config_modal.mensagem;
+          if(this.oDadosControleApp.tela_na_horizontal) {
+            margemHorizontal = 120;
+          }
+          console.log('Configuracao Mensagem Modal ... ', this.oDadosControleApp.config_modal);
+        }
+
         return (
-        <View style={styles.centeredView}>
-            <Modal
-                animationType="slide"
-                presentationStyle='fullScreen'
-                transparent={true}
-                visible={this.oDadosControleApp.config_modal.exibir_modal}
-                onRequestClose={() => {
-                  Alert.alert("Modal has been closed.");
-                }}
-            >
-                <View style={styles.centeredView}>
-                    <View style={styles.modalView}>
-                        <Text style={styles.modalText}>{this.oDadosControleApp.config_modal.mensagem}</Text>                        
-                    </View>
-                    <View>
-                        {this.montarBotoes()}
-                    </View>
-                </View>
-            </Modal>
-        </View>)
+          <Modal
+            animationType="none"
+            transparent={true}
+            visible={exibir}
+            onRequestClose={() => {
+              
+            }}
+          >
+            <View style={styles.centeredView}>
+              <View style={{...styles.modalView, marginHorizontal:margemHorizontal}}>
+                  {this.controlarIndicadorAtividade(indExibirIndicador)}
+                  <Text style={styles.modalText}>{mensagem}</Text>
+                  <View style={{flexDirection:'row'}}> 
+                    {this.montarBotoes()}
+                  </View>
+              </View>
+            </View>
+          </Modal>
+        )
     }
 }
 MensagemModal.contextType = ContextoApp;
@@ -97,11 +126,12 @@ const styles = StyleSheet.create({
       alignItems: "center",
     },
     modalView: {
-      margin: 20,
+      margin: 40,
       backgroundColor: "white",
       borderRadius: 20,
-      padding: 35,
+      padding: 20,
       alignItems: "center",
+      alignSelf:'stretch',
       shadowColor: "#000",
       shadowOffset: {
         width: 0,
@@ -113,8 +143,9 @@ const styles = StyleSheet.create({
     },
     openButton: {
       backgroundColor: "#F194FF",
-      borderRadius: 20,
+      borderRadius: 10,
       padding: 10,
+      marginHorizontal: 5,
       elevation: 2
     },
     textStyle: {
@@ -123,7 +154,8 @@ const styles = StyleSheet.create({
       textAlign: "center"
     },
     modalText: {
-      marginBottom: 15,
+      marginBottom: 20,
+      fontSize: 16,
       textAlign: "center"
     }
   });

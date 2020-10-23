@@ -1,7 +1,4 @@
 'use strict';
-import {
-    Alert,
-} from 'react-native';
 import { clonarObjeto, ESTADO } from '../contexts/DadosAppGeral';
 import Util from './Util';
 
@@ -30,7 +27,7 @@ export default class ComunicacaoHTTP {
 
         if (__DEV__) {
             protocol = 'http://';
-            domain = '192.168.0.110:8000';
+            domain = '192.168.0.103:8000';
         }
         return protocol + domain + metodo;
     };
@@ -65,17 +62,19 @@ export default class ComunicacaoHTTP {
 
     fazerRequisicaoHTTP(metodoURI, oDadosRequisicao, oFuncaoCallback, suprimirMsgServidor, ignorarCallbackSeErro) {
         let nomeFuncao = 'fazerRequisicaoHTTP';
-
+        
         this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
 
+        this.oUtil.exibirMensagem('Processando. Aguarde...');
         this.oDadosControleApp.processando_requisicao = true;
-        
-        if(this.oComponente) {
-            this.oComponente.texto_instrucao = this.oDadosInstrucao.texto_instrucao;
-            this.oDadosInstrucao.texto_instrucao = 'Processando. Aguarde...';
-            this.oGerenciadorContextoApp.atualizarEstadoTela(this.oComponente);
-        }
-        
+
+        // if(this.oComponente) {
+        //     this.oComponente.texto_instrucao = this.oDadosInstrucao.texto_instrucao;
+        //  //   this.oDadosInstrucao.texto_instrucao = 'Processando. Aguarde...';
+
+        //    // this.oGerenciadorContextoApp.atualizarEstadoTela(this.oComponente);
+        // }
+
         let url = this.getURL(metodoURI);
         let oParametrosHTTPS = this.getParametrosHTTPS(oDadosRequisicao);
 
@@ -192,9 +191,9 @@ export default class ComunicacaoHTTP {
     
     obterJsonResposta(oRespostaHTTP, ignorarErro) {
         let nomeFuncao = 'obterJsonResposta';
-        
-        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
-        
+        this.oDadosControleApp.config_modal.exibir_modal = false;
+
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);        
         this.oRegistradorLog.registrar(`Resposta HTTP = ${JSON.stringify(oRespostaHTTP)}`);
         
         let retornoJson = null;
@@ -225,7 +224,7 @@ export default class ComunicacaoHTTP {
 
     tratarRetornoServidor(oJsonRetorno, oFuncaoCallback, suprimirMsgServidor, ignorarCallbackSeErro) {
         let nomeFuncao = 'tratarRetornoServidor';
-
+        
         this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
 
         let oEstado = clonarObjeto(ESTADO);
@@ -258,7 +257,7 @@ export default class ComunicacaoHTTP {
         }
 
         if (!suprimirMsgServidor && oEstado.mensagem && oEstado.mensagem.trim()) {
-            Alert.alert('Trisafe', oEstado.mensagem);
+            this.oUtil.exibirMensagem(oEstado.mensagem);
         }
         
         if(oDados && typeof(oDados) === 'string' && oDados.trim()) {
@@ -267,8 +266,8 @@ export default class ComunicacaoHTTP {
         
         this.oRegistradorLog.registrar(`Estado da resposta do servidor = ${JSON.stringify(oEstado)}`);
 
+        this.oUtil.fecharMensagem();     
         if(oFuncaoCallback) {
-             
             if(ignorarCallbackSeErro) {
                 if(oEstado.ok === true) {
                     oFuncaoCallback(oDados, oEstado);
@@ -277,6 +276,7 @@ export default class ComunicacaoHTTP {
                 oFuncaoCallback(oDados, oEstado);
             }
         }
+        
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);        
     }
 }

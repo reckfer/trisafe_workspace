@@ -18,7 +18,6 @@ import { RNCamera } from 'react-native-camera';
 import Orientation from 'react-native-orientation';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { clonarObjeto } from '../contexts/DadosAppGeral';
 import { StackActions } from '@react-navigation/native';
 import Svg, { Rect } from 'react-native-svg';
 
@@ -31,10 +30,10 @@ export default class TelaCapturaFoto extends PureComponent {
         super();
         
         inicializarContextoComum(props, contexto, this, INSTRUCAO_INICIAL);
+        this.oDadosControleApp.tela_na_horizontal = true;
 
         this.capturarFotoCNH = this.capturarFotoCNH.bind(this);
         this.registrarEventoFoco = this.registrarEventoFoco.bind(this);
-        this.voltar = this.voltar.bind(this);
         this._tratarVoltarPeloDispositivo = this._tratarVoltarPeloDispositivo.bind(this);
 
         BackHandler.addEventListener('hardwareBackPress', this._tratarVoltarPeloDispositivo);
@@ -61,10 +60,6 @@ export default class TelaCapturaFoto extends PureComponent {
         });
     }
     
-    voltar() {
-        this.oNavegacao.goBack();
-    }
-
     _tratarVoltarPeloDispositivo() {
         console.log('Desbloqueando orientacao horizontal...');
         Orientation.unlockAllOrientations;
@@ -97,6 +92,8 @@ export default class TelaCapturaFoto extends PureComponent {
 
                 console.log('Removendo tela camera...', JSON.stringify(pop));
                 this.oNavegacao.dispatch(pop);
+
+                //const push = StackActions.push('Modais', { screen: 'Visualizacao Foto' });
                 this.oNavegacao.navigate('Visualizacao Foto');
             }).catch((oExcecao) => {
                 this.oUtil.tratarExcecao(oExcecao);
@@ -104,7 +101,6 @@ export default class TelaCapturaFoto extends PureComponent {
         }
     };
 
-    botaoVoltar = () => <Button title="Voltar" onPress={this.voltar} ></Button>;
     botaoIncluirContrato = () => <Button title="Avançar" onPress={this.incluirContrato} loading={this.oDadosControleApp.processando_requisicao} ></Button>;
     
     render() {
@@ -160,7 +156,6 @@ export default class TelaCapturaFoto extends PureComponent {
                             </View>
                         </View>
                         <View style={{flex:.1, flexDirection:'column',  backgroundColor:'black', opacity: .7}}>
-                            
                         </View>
                     </View>
                 </RNCamera>

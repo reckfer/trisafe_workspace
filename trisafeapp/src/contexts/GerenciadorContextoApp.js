@@ -3,6 +3,7 @@ import { DADOS_APP_GERAL, clonarObjeto } from './DadosAppGeral';
 import RegistradorLog from './RegistradorLog';
 import DeviceInfo from 'react-native-device-info';
 import { AppState } from 'react-native';
+import { Component } from 'react';
 
 const NOME_COMPONENTE = 'GerenciadorContextoApp';
 
@@ -12,7 +13,6 @@ export default class GerenciadorContextoApp {
         this.oDadosReferencia = DADOS_APP_GERAL;
 
         this.oRegistradorLog = new RegistradorLog(this);
-        //this.oDadosReferencia.registros_log = this.oRegistradorLog.registrosLog;
         
         this.criarAtalhosDadosContexto = this.criarAtalhosDadosContexto.bind(this);
         this.atualizarEstadoTela = this.atualizarEstadoTela.bind(this);
@@ -59,6 +59,10 @@ export default class GerenciadorContextoApp {
     set registradorLog(oRegistradorLog) {
         this.oRegistradorLog = oRegistradorLog;
     }
+    
+    set componenteMensagemModal(oComponente) {
+        this.oComponenteMensagemModal = oComponente;
+    };
 
     get appAtivo() {
 
@@ -79,20 +83,27 @@ export default class GerenciadorContextoApp {
     }
 
     criarAtalhosDadosContexto(oComponente) {
-        oComponente.oGerenciadorContextoApp = this;
-        oComponente.oRegistradorLog = this.registradorLog;         
-        oComponente.oDadosApp = this.dadosApp;
-        oComponente.oDadosControleApp = this.dadosControleApp;
-        oComponente.oDadosInstrucao = this.instrucaoUsuarioApp;
-        oComponente.oDadosCliente = this.dadosApp.cliente;
-        oComponente.oDadosVeiculoAtual = this.dadosApp.veiculo_atual;
-        oComponente.oDadosVeiculos = this.dadosApp.veiculos;
-        oComponente.oDadosContrato = this.dadosApp.contrato;
-        oComponente.oDadosFoto = this.dadosApp.foto;
-        oComponente.oDadosChaves = this.dadosApp.chaves;
-        oComponente.oDadosDispositivo = this.dadosApp.dados_dispositivo;
-
-        oComponente.state = this.dadosAppGeral;
+        if(oComponente) {
+            
+            if(oComponente instanceof Component) {
+                this.telaAtual = oComponente;
+            }
+            
+            oComponente.oGerenciadorContextoApp = this;
+            oComponente.oRegistradorLog = this.registradorLog;         
+            oComponente.oDadosApp = this.dadosApp;
+            oComponente.oDadosControleApp = this.dadosControleApp;
+            oComponente.oDadosInstrucao = this.instrucaoUsuarioApp;
+            oComponente.oDadosCliente = this.dadosApp.cliente;
+            oComponente.oDadosVeiculoAtual = this.dadosApp.veiculo_atual;
+            oComponente.oDadosVeiculos = this.dadosApp.veiculos;
+            oComponente.oDadosContrato = this.dadosApp.contrato;
+            oComponente.oDadosFoto = this.dadosApp.foto;
+            oComponente.oDadosChaves = this.dadosApp.chaves;
+            oComponente.oDadosDispositivo = this.dadosApp.dados_dispositivo;
+            
+            oComponente.state = this.dadosAppGeral;
+        }
     }
 
     /*** FUNCOES DE ATRIBUICOES ****/
@@ -107,6 +118,18 @@ export default class GerenciadorContextoApp {
             oTela.setState(this.oDadosReferencia);
         }
     };
+
+    atualizarMensagemModal() {
+        let nomeFuncao = 'atualizarMensagemModal';
+
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        if(this.oComponenteMensagemModal) {
+            this.oRegistradorLog.registrar('Atualizando mensagem modal...');
+            this.oComponenteMensagemModal.setState(this.oDadosReferencia);
+        }
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+    }
 
     atribuirDados(nomeAtributo, oDadosAtribuir, instanciaComponente) {
         let nomeFuncao = 'atribuirDados';

@@ -71,6 +71,20 @@ class VeiculoViewSet(AutenticacaoTriSafeViewSet, viewsets.ModelViewSet, permissi
                     
             retorno = Retorno(False, self, 'A consulta dos dados cadastrais do veículo falhou.', None, None, e)
             return retorno.gerar_resposta_http()
+    
+    @action(detail=False, methods=['post'])
+    def excluir(self, request):
+        try:
+            self.apropriar_dados_http(request.data)
+            
+            retorno_veiculo = self.m_veiculo.excluir()
+            
+            return retorno_veiculo.gerar_resposta_http()
+            
+        except Exception as e:
+                    
+            retorno = Retorno(False, self, 'A consulta dos dados cadastrais do veículo falhou.', None, None, e)
+            return retorno.gerar_resposta_http()
 
     @action(detail=False, methods=['post'])
     def listar_por_cliente(self, request):

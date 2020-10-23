@@ -33,17 +33,18 @@ function FluxoCadastro() {
         <fluxoCadastro.Screen name="Veiculo Inicio" component={TelaVeiculoInicio} />
         <fluxoCadastro.Screen name="Veiculo Cadastro" component={TelaVeiculoCadastro} />
         <fluxoCadastro.Screen name="Contratacao" component={TelaContratacaoPrincipal} />
+        <fluxoCadastro.Screen name="Modais" component={FluxoModais} />
     </fluxoCadastro.Navigator>
   );
 }
 
 function FluxoModais() {
   return (
-    <fluxoModais.Navigator headerMode='none' initialRouteName='Testes Cadastro'>
+    <fluxoModais.Navigator headerMode='none' mode='modal' initialRouteName='Cadastro'>
+        <fluxoModais.Screen name="Cadastro" component={FluxoCadastro} />
         <fluxoModais.Screen name="Visualizacao Foto" component={TelaModalVisualizaFoto} />
         <fluxoModais.Screen name="Contrato Clicksign" component={TelaModalContratoClicksign} />
         <fluxoModais.Screen name="Boleto Gerencianet" component={TelaModalBoleto} />
-        <fluxoModais.Screen name="Fluxo Cadastro Cliente" component={FluxoCadastro} />
         <fluxoModais.Screen name="Testes Cadastro" component={TelaModalTestesCadastro} />
     </fluxoModais.Navigator>
   );
@@ -52,10 +53,9 @@ function FluxoModais() {
 function FluxoRaiz() {
   
   return (
-    <fluxoRaiz.Navigator headerMode='none' mode='modal' initialRouteName='Menu'>
+    <fluxoRaiz.Navigator headerMode='none' initialRouteName='Menu'>
         <fluxoRaiz.Screen name="Menu" component={TelaMenuInicio} />
-        <fluxoRaiz.Screen name="Fluxo Cadastro Cliente" component={FluxoCadastro} />
-        <fluxoRaiz.Screen name="Fluxo Modais" component={FluxoModais} />
+        <fluxoRaiz.Screen name="Cadastro" component={FluxoCadastro} />
     </fluxoRaiz.Navigator>
   );
 }
