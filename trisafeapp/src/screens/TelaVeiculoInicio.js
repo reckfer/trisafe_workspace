@@ -22,9 +22,10 @@ import AreaRodape from '../common/AreaRodape';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TouchableHighlight, TouchableOpacity } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Orientation from 'react-native-orientation';
 
 const NOME_COMPONENTE = 'TelaVeiculoInicio';
-const INSTRUCAO_INICIAL = '';
+const INSTRUCAO_INICIAL = 'Gerencie seus veículos para rastreamento.';
 
 export default class TelaVeiculoInicio extends Component {
     
@@ -35,6 +36,8 @@ export default class TelaVeiculoInicio extends Component {
 
         this.listarVeiculosCliente = this.listarVeiculosCliente.bind(this);
         this.tratarDadosVeiculosCliente = this.tratarDadosVeiculosCliente.bind(this);
+        this.registrarEventoFoco = this.registrarEventoFoco.bind(this);
+        this.definirDadosPadraoTela = this.definirDadosPadraoTela.bind(this);
         this.irParaCadastro = this.irParaCadastro.bind(this);
         this.avancar = this.avancar.bind(this);
         this.voltar = this.voltar.bind(this);
@@ -45,11 +48,26 @@ export default class TelaVeiculoInicio extends Component {
         
         this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
         
+        this.registrarEventoFoco();
+        
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+    }
+
+    registrarEventoFoco() {
+	
+        this.oNavegacao.addListener('focus', this.definirDadosPadraoTela);
+    }
+    
+    definirDadosPadraoTela() {
+        let nomeFuncao = 'definirDadosPadraoTela';
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+    
+        Orientation.unlockAllOrientations();
         this.oDadosControleApp.cadastrando_veiculo = true;
         this.oDadosControleApp.cadastrando_cliente = false;
-
+        this.oDadosInstrucao.texto_instrucao = INSTRUCAO_INICIAL;
         this.listarVeiculosCliente();
-
+        
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
     
@@ -178,6 +196,7 @@ export class AreaDados extends Component {
 
         this.oUtil.exibirMensagem(`Tem certeza que desaja excluir o veículo ${oVeiculo.modelo}, placa ${oVeiculo.placa}?`);
     }
+    
     excluir(indiceLista) {
         let nomeFuncao = 'excluir';
 
@@ -212,6 +231,10 @@ export class AreaDados extends Component {
             
             //Remove o veiculo excluido da lista.
             this.oDadosVeiculos.splice(indiceLista, 1);
+            
+            if(this.oDadosVeiculos.length <= 0) {
+                this.oDadosVeiculos = [clonarObjeto(DADOS_VEICULO)];
+            }
 
             this.oGerenciadorContextoApp.atualizarEstadoTela(this);
         }

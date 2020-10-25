@@ -17,9 +17,8 @@ import { styles, theme } from '../common/Estilos';
 import AreaRodape from '../common/AreaRodape';
 import { ContextoApp } from '../contexts/ContextoApp';
 import Orientation from 'react-native-orientation';
-import { StackActions } from '@react-navigation/native';
 import { inicializarContextoComum } from '../common/Configuracao';
-import Util from '../common/Util';
+import { clonarObjeto, DADOS_VEICULO } from '../contexts/DadosAppGeral';
 
 const NOME_COMPONENTE = 'TelaVeiculoCadastro';
 const INSTRUCAO_INICIAL = 'Informe os dados do seu veículo.';
@@ -35,6 +34,8 @@ export default class TelaVeiculoCadastro extends Component {
         this.tratarDadosVeiculo = this.tratarDadosVeiculo.bind(this);
         this.salvar = this.salvar.bind(this);
         this.tratarRetornoAtualizacao = this.tratarRetornoAtualizacao.bind(this);
+        this.registrarEventoFoco = this.registrarEventoFoco.bind(this);
+        this.definirDadosPadraoTela = this.definirDadosPadraoTela.bind(this);
         this.voltar = this.voltar.bind(this);
         this.irParaFotoDoc = this.irParaFotoDoc.bind(this);
     }
@@ -44,15 +45,31 @@ export default class TelaVeiculoCadastro extends Component {
         
         this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
         
-        this.oDadosControleApp.cadastrando_veiculo = true;
-        this.oDadosControleApp.cadastrando_cliente = false;
+        this.registrarEventoFoco();
+        
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+    }
 
-        if(!this.oDadosControleApp.novo_veiculo && !this.oDadosVeiculoAtual.placa) {
-            this.obter();
+    registrarEventoFoco() {
+	
+        this.oNavegacao.addListener('focus', this.definirDadosPadraoTela);
+    }
+    
+    definirDadosPadraoTela() {
+        let nomeFuncao = 'definirDadosPadraoTela';
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+    
+        if(!this.oDadosControleApp.manter_tela_na_horizontal) {
+            
+            Orientation.unlockAllOrientations();        
+            this.oDadosControleApp.cadastrando_veiculo = true;
+            this.oDadosControleApp.cadastrando_cliente = false;
+            this.oDadosInstrucao.texto_instrucao = INSTRUCAO_INICIAL;
+            
+            if(!this.oDadosControleApp.novo_veiculo && !this.oDadosVeiculoAtual.placa) {
+                this.obter();
+            }
         }
-
-        Orientation.unlockAllOrientations();
-
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
 
@@ -112,54 +129,67 @@ export default class TelaVeiculoCadastro extends Component {
 
     tratarRetornoAtualizacao(oDados, oEstado) {
         let nomeFuncao = 'tratarRetornoAtualizacao';
+        let mensagem = '';
 
         this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
 
         if (oEstado.mensagem && oEstado.mensagem.trim()) {
-            let mensagem = oEstado.mensagem;
+            mensagem = oEstado.mensagem;
+        }
+        if(!oEstado.ok) {
 
-            if(!oEstado.ok) {
+            this.oUtil.exibirMensagem(mensagem, true, this.voltar);
+        } else {
+        
+            if(this.oDadosControleApp.novo_veiculo) {
 
-                this.oUtil.exibirMensagem(mensagem, true, this.voltar);
+                // if(this.oDadosVeiculos.length == 0 || 
+                //     (this.oDadosVeiculos.length == 1 && !this.oDadosVeiculos.placa)) {
+                    
+                //     // Adiciona o veiculo novo na lista, se eh o primeiro veiculo.
+                //     this.oGerenciadorContextoApp.atribuirDados('veiculos', [oDados], this);
+                // } else {
+
+                //     // Adiciona o veiculo novo na lista.
+                //     this.oDadosVeiculos.push(this.oDadosVeiculoAtual);
+                // }
+
+                mensagem += '\n\nA câmera será aberta para tirar uma foto do documento do veículo.';
+
+                this.oUtil.exibirMensagem(mensagem, true, this.irParaFotoDoc);                    
+            } else if(this.oDadosVeiculoAtual.foto_doc.url) {
+                
+                // Verifica se tem foto e pede confirmacao para atualizar.
+                mensagem += '\n\nDeseja atualizar a foto do documento do veículo?';
+                
+                this.oUtil.definirBotaoMensagem('Sim', this.irParaFotoDoc);
+                // Volta para a tela de lista.
+                this.oUtil.definirBotaoMensagem('Agora Não', this.voltar);
+                this.oUtil.exibirMensagem(mensagem);
+                
             } else {
-            
-                if(this.oDadosControleApp.novo_veiculo) {
-                    mensagem += '\n\nAgora a câmera será aberta para tirar uma foto do documento do veículo.';
-
-                    this.oUtil.exibirMensagem(mensagem, true, this.irParaFotoDoc);                    
-                } else if(this.oDadosVeiculoAtual.foto_doc.url) {
-                    
-                    // Verifica se tem foto e pede confirmacao para atualizar.
-                    mensagem += '\n\nDeseja atualizar a foto do documento do veículo?';
-                    
-                    this.oUtil.definirBotaoMensagem('Sim', this.irParaFotoDoc);
-                    this.oUtil.definirBotaoMensagem('Agora Não', this.voltar);
-                    this.oUtil.exibirMensagem(mensagem);
-                    
-                } else {
-                    this.oUtil.exibirMensagem(mensagem, true, this.irParaFotoDoc);
-                }
+                this.oUtil.exibirMensagem(mensagem, true, this.irParaFotoDoc);
             }
         }
-        
+
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
 
     irParaFotoDoc() {
-        
+        // Importante manter a rotação na horizontal para garantir correta renderização da máscara da camera.
+        //Orientation.lockToLandscapeLeft();
+
         this.oDadosApp.foto = this.oDadosVeiculoAtual.foto_doc;
         this.oDadosFoto = this.oDadosApp.foto;
-        
+
         this.oNavegacao.navigate('Visualizacao Foto');
     }
 
     voltar() {
-        // const pop = StackActions.pop(1);                
-        // console.log('Removendo tela veiculo cadastro...', JSON.stringify(pop));
-        // this.oNavegacao.dispatch(pop);
-
-        // const push = StackActions.push('Cadastro', { screen: 'Veiculo Inicio' });
-        // this.oNavegacao.dispatch(push);
+        // Limpa os dados nas referencias de veiculo atual.
+        this.oDadosApp.veiculo = clonarObjeto(DADOS_VEICULO);
+        this.oDadosVeiculoAtual = this.oDadosApp.veiculo;
+        
         this.oNavegacao.goBack();
     }
 

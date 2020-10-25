@@ -20,7 +20,7 @@ const NOME_COMPONENTE = 'Configuracao';
 export default class Configuracao {
 
     constructor(gerenciadorContexto, instanciaComponente) {
-        
+
         if(gerenciadorContexto) {
             gerenciadorContexto.criarAtalhosDadosContexto(this);
 
@@ -33,15 +33,13 @@ export default class Configuracao {
         this.apropriarToken = this.apropriarToken.bind(this);
         this.solicitarPermissaoArmazenamento = this.solicitarPermissaoArmazenamento.bind(this);
         this.enviarLogsContingencia = this.enviarLogsContingencia.bind(this);
-        this.texto_instrucao = '';
     }
 
     autenticarCliente() {
 
         try {
             if(!this.oDadosChaves.token_trisafe) {
-                this.texto_instrucao = this.oDadosInstrucao.texto_instrucao;
-                this.oDadosInstrucao.texto_instrucao = 'Autenticando. Aguarde...';
+                
                 this.oDadosControleApp.autenticado = false;
                 this.oGerenciadorContextoApp.atualizarEstadoTela(this.oInstanciaComponente);
 
@@ -54,6 +52,7 @@ export default class Configuracao {
                 // Credencial secundaria.
                 oDadosRequisicao.chaves.credencial_secundaria = 'gAAAAABfQRrm33-jDVGFyH0c2pbFeAjh2oCjwq4xtdhMvDUES2v-9MJiBQjgbrjjQvHL468V-KT1MUDD_JEAODLS1KJaW_sNb5PZb0Xp00Ow3VknOcYnP1zlyjXbGU8IR3-jeqmDosXk-C35XkRePBrQeMwQ9jtJXQ==';
                 
+                this.oGerenciadorContextoApp.funcaoAtual = this.autenticarCliente;
                 this.oComunicacaoHTTP.fazerRequisicaoHTTP(metodoURI, oDadosRequisicao, this.apropriarToken, false, false);
             }
         } catch (oExcecao) {
@@ -62,10 +61,9 @@ export default class Configuracao {
     }
 
     apropriarToken(oDados, oEstado) {
-        this.oDadosInstrucao.texto_instrucao = 'A autenticação com o servidor falhou.';
-        
-        console.log('dados_token: ', oDados);
-        
+        let nomeFuncao = 'apropriarToken';
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
         if(oDados) {
             if(oDados.token_trisafe) {
                 this.oDadosChaves.token_trisafe = oDados.token_trisafe;
@@ -77,8 +75,10 @@ export default class Configuracao {
             this.oDadosChaves.token_trisafe.trim()) {
             
             this.autenticado = true;
-            this.oDadosInstrucao.texto_instrucao = this.texto_instrucao;
+        } else {
+            this.oDadosInstrucao.texto_instrucao = 'A autenticação do aplicativo falhou.';
         }
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
 
         this.oGerenciadorContextoApp.atualizarEstadoTela(this.oInstanciaComponente);
     }
@@ -204,7 +204,7 @@ export function inicializarContextoComum(propsGeral, contextoGeral, oComponente,
         oComponente.oDadosControleApp.tela_na_horizontal = false;
 
         if(textoInstrucao) {
-            oComponente.texto_instrucao = textoInstrucao;
+            //oComponente.texto_instrucao = textoInstrucao;
             oComponente.oDadosInstrucao.texto_instrucao = textoInstrucao;
         }
 

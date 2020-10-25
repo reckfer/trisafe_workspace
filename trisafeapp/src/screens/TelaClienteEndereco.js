@@ -28,7 +28,9 @@ export default class TelaClienteEndereco extends Component {
         super();
         
         inicializarContextoComum(props, contexto, this, INSTRUCAO_INICIAL);
-        
+
+        this.registrarEventoFoco = this.registrarEventoFoco.bind(this);
+        this.definirDadosPadraoTela = this.definirDadosPadraoTela.bind(this);
         this.avancar = this.avancar.bind(this);
         this.voltar = this.voltar.bind(this);
     }
@@ -37,12 +39,33 @@ export default class TelaClienteEndereco extends Component {
         let nomeFuncao = 'componentDidMount';
         
         this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        this.registrarEventoFoco();
+
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+    }
+
+    componentWillUnmount() {
+        // let nomeFuncao = 'componentWillUnmount';
         
+        // this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        // this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+    }
+
+    registrarEventoFoco() {
+        this.oNavegacao.addListener('focus', this.definirDadosPadraoTela);
+    }
+
+    definirDadosPadraoTela() {
+        let nomeFuncao = 'definirDadosPadraoTela';
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+    
+        Orientation.unlockAllOrientations();
         this.oDadosControleApp.cadastrando_cliente = true;
         this.oDadosControleApp.cadastrando_veiculo = false;
-
-        Orientation.unlockAllOrientations();
-
+        this.oDadosInstrucao.texto_instrucao = INSTRUCAO_INICIAL;
+    
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
 
@@ -51,7 +74,7 @@ export default class TelaClienteEndereco extends Component {
         
         // if(this.validarDadosPessoais()) {
             // this.oGerenciadorContextoApp.setTelaAnterior(this);
-            this.oNavegacao.navigate('Confirmação dos dados', this.state);
+            this.oNavegacao.navigate('Confirmação dos dados');
         // }
     }
 

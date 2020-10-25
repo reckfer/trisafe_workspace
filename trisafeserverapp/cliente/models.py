@@ -249,6 +249,13 @@ class Cliente(models.Model, GerenciadorLog):
         return self.__criar_json__()
 
     def __criar_json__(self):
+        url_foto = ''
+        
+        try:
+            url_foto = self.foto_cnh.url
+        except Exception:
+            pass
+
         ret = {
             "id_cliente_iter": self.id_cliente_iter,
             "nome": self.nome,
@@ -265,7 +272,11 @@ class Cliente(models.Model, GerenciadorLog):
             "telefone": self.telefone,
             "email": self.email,
             'id_signatario_contrato': self.id_signatario_contrato,
-            }
+            "foto_cnh": {
+                'url': url_foto,
+                'foto_base64': '',
+            },
+        }
         return ret
 
     def __str__(self):

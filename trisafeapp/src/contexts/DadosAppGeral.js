@@ -90,7 +90,9 @@ export const DADOS_CONTROLE_APP = {
     exibir_foto: true,
     exibir_modal: false,
     config_modal: DADOS_MENSAGEM_MODAL,
-    tela_na_horizontal: false
+    tela_na_horizontal: false,
+    manter_tela_na_horizontal: false,
+    qtd_retentativas_comunicacao: 0,
 };
 
 export const DADOS_INSTRUCAO_USUARIO = {
@@ -130,11 +132,6 @@ export const ESTADO = {
     cod_mensagem: '0',
     http_status: '0'
 }
-
-// export const VEICULO_ATUAL = {
-//     indice_lista: -1,
-//     veiculo: DADOS_VEICULO
-// }
 
 export const DADOS_APP_GERAL = {
     dados_app: {

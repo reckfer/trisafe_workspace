@@ -33,6 +33,8 @@ export default class TelaClienteInicio extends Component {
         this.tratarDadosCliente = this.tratarDadosCliente.bind(this);
         this.irParaTestesRapidos = this.irParaTestesRapidos.bind(this);
         this.registrarEventoFoco = this.registrarEventoFoco.bind(this);
+        this.definirDadosPadraoTela = this.definirDadosPadraoTela.bind(this);
+        console.log(NOME_COMPONENTE, 'constructor()');
     }
     
     componentDidMount() {
@@ -40,22 +42,33 @@ export default class TelaClienteInicio extends Component {
         
         this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
         
-        this.oDadosControleApp.cadastrando_cliente = true;
-        this.oDadosControleApp.cadastrando_veiculo = false;
+        this.registrarEventoFoco();
         
-        Orientation.unlockAllOrientations();
-
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
 
-    componentWillUnmount() {        
-        this.registrarEventoFoco();
+    componentWillUnmount() {
+        // let nomeFuncao = 'componentWillUnmount';
+        
+        // this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        // this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
 
     registrarEventoFoco() {
-        this.oNavegacao.addListener('focus', () => {
-            Orientation.unlockAllOrientations();
-        });
+        this.oNavegacao.addListener('focus', this.definirDadosPadraoTela);
+    }
+
+    definirDadosPadraoTela() {
+        let nomeFuncao = 'definirDadosPadraoTela';
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        Orientation.unlockAllOrientations();
+        this.oDadosControleApp.cadastrando_cliente = true;
+        this.oDadosControleApp.cadastrando_veiculo = false;
+        this.oDadosInstrucao.texto_instrucao = INSTRUCAO_INICIAL;
+    
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
 
     obterCliente() {
@@ -97,7 +110,7 @@ export default class TelaClienteInicio extends Component {
             this.oGerenciadorContextoApp.atribuirDados('cliente', oDados, this);
         }
         if(irPara) {
-            this.oNavegacao.navigate('Dados pessoais', this.state);
+            this.oNavegacao.navigate('Dados pessoais');
         }
     }
 

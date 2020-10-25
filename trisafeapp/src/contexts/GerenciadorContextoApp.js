@@ -24,6 +24,7 @@ export default class GerenciadorContextoApp {
         this._transportarLogServidor = this._transportarLogServidor.bind(this);
         this.oTelaAtual = null;
         this.oTelaAnterior = null;
+        this.oFuncaoAtual = null;
 
         AppState.addEventListener('change', this._transportarLogServidor);
         this.coletarInformacoesDispositivo();
@@ -62,6 +63,14 @@ export default class GerenciadorContextoApp {
     
     set componenteMensagemModal(oComponente) {
         this.oComponenteMensagemModal = oComponente;
+    };
+
+    set funcaoAtual(oFuncaoAtual) {
+        this.oFuncaoAtual = oFuncaoAtual;
+    };
+
+    get funcaoAtual() {
+        return this.oFuncaoAtual;
     };
 
     get appAtivo() {

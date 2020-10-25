@@ -31,14 +31,16 @@ export default class TelaMenuInicio extends Component {
 
         this.irParaMeusDados = this.irParaMeusDados.bind(this);
         this.irParaMeusVeiculos = this.irParaMeusVeiculos.bind(this);
+        this.registrarEventoFoco = this.registrarEventoFoco.bind(this);
+        this.definirDadosPadraoTela = this.definirDadosPadraoTela.bind(this);
     }
 
     componentDidMount() {
         let nomeFuncao = 'componentDidMount';
         
         this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
-
-        Orientation.unlockAllOrientations();
+        
+        this.registrarEventoFoco();
 
         this.inicializar();
         
@@ -56,7 +58,24 @@ export default class TelaMenuInicio extends Component {
         
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
+
+    registrarEventoFoco() {
+        this.oNavegacao.addListener('focus', this.definirDadosPadraoTela);
+    }
     
+    definirDadosPadraoTela() {
+        let nomeFuncao = 'definirDadosPadraoTela';
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        Orientation.unlockAllOrientations();
+
+        this.oDadosControleApp.cadastrando_cliente = false;
+        this.oDadosControleApp.cadastrando_veiculo = false;
+        this.oDadosInstrucao.texto_instrucao = INSTRUCAO_INICIAL;
+
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+    }
+
     irParaMeusDados() {
         this.oNavegacao.navigate('Cadastro', this.state);
     }
@@ -67,7 +86,7 @@ export default class TelaMenuInicio extends Component {
     }
 
     render() {
-        
+
         let botoesTela = [ 
             <Button title="Meus dados" key={1} onPress={this.irParaMeusDados} buttonStyle={{margin:10, padding: 10}} icon={<Icon name="user" color="#022F18" size={20} style={{margin:10}} />}></Button>, 
             <Button title="Meus Veículos" key={2} onPress={this.irParaMeusVeiculos} buttonStyle={{margin:10, padding:10}} icon={<Icon name="car" color="#022F18" size={20} style={{margin:10}} />}></Button>

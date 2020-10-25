@@ -30,10 +30,10 @@ export default class TelaCapturaFoto extends PureComponent {
         super();
         
         inicializarContextoComum(props, contexto, this, INSTRUCAO_INICIAL);
-        this.oDadosControleApp.tela_na_horizontal = true;
 
         this.capturarFotoCNH = this.capturarFotoCNH.bind(this);
         this.registrarEventoFoco = this.registrarEventoFoco.bind(this);
+        this.definirDadosPadraoTela = this.definirDadosPadraoTela.bind(this);
         this._tratarVoltarPeloDispositivo = this._tratarVoltarPeloDispositivo.bind(this);
 
         BackHandler.addEventListener('hardwareBackPress', this._tratarVoltarPeloDispositivo);
@@ -44,20 +44,27 @@ export default class TelaCapturaFoto extends PureComponent {
         
         this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
         
-        Orientation.lockToLandscapeLeft();
-        this.oDadosControleApp.abrir_camera = false;
+        // this.registrarEventoFoco();
 
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
     
-    componentWillUnmount() {
-        this.registrarEventoFoco();
+    registrarEventoFoco() {
+        
+        this.oNavegacao.addListener('focus', this.definirDadosPadraoTela);
     }
 
-    registrarEventoFoco() {
-        this.oNavegacao.addListener('focus', () => {
-            Orientation.lockToLandscapeLeft();
-        });
+    definirDadosPadraoTela() {
+        let nomeFuncao = 'definirDadosPadraoTela';
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+    
+        Orientation.lockToLandscapeLeft();
+        this.oDadosControleApp.abrir_camera = false;
+        this.oDadosInstrucao.texto_instrucao = INSTRUCAO_INICIAL;
+
+        this.oGerenciadorContextoApp.atualizarEstadoTela(this);
+
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
     
     _tratarVoltarPeloDispositivo() {
@@ -77,23 +84,16 @@ export default class TelaCapturaFoto extends PureComponent {
             
             const options = { quality: 0.5, base64: true, doNotSave: true, orientation: 'landscapeLeft'};
             this.camera.takePictureAsync(options).then((data) => {
-                
-                console.log('Foto tirada: ', data.uri);
-
-                // let dadosFotos = clonarObjeto(DADOS_FOTOS);
-                // dadosFotos.uri_local_cnh = data.uri;
-                // dadosFotos.foto_cnh_base64 = data.base64;
-                // this.oDadosApp.foto = dadosFotos;
 
                 this.oDadosFoto.caminho_local = data.uri;
                 this.oDadosFoto.foto_base64 = data.base64;
-
+                this.oDadosControleApp.manter_tela_na_horizontal = true;
+                
                 const pop = StackActions.pop(1);
 
                 console.log('Removendo tela camera...', JSON.stringify(pop));
                 this.oNavegacao.dispatch(pop);
 
-                //const push = StackActions.push('Modais', { screen: 'Visualizacao Foto' });
                 this.oNavegacao.navigate('Visualizacao Foto');
             }).catch((oExcecao) => {
                 this.oUtil.tratarExcecao(oExcecao);
@@ -124,8 +124,7 @@ export default class TelaCapturaFoto extends PureComponent {
                     style={estiloFoto}
                     type={RNCamera.Constants.Type.back}
                     flashMode={RNCamera.Constants.FlashMode.off}
-                    onCameraReady={() => {
-                    }}
+                    onCameraReady={this.definirDadosPadraoTela}
                     captureAudio={false}
                     autoFocusPointOfInterest={{x: 0.7, y: 0.7}}
                     onGoogleVisionBarcodesDetected={({ barcodes }) => {

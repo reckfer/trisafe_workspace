@@ -33,6 +33,8 @@ export default class TelaModalTestesCadastro extends Component {
 
         this.objUtilTests = new UtilTests();
 
+        this.registrarEventoFoco = this.registrarEventoFoco.bind(this);
+        this.definirDadosPadraoTela = this.definirDadosPadraoTela.bind(this);
         this.inicializarDadosTela = this.inicializarDadosTela.bind(this);
         this.irParaTesteCadastroIter = this.irParaTesteCadastroIter.bind(this);
         this.irParaTesteBoletoGerenciaNet = this.irParaTesteBoletoGerenciaNet.bind(this); 
@@ -59,17 +61,31 @@ export default class TelaModalTestesCadastro extends Component {
         
         this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
         
-        Orientation.unlockAllOrientations();
-        this.inicializarDadosTela();
+        this.registrarEventoFoco();
         
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+    }
+    registrarEventoFoco() {
+	
+        this.oNavegacao.addListener('focus', this.definirDadosPadraoTela);
+    }
+    
+    definirDadosPadraoTela() {
+        let nomeFuncao = 'definirDadosPadraoTela';
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+    
+        Orientation.unlockAllOrientations();
+
+        //if(!this.oGerenciadorContextoApp.temDados()) {
+            this.obterUltimoCliente();
+        //}
+    
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
 
     inicializarDadosTela() {
 
-        if(!this.oGerenciadorContextoApp.temDados()) {
-            this.obterUltimoCliente();
-        }
+        
     }
 
     irParaTesteCadastroIter() {

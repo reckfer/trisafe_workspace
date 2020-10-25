@@ -150,7 +150,7 @@ class Veiculo(models.Model, GerenciadorLog):
             
             m_veiculo = retorno.dados
             
-            nome_arquivo = "foto_doc_%s.jpg" % self.cliente.cpf
+            nome_arquivo = "foto_doc_%s_%s.jpg" % (self.cliente.cpf, self.placa)
 
             foto_doc = base64.b64decode(foto_doc_base64)
 

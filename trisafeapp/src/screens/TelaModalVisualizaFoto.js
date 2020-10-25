@@ -29,14 +29,14 @@ export default class TelaModalVisualizaFoto extends Component {
     
     constructor(props, contexto) {
         super();
-        
+
         inicializarContextoComum(props, contexto, this, INSTRUCAO_INICIAL);
-        this.oDadosControleApp.tela_na_horizontal = true;
 
         this.salvar = this.salvar.bind(this);
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
         this.capturarNovamente = this.capturarNovamente.bind(this);
         this.registrarEventoFoco = this.registrarEventoFoco.bind(this);
+        this.definirDadosPadraoTela = this.definirDadosPadraoTela.bind(this);
         this.avancar = this.avancar.bind(this);
         this.voltar = this.voltar.bind(this);
     }
@@ -45,24 +45,39 @@ export default class TelaModalVisualizaFoto extends Component {
         let nomeFuncao = 'componentDidMount';
         
         this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
-        
-        Orientation.lockToLandscapeLeft();
-
-        if(this.oDadosControleApp.abrir_camera) {
-            this.voltar();
-        }
+    
+        this.registrarEventoFoco();
 
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
 
-    componentWillUnmount() {
-        this.registrarEventoFoco();
-    }
-
     registrarEventoFoco() {
-        this.oNavegacao.addListener('focus', () => {
-            Orientation.lockToLandscapeLeft();
-        });
+	
+        this.oNavegacao.addListener('focus', this.definirDadosPadraoTela);
+    }
+    
+    definirDadosPadraoTela() {
+        Orientation.lockToLandscapeLeft();
+        
+        let nomeFuncao = 'definirDadosPadraoTela';
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+        this.oDadosControleApp.manter_tela_na_horizontal = true;
+
+        if(this.oDadosControleApp.abrir_camera) {
+            
+            this.oUtil.exibirMensagem('Preparando câmera...', false, null, true);
+            
+            // Aguarda 2 segundos com a intencao de garantir que a tela fique na horizontal antes de renderizar a mascara.
+            setTimeout(() => {
+                this.voltar();
+                this.oUtil.fecharMensagem();
+            }, 2000);
+        } else {
+            this.oDadosInstrucao.texto_instrucao = INSTRUCAO_INICIAL;
+            this.oGerenciadorContextoApp.atualizarEstadoTela(this);
+        }
+
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
 
     salvar() {
@@ -90,9 +105,23 @@ export default class TelaModalVisualizaFoto extends Component {
     }
 
     tratarDadosRetorno(oDados, oEstado) {
-        this.oDadosApp.foto = clonarObjeto(DADOS_FOTO);
+        let url_foto_cliente = this.oDadosCliente.foto_cnh.url;
+        let url_foto_veiculo_atual = this.oDadosVeiculoAtual.foto_doc.url;
 
-        let oFuncaoMensagem = () => {};
+        // Limpa os dados nas referencias de veiculo atual.
+        this.oDadosApp.veiculo = clonarObjeto(DADOS_VEICULO);
+        this.oDadosVeiculoAtual = this.oDadosApp.veiculo;
+
+        // Limpa os dados das fotos.
+        this.oDadosCliente.foto_cnh = clonarObjeto(DADOS_FOTO);
+        //this.oDadosVeiculoAtual.foto_doc = clonarObjeto(DADOS_FOTO);
+        this.oDadosApp.foto = clonarObjeto(DADOS_FOTO);
+        
+        // Mantem as URLs das ultimas fotos tiradas, para indicar que as fotos ja foram tiradas.
+        this.oDadosCliente.foto_cnh.url = url_foto_cliente;
+        this.oDadosVeiculoAtual.foto_doc = url_foto_veiculo_atual;
+
+        let oFuncaoMensagem = null;
         
         if(oEstado.ok) {
             oFuncaoMensagem = this.avancar;
@@ -102,14 +131,13 @@ export default class TelaModalVisualizaFoto extends Component {
     }
 
     avancar() {
-        Orientation.unlockAllOrientations();
         let proximaTela = 'Contratacao';
 
-        if(this.oDadosControleApp.novo_veiculo) {
+        if(this.oDadosControleApp.cadastrando_cliente || this.oDadosControleApp.cadastrando_veiculo) {
             proximaTela = 'Veiculo Inicio';
         }
-        this.oDadosControleApp.novo_cliente = false;
-        this.oDadosControleApp.novo_veiculo = false;
+        this.oDadosControleApp.cadastrando_cliente = false;
+        this.oDadosControleApp.cadastrando_veiculo = false;
         
         const pop = StackActions.pop(1);
 
@@ -118,6 +146,7 @@ export default class TelaModalVisualizaFoto extends Component {
 
         console.log('Navegando para a tela...', proximaTela);
 
+        Orientation.unlockAllOrientations();
         this.oNavegacao.navigate('Cadastro', { screen: proximaTela });
     }
     
@@ -144,33 +173,14 @@ export default class TelaModalVisualizaFoto extends Component {
         if(this.oDadosFoto.foto_base64) {
 
             console.log('Vai renderizar foto tirada...');
-            //let estiloAreaFoto = clonarObjeto(styles.areaCliente);
-            // estiloAreaFoto.flex = 1
-            // estiloAreaFoto.justifyContent= 'center';
-            // estiloAreaFoto.alignItems = 'center';
-            // estiloAreaFoto.backgroundColor = 'green';
-            // estiloAreaFoto.margin = 30;
-            // estiloAreaFoto.marginTop = 50;
-            // estiloAreaFoto.marginRight = 60;
 
             let estiloAreaFoto =  {
                 flex: 1,
                 flexDirection: 'row',
                 justifyContent: 'flex-start',
-                // flexDirection: 'column',
-                // justifyContent: 'flex-start',
-                //alignItems: 'center',
-                //backgroundColor: '#f5f5f5',
-               // padding: 50,
             }
             let estiloFoto =  {
                 flex: 1,
-                //transform: [{ rotate: '90deg' }]
-                // flexDirection: 'column',
-                // justifyContent: 'center',
-                // alignItems: 'center',
-                //backgroundColor: '#f5f5f5',
-               // padding: 50,
             }
 
             return(

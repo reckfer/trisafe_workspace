@@ -35,6 +35,8 @@ export default class TelaContratacaoPrincipal extends Component {
         
         this.incluirContrato = this.incluirContrato.bind(this);
         this.tratarIncluirContrato = this.tratarIncluirContrato.bind(this);
+        this.registrarEventoFoco = this.registrarEventoFoco.bind(this);
+        this.definirDadosPadraoTela = this.definirDadosPadraoTela.bind(this);
         this.voltar = this.voltar.bind(this);
     }
     
@@ -43,7 +45,7 @@ export default class TelaContratacaoPrincipal extends Component {
 
         this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
         
-        Orientation.unlockAllOrientations();
+        this.registrarEventoFoco();
 
         if(this.oGerenciadorContextoApp.temDados()) {
             
@@ -51,6 +53,23 @@ export default class TelaContratacaoPrincipal extends Component {
                 this.incluirContrato();
             }
         }
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+    }
+
+    registrarEventoFoco() {
+	
+        this.oNavegacao.addListener('focus', this.definirDadosPadraoTela);
+    }
+
+    definirDadosPadraoTela() {
+        let nomeFuncao = 'definirDadosPadraoTela';
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        Orientation.unlockAllOrientations();
+        this.oDadosControleApp.cadastrando_cliente = false;
+        this.oDadosControleApp.cadastrando_veiculo = false;
+        this.oDadosInstrucao.texto_instrucao = INSTRUCAO_INICIAL;
+
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
 

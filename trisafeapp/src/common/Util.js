@@ -1,5 +1,7 @@
 'use strict';
+import Orientation from "react-native-orientation";
 import { clonarObjeto, DADOS_BOTAO, DADOS_MENSAGEM_MODAL } from "../contexts/DadosAppGeral";
+import NetInfo from "@react-native-community/netinfo";
 
 const NOME_COMPONENTE = 'Util';
 
@@ -32,7 +34,7 @@ export default class Util {
         oBotoesModal.push(oBotao);
     }
 
-    exibirMensagem(textoMensagem, indAlerta, oFuncaoAlerta) {
+    exibirMensagem(textoMensagem, indAlerta, oFuncaoAlerta, indFixarHorizontal) {
         let nomeFuncao = 'exibirMensagem';
 
         this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
@@ -53,7 +55,29 @@ export default class Util {
         } else {
             this.oDadosControleApp.config_modal = clonarObjeto(DADOS_MENSAGEM_MODAL);    
         }
-        this.oGerenciadorContextoApp.atualizarMensagemModal();
+
+        if(indFixarHorizontal === undefined) {
+
+            Orientation.getOrientation((err, orientacaoAtual) => {
+            
+                if(!err) {
+                    this.oDadosControleApp.tela_na_horizontal = false;
+                    
+                    if (orientacaoAtual && orientacaoAtual.trim().toUpperCase().indexOf('LANDSCAPE') >= 0) {
+                        this.oDadosControleApp.tela_na_horizontal = true;
+                    }
+
+                    this.oGerenciadorContextoApp.atualizarMensagemModal();
+                } else {
+                    this.tratarExcecao(err);
+                }
+            });
+        } else {
+            this.oDadosControleApp.tela_na_horizontal = indFixarHorizontal;
+            
+            this.oGerenciadorContextoApp.atualizarMensagemModal();
+        }
+        
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
 
@@ -91,6 +115,50 @@ export default class Util {
         this.exibirMensagem(mensagem, true);
 
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+
+        this.oRegistradorLog.transportar();
+    }
+
+    tratarErroComunicacao(oErro) {
+        let nomeFuncao = 'tratarErroComunicacao';
+
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        if(oErro) {
+            let mensagem = 'No momento não é possível comunicar com nossos servidores.';
+            this.oRegistradorLog.registrar(JSON.stringify(oErro));
+
+            this.fecharMensagem();
+
+            if (oErro.name && oErro.name.trim().toUpperCase().indexOf('ABORTERROR') >= 0) {
+                let mensagem = 'O tempo máximo de comunicação foi excedido.';
+
+                if(this.oGerenciadorContextoApp.funcaoAtual) {
+                    let tempoEsperaRetentativa = 30000;
+                    if(__DEV__) {
+                        tempoEsperaRetentativa = 5000;
+                    }
+                    if(this.oDadosControleApp.qtd_retentativas_comunicacao < 5) {
+                        mensagem += `\n\nTentará novamente em ${tempoEsperaRetentativa/1000} segundos...`;
+                        
+                        this.oDadosControleApp.qtd_retentativas_comunicacao++;
+
+                        setTimeout(this.oGerenciadorContextoApp.funcaoAtual, tempoEsperaRetentativa);
+                        this.exibirMensagem(mensagem);
+                    } else {
+                        mensagem = 'Lamentamos a impossibilidade de atendê-lo no momento.\n\nPor favor, tente novamente mais tarde.';
+                        this.exibirMensagem(mensagem, true);
+                    }
+                }
+                return;
+            }
+            this.exibirMensagem(mensagem.concat('\nTente novamente mais tarde.'));
+
+            this.oRegistradorLog.transportar();
+            this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        } else {
+            this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+        }
     }
 
     tratarExcecaoLogs(oExcecao) {
@@ -113,5 +181,16 @@ export default class Util {
         this.oRegistradorLog.registrar(`${mensagem}. Stack: ${stack}`);
 
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+    }
+
+    verificarConexaoRedeAtiva(callback) {
+        NetInfo.fetch().then(state => {
+            console.log("Connection type", state.type);
+            console.log("Is connected?", state.isConnected);
+
+            if(callback) {
+                callback();
+            }
+          });
     }
 };

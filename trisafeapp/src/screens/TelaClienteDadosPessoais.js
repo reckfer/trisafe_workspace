@@ -29,6 +29,8 @@ export default class TelaClienteDadosPessoais extends Component {
         
         inicializarContextoComum(props, contexto, this, INSTRUCAO_INICIAL);
 
+        this.registrarEventoFoco = this.registrarEventoFoco.bind(this);
+        this.definirDadosPadraoTela = this.definirDadosPadraoTela.bind(this);
         this.voltar = this.voltar.bind(this);
         this.avancar = this.avancar.bind(this);
     }
@@ -37,12 +39,34 @@ export default class TelaClienteDadosPessoais extends Component {
         let nomeFuncao = 'componentDidMount';
 
         this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+        
+        this.registrarEventoFoco();
 
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+    }
+
+    componentWillUnmount() {
+        // let nomeFuncao = 'componentWillUnmount';
+        
+        // this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+        
+        // this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+    }
+
+    registrarEventoFoco() {
+        
+        this.oNavegacao.addListener('focus', this.definirDadosPadraoTela);
+    }
+
+    definirDadosPadraoTela() {
+        let nomeFuncao = 'definirDadosPadraoTela';
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+    
+        Orientation.unlockAllOrientations();
         this.oDadosControleApp.cadastrando_cliente = true;
         this.oDadosControleApp.cadastrando_veiculo = false;
-        
-        Orientation.unlockAllOrientations();
-
+        this.oDadosInstrucao.texto_instrucao = INSTRUCAO_INICIAL;
+    
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
     

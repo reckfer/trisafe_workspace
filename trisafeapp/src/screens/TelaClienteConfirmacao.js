@@ -31,6 +31,9 @@ export default class TelaClienteConfirmacao extends Component {
         
         this.salvar = this.salvar.bind(this);
         this.tratarDadosRetorno = this.tratarDadosRetorno.bind(this);
+        this.irParaFotoCNH = this.irParaFotoCNH.bind(this);
+        this.registrarEventoFoco = this.registrarEventoFoco.bind(this);
+        this.definirDadosPadraoTela = this.definirDadosPadraoTela.bind(this);
         this.avancar = this.avancar.bind(this);
         this.voltar = this.voltar.bind(this);
     }
@@ -40,13 +43,28 @@ export default class TelaClienteConfirmacao extends Component {
         
         this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
         
-        this.oDadosControleApp.cadastrando_cliente = true;
-        this.oDadosControleApp.cadastrando_veiculo = false;
-
-        Orientation.unlockAllOrientations();
+        this.registrarEventoFoco();
 
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
+
+    registrarEventoFoco() {
+	
+        this.oNavegacao.addListener('focus', this.definirDadosPadraoTela);
+    }
+
+    definirDadosPadraoTela() {
+        let nomeFuncao = 'definirDadosPadraoTela';
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+    
+        Orientation.unlockAllOrientations();
+        this.oDadosControleApp.cadastrando_cliente = true;
+        this.oDadosControleApp.cadastrando_veiculo = false;
+        this.oDadosInstrucao.texto_instrucao = INSTRUCAO_INICIAL;
+    
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
+    }
+
     salvar() {
         try {
             let metodoURI = '/clientes/incluir/';
@@ -65,22 +83,59 @@ export default class TelaClienteConfirmacao extends Component {
     }
 
     tratarDadosRetorno(oDados, oEstado) {
-        let oFuncaoMensagem = () => {};
-        
-        if(oEstado.ok) {
-            oFuncaoMensagem = this.avancar;
-        }
+        let nomeFuncao = 'tratarDadosRetorno';
+        let mensagem = '';
 
-        this.oUtil.exibirMensagem(oEstado.mensagem, true, oFuncaoMensagem);        
+        this.oRegistradorLog.registrarInicio(NOME_COMPONENTE, nomeFuncao);
+
+        if (oEstado.mensagem && oEstado.mensagem.trim()) {
+            mensagem = oEstado.mensagem;
+        }
+        if(!oEstado.ok) {
+
+            this.oUtil.exibirMensagem(mensagem, true, this.voltar);
+        } else {
+        
+            if(this.oDadosControleApp.novo_cliente) {
+
+                mensagem += '\n\nA câmera será aberta para você capturar uma foto da sua CNH.';
+
+                this.oUtil.exibirMensagem(mensagem, true, this.irParaFotoCNH);                    
+            } else if(this.oDadosCliente.foto_cnh.url) {
+                
+                // Verifica se tem foto e pede confirmacao para atualizar.
+                mensagem += '\n\nDeseja atualizar a foto da sua CNH?';
+                
+                this.oUtil.definirBotaoMensagem('Sim', this.irParaFotoCNH);
+                this.oUtil.definirBotaoMensagem('Agora Não', this.avancar);
+                this.oUtil.exibirMensagem(mensagem);
+                
+            } else {
+                this.oUtil.exibirMensagem(mensagem, true, this.irParaFotoCNH);
+            }
+        }
+        this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
     }
 
     avancar() {
+        Orientation.unlockAllOrientations();
+
         this.oDadosApp.foto = this.oDadosCliente.foto_cnh;
         this.oDadosFoto = this.oDadosApp.foto;
-        this.oNavegacao.navigate('Captura Foto');
-        
+
+        this.oNavegacao.navigate('Veiculo Inicio');
     }
-     
+    
+    irParaFotoCNH() {
+        // Importante manter a rotação na horizontal para garantir correta renderização da máscara da camera.
+        Orientation.lockToLandscapeLeft();
+
+        this.oDadosApp.foto = this.oDadosCliente.foto_cnh;
+        this.oDadosFoto = this.oDadosApp.foto;
+        
+        this.oNavegacao.navigate('Visualizacao Foto');
+    }
+
     voltar() {
         this.oNavegacao.goBack();
     }

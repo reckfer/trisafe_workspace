@@ -27,14 +27,15 @@ export default class ComunicacaoHTTP {
 
         if (__DEV__) {
             protocol = 'http://';
-            domain = '192.168.0.103:8000';
+            domain = '192.168.1.118:8000';
         }
         return protocol + domain + metodo;
     };
 
     getParametrosHTTPS(oDados) {
+        const oControladorConexao = new AbortController();
         let metodo = 'POST';
-
+        
         if(!oDados) {
             oDados = '{}';
         } else {
@@ -42,12 +43,17 @@ export default class ComunicacaoHTTP {
                 oDados.chaves = this.oDadosChaves;    
             }
             oDados.dados_dispositivo = this.oDadosDispositivo;
-            // if(!oDados.hasOwnProperty('dados_dispositivo')) {
-            //     oDados['dados_dispositivo'] = this.oDadosDispositivo;
-            // }
+        }
+        // 20 segundos
+        let tempoTimeout = 20000;
+        if(__DEV__) {
+            tempoTimeout = 5000;
         }
 
-        return {
+        // Cancel the request if it takes more than parameterized timeout.
+        setTimeout(() => oControladorConexao.abort(), tempoTimeout);
+
+        return { 
             method: metodo,
             headers: {
                 //'Authorization': 'Token 3f7edf70591040bf58437b0cc5d986972ced732e',
@@ -57,6 +63,8 @@ export default class ComunicacaoHTTP {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(oDados),
+            mode: 'cors',
+            signal: oControladorConexao.signal,
         }
     };
 
@@ -67,14 +75,7 @@ export default class ComunicacaoHTTP {
 
         this.oUtil.exibirMensagem('Processando. Aguarde...');
         this.oDadosControleApp.processando_requisicao = true;
-
-        // if(this.oComponente) {
-        //     this.oComponente.texto_instrucao = this.oDadosInstrucao.texto_instrucao;
-        //  //   this.oDadosInstrucao.texto_instrucao = 'Processando. Aguarde...';
-
-        //    // this.oGerenciadorContextoApp.atualizarEstadoTela(this.oComponente);
-        // }
-
+        
         let url = this.getURL(metodoURI);
         let oParametrosHTTPS = this.getParametrosHTTPS(oDadosRequisicao);
 
@@ -86,7 +87,7 @@ export default class ComunicacaoHTTP {
                 this.tratarRetornoServidor(oJsonDados, oFuncaoCallback, suprimirMsgServidor, ignorarCallbackSeErro);
             })
             .catch((oExcecao) => {
-                this.oUtil.tratarExcecao(oExcecao);
+                this.oUtil.tratarErroComunicacao(oExcecao);
             });
         
         this.oRegistradorLog.registrarFim(NOME_COMPONENTE, nomeFuncao);
@@ -234,7 +235,7 @@ export default class ComunicacaoHTTP {
             
         if(this.oComponente) {
             
-            this.oDadosInstrucao.texto_instrucao = this.oComponente.texto_instrucao;
+            //this.oDadosInstrucao.texto_instrucao = this.oComponente.texto_instrucao;
             this.oGerenciadorContextoApp.atualizarEstadoTela(this.oComponente);
         }
         
